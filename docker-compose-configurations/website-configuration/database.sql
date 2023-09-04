@@ -14,6 +14,20 @@ CREATE TABLE users (
     -- Add other user-related fields as needed
 );
 
+-- Create the "administrators" table to store administrator information
+CREATE TABLE administrators (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    -- Add other administrator-related fields as needed
+);
+
+-- Create the "moderators" table to store moderator information
+CREATE TABLE moderators (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    -- Add other moderator-related fields as needed
+);
+
 -- Create the "oauth_connections" table to store OAuth provider connections
 CREATE TABLE oauth_connections (
     id SERIAL PRIMARY KEY,
