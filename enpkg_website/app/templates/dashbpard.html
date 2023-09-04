@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <!-- Include the navigator template for the header -->
+    {% include 'navigator.html' %}
+
+    <div class="dashboard-container">
+        <h1>Real-time Dashboard</h1>
+        <div id="data-container">
+            <!-- Data updates will be displayed here -->
+        </div>
+        <button id="update-data-button" class="btn btn-primary">Update Data</button>
+    </div>
+
+    <!-- Include the footer template for the footer -->
+    {% include 'footer.html' %}
+
+    <script>
+        const socket = io.connect(window.location.origin);
+
+        // Listen for data updates from the server
+        socket.on('data_updated', (data) => {
+            // Update the UI with the received data
+            updateUI(data);
+        });
+
+        function updateUI(data) {
+            // Update the UI elements with the new data
+            const dataContainer = document.getElementById('data-container');
+            dataContainer.innerHTML = `<p>Data: ${data}</p>`;
+        }
+
+        // JavaScript code for updating data on the server
+        const updateDataButton = document.getElementById('update-data-button');
+        updateDataButton.addEventListener('click', () => {
+            const newData = 'New data to be sent to the server';
+            socket.emit('update_data', newData);
+        });
+    </script>
+</body>
+</html>

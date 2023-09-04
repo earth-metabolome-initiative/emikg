@@ -1,0 +1,53 @@
+version: '3'
+services:
+  web:
+    build:
+      context: ./docker-compose-configurations/website-configuration
+    ports:
+      - "80:80"
+    depends_on:
+      - postgres_database
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - ".:/app"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  postgres_database:
+    image: postgres:latest
+    volumes:
+      - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  postgres_database_backup:
+    build:
+       # Path to the directory containing your Dockerfile and scripts
+      context: ./docker-compose-configurations/postgres-backup-configuration
+      args:
+        - BACKUP_SERVER_USERNAME=${BACKUP_SERVER_USERNAME}
+        - BACKUP_SERVER_NAME=${BACKUP_SERVER_NAME}
+        - BACKUP_SERVER_PORT=${BACKUP_SERVER_PORT}
+        - BACKUP_REMOTE_PATH=${BACKUP_REMOTE_PATH}
+    depends_on:
+      - postgres_database
+    volumes:
+      - ${POSTGRES_DATABASE_DIRECTORY}:/backup_source
+    secrets:
+      - source: postgres_database_backup_ssh_private_key
+        target: postgres_database_backup_ssh_private_key
+        mode: 0600
+secrets:
+  postgres_database_backup_ssh_private_key:
+    file: ${BACKUP_SERVER_PRIVATE_KEY_PATH}

@@ -1,0 +1,13 @@
+{% extends 'navigator.html' %}
+
+{% block content %}
+    <div class="login-container">
+        <div class="login-form">
+            <h2>Login with OAuth</h2>
+            <p>Click one of the buttons below to log in:</p>
+            <a href="{{ url_for('oauth_login', provider='google') }}" class="btn btn-google">Login with Google</a>
+            <a href="{{ url_for('oauth_login', provider='facebook') }}" class="btn btn-facebook">Login with Facebook</a>
+            <!-- Add more OAuth login options as needed -->
+        </div>
+    </div>
+{% endblock %}
