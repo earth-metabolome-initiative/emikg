@@ -1,9 +1,16 @@
--- Create the "translations" table to store translations
+-- Create the "translations" table to store translations.
+-- The combination of the label and lang columns in the translations table
+-- must be unique, so that we can have multiple translations for the same
+-- label, but not multiple translations for the same label and lang.
 CREATE TABLE translations (
     id SERIAL PRIMARY KEY,
-    key VARCHAR(255) NOT NULL UNIQUE,
-    lang VARCHAR(10) NOT NULL,
-    text TEXT NOT NULL
+    label VARCHAR(255) NOT NULL,
+    lang VARCHAR(255) NOT NULL,
+    translation TEXT NOT NULL,
+    last_updated_by INT REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE (label, lang)
 );
 
 -- Create the "users" table to store user information

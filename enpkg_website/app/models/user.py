@@ -53,6 +53,12 @@ class User(UserInterface):
             )
         ).scalar()
     
+    @staticmethod
+    def must_be_moderator() -> None:
+        """Raise ValueError if the user is not an moderator."""
+        if not User.from_flask_session().is_moderator():
+            raise Unauthorized()
+
     def is_moderator(self) -> bool:
         """Return True if the user is a moderator.
         
