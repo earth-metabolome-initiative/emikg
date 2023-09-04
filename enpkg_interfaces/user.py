@@ -48,7 +48,15 @@ class User:
     def is_author_of_sample(self, sample: Type[Sample]) -> bool:
         """Return True if the user is the author of the sample."""
         return self.get_user_id() == sample.get_author_user_id()
-    
+
+    def delete(self):
+        """Delete the user."""
+        raise NotImplementedError(
+            "Abstract method 'delete' must be implemented in subclass. "
+            f"It was not implemented in {self.__class__.__name__}."
+        )
+
+
     @classmethod
     def is_valid_user_id(cls, user_id: int) -> bool:
         """Return True if the user ID is valid.
