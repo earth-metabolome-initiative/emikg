@@ -1,7 +1,7 @@
 """Module providing the abstract sample Factory class for creating Sample classes."""
 
 from typing import Type, Optional
-from enpkg.samples import AbstractSample
+from enpkg_website.samples import AbstractSample
 
 
 class AbstractSampleFactory:

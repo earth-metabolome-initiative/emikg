@@ -1,6 +1,6 @@
 """Module providing the abstract Enricher class for extending the metadata of a Sample class."""
 from typing import Type
-from enpkg.samples import AbstractSample
+from enpkg_website.samples import AbstractSample
 
 
 class AbstractEnricher:
