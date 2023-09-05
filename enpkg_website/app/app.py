@@ -30,6 +30,3 @@ def handle_update_data(data):
     # Handle data updates here (e.g., process data)
     # Send updated data to all connected clients
     emit('data_updated', data, broadcast=True)
-
-if __name__ == '__main__':
-    socketio.run(app, debug=True)
