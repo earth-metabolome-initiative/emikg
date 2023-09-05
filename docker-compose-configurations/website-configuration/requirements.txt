@@ -3,3 +3,4 @@ flask_sqlalchemy
 flask_login
 authlib
 Flask-SocketIO
+dict_hash

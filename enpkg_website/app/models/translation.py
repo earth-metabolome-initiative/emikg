@@ -7,6 +7,46 @@ class Translation:
     """Class providing methods to update textual entries in the database."""
 
     @staticmethod
+    def retrieve_from_label_and_language(label: str, lang: str = "en") -> "Translation":
+        """Retrieve a translation from its label and language.
+
+        Parameters
+        ----------
+        label: str
+            Label of the translation to retrieve.
+        lang: str = "en"
+            Language of the translation to retrieve.
+
+        Implementative details
+        ----------------------
+        If the translation is not found in the requested language, then
+        the translation is searched in the default language (English).
+        If the translation is not found in the default language either,
+        then the translation is searched in any language. If the
+        translation is still not found, then an exception is raised.
+        """
+        return db.engine.execute(
+            """
+            SELECT label, translation, lang
+            FROM translations
+            WHERE label = :label AND lang = :lang
+            LIMIT 1
+            UNION
+            SELECT label, translation, lang
+            FROM translations
+            WHERE label = :label AND lang = 'en'
+            LIMIT 1
+            UNION
+            SELECT label, translation, lang
+            FROM translations
+            WHERE label = :label
+            LIMIT 1
+            """,
+            label=label,
+            lang=lang.lower()
+        ).first()
+
+    @staticmethod
     def update_translation(label: str, translation: str, lang: str):
         """Update or insert a translation in the database.
 
@@ -42,6 +82,11 @@ class Translation:
 
         if not label or not translation:
             raise ValueError("Label and translation must be non-empty strings")
+        
+        lang = lang.lower()
+
+        if len(lang) != 2:
+            raise ValueError("Language must be a two-letter code")
 
         db.engine.execute(
             """

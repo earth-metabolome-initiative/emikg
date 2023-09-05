@@ -21,6 +21,24 @@ CREATE TABLE users (
     -- Add other user-related fields as needed
 );
 
+-- Create the "tokens" table, which stores tokens for API access
+-- for a given user without requiring the user to log in.
+-- The table contains a token name, which when combined with the
+-- user ID is unique. The token itself is a random string, generated
+-- upon creation by the application.
+-- Furthermore, the token itself must be unique, so that a user
+-- can be identified uniquely by the token.
+CREATE TABLE tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    token_name VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    used_last_on TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE (user_id, token_name)
+    UNIQUE (token)
+);
+
 -- Create the "administrators" table to store administrator information
 CREATE TABLE administrators (
     id SERIAL PRIMARY KEY,
