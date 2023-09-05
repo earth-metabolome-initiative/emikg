@@ -15,7 +15,7 @@ CREATE TABLE translations (
 
 -- Create the "users" table to store user information
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    user_id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     -- Add other user-related fields as needed
@@ -64,9 +64,9 @@ CREATE TABLE oauth_connections (
     -- Add other OAuth-related fields as needed
 );
 
--- Create the "taxon" table to store metadata about taxon
-CREATE TABLE taxon (
-    id SERIAL PRIMARY KEY,
+-- Create the "taxons" table to store metadata about taxons
+CREATE TABLE taxons (
+    taxon_id SERIAL PRIMARY KEY,
     taxon_name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),

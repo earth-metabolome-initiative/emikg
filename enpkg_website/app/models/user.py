@@ -115,7 +115,7 @@ class User(UserInterface):
         return db.session.query(
             db.exists().where(
                 db.and_(
-                    db.table("users").column("id") == user_id
+                    db.table("users").column("user_id") == user_id
                 )
             )
         ).scalar()

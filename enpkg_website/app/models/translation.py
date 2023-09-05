@@ -1,21 +1,20 @@
 """Class providing methods to update textual entries in the database."""
 
-from ..app import db
+from flask import session
+from ..app import db, app
 from .user import User
 
 class Translation:
     """Class providing methods to update textual entries in the database."""
 
     @staticmethod
-    def retrieve_from_label_and_language(label: str, lang: str = "en") -> "Translation":
+    def retrieve_from_label(label: str) -> "Translation":
         """Retrieve a translation from its label and language.
 
         Parameters
         ----------
         label: str
             Label of the translation to retrieve.
-        lang: str = "en"
-            Language of the translation to retrieve.
 
         Implementative details
         ----------------------
@@ -23,28 +22,64 @@ class Translation:
         the translation is searched in the default language (English).
         If the translation is not found in the default language either,
         then the translation is searched in any language. If the
-        translation is still not found, then an exception is raised.
+        translation is still not found, then we return the textual
+        label itself as the translation, plus the message in all caps
+        that the translation is missing. A moderator can then add the
+        missing translation by clicking on the message.
         """
-        return db.engine.execute(
+        # We determine whether the session language was set.
+        # If not, we set it to the default language, i.e. English.
+        lang = session.get("lang", "en")
+
+        # We first try to retrieve the translation in the requested
+        # language. If not found, we try the default language.
+        # If not found, we try any language.
+        # If not found, we return the label itself as the translation
+        # and a message in all caps that the translation is missing.
+
+        translation = db.engine.execute(
             """
-            SELECT label, translation, lang
+            SELECT translation
             FROM translations
             WHERE label = :label AND lang = :lang
-            LIMIT 1
-            UNION
-            SELECT label, translation, lang
-            FROM translations
-            WHERE label = :label AND lang = 'en'
-            LIMIT 1
-            UNION
-            SELECT label, translation, lang
-            FROM translations
-            WHERE label = :label
-            LIMIT 1
             """,
             label=label,
-            lang=lang.lower()
-        ).first()
+            lang=lang
+        ).scalar()
+
+        # If the translation is not found in the requested language,
+        # we try the default language, if the default language is not
+        # the requested language.
+        if translation is None and lang != "en":
+            translation = db.engine.execute(
+                """
+                SELECT translation
+                FROM translations
+                WHERE label = :label AND lang = :lang
+                """,
+                label=label,
+                lang="en"
+            ).scalar()
+
+        # If the translation is not found in the requested language
+        # or in the default language, we try any language.
+        if translation is None:
+            translation = db.engine.execute(
+                """
+                SELECT translation
+                FROM translations
+                WHERE label = :label
+                """,
+                label=label
+            ).scalar()
+
+        # If the translation is still not found, we return the label
+        # itself as the translation and a message in all caps that
+        # the translation is missing.
+        if translation is None:
+            translation = f"{label} (TRANSLATION MISSING)"
+
+        return translation
 
     @staticmethod
     def update_translation(label: str, translation: str, lang: str):
@@ -101,3 +136,5 @@ class Translation:
             lang=lang,
             user_id=User.session_user_id()
         )
+
+app.jinja_env.globals.update(translation=Translation.retrieve_from_label)
