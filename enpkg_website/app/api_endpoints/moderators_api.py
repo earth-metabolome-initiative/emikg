@@ -18,7 +18,6 @@ def update_translation(lang: str, label: str):
     update or insert. The translation is sanitized before being inserted
     into the database so as to avoid SQL injection.
     """
-    
     if not request.is_json:
         return jsonify({"message": "Request body must be a JSON object"}), 400
     

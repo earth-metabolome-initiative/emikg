@@ -231,3 +231,115 @@ class User(UserInterface):
                 db.table("users").column("id") == self.get_user_id()
             )
         )
+
+    def promote_admin(self):
+        """Promote the user to administrator.
+        
+        Raises
+        ------
+        Unauthorized
+            If the user is not an administrator.
+
+        Implementative details
+        ----------------------
+        This method is implemented by inserting the user ID in the "administrators"
+        table, which is the table that contains the user IDs of the administrators.
+        """
+        # The current user session must be an administrator
+        User.must_be_administrator()
+
+        # If the current user is already an administrator, then we raise an exception
+        if self.is_administrator():
+            raise APIException("User is already an administrator.")
+        
+        # If the current user is the session user, or is an administrator,
+        # then promote the user to administrator
+        db.session.execute(
+            db.insert("administrators").values(
+                user_id=self.get_user_id()
+            )
+        )
+
+    def demote_admin(self):
+        """Demote the user from administrator.
+        
+        Raises
+        ------
+        Unauthorized
+            If the user is not an administrator.
+
+        Implementative details
+        ----------------------
+        This method is implemented by deleting the user ID from the "administrators"
+        table, which is the table that contains the user IDs of the administrators.
+        """
+        # The current user session must be an administrator
+        User.must_be_administrator()
+
+        # If the current user is NOT an administrator, then we raise an exception
+        if not self.is_administrator():
+            raise APIException("User is not an administrator.")
+        
+        # If the current user is the session user, or is an administrator,
+        # then demote the user from administrator
+        db.session.execute(
+            db.delete("administrators").where(
+                db.table("administrators").column("user_id") == self.get_user_id()
+            )
+        )
+
+    def promote_moderator(self):
+        """Promote the user to moderator.
+        
+        Raises
+        ------
+        Unauthorized
+            If the user is not an administrator.
+
+        Implementative details
+        ----------------------
+        This method is implemented by inserting the user ID in the "moderators"
+        table, which is the table that contains the user IDs of the moderators.
+        """
+        # The current user session must be an administrator
+        User.must_be_administrator()
+
+        # If the current user is already a moderator, then we raise an exception
+        if self.is_moderator():
+            raise APIException("User is already a moderator.")
+        
+        # If the current user is the session user, or is an administrator,
+        # then promote the user to moderator
+        db.session.execute(
+            db.insert("moderators").values(
+                user_id=self.get_user_id()
+            )
+        )
+
+    def demote_moderator(self):
+        """Demote the user from moderator.
+        
+        Raises
+        ------
+        Unauthorized
+            If the user is not an administrator.
+
+        Implementative details
+        ----------------------
+        This method is implemented by deleting the user ID from the "moderators"
+        table, which is the table that contains the user IDs of the moderators.
+        """
+        # The current user session must be an administrator
+        User.must_be_administrator()
+
+        # If the current user is NOT a moderator, then we raise an exception
+        if not self.is_moderator():
+            raise APIException("User is not a moderator.")
+        
+        # If the current user is the session user, or is an administrator,
+        # then demote the user from moderator
+        db.session.execute(
+            db.delete("moderators").where(
+                db.table("moderators").column("user_id") == self.get_user_id()
+            )
+        )
