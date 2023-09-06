@@ -22,6 +22,7 @@ class User:
             If the user ID does not exist.
         """
         if not self.is_valid_user_id(user_id):
+            self.illegal_user_id_callback(user_id)
             raise ValueError(
                 f"User ID #{user_id} does not exist."
             )
@@ -31,6 +32,10 @@ class User:
     def get_user_id(self) -> int:
         """Return user ID."""
         return self._user_id
+    
+    def illegal_user_id_callback(self, illegal_user_id: int) -> None:
+        """Method called upon detection of an illegal user ID."""
+        pass
 
     def is_administrator(self) -> bool:
         """Return True if the user is an administrator."""

@@ -343,3 +343,17 @@ class User(UserInterface):
                 db.table("moderators").column("user_id") == self.get_user_id()
             )
         )
+
+    def illegal_user_id_callback(self, illegal_user_id: int) -> None:
+        """Method called upon detection of an illegal user ID.
+        
+        Implementative details
+        ----------------------
+        This method handles the corner case where the provided user ID
+        is not present in the database, but is equal to the ID of the
+        current session. Such cases could represent users that have
+        recently been banned or deleted, and that are still logged in.
+        In such cases, we delete the session.
+        """
+        if illegal_user_id == User.session_user_id():
+            session.clear()
