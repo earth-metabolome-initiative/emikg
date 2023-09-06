@@ -1,7 +1,7 @@
 """Concretely implements the proxy taxon interface using SQLAlchemy."""
 from enpkg_interfaces import Taxon as TaxonInterface
 
-from ..app import db
+from ..application import db
 from ..exceptions import APIException
 from .user import User
 

@@ -6,7 +6,7 @@ from .user import User
 from .taxon import Taxon
 from ..exceptions import APIException
 
-from ..app import db
+from ..application import db
 
 class Sample(SampleInterface):
     """Class to represent a sample."""

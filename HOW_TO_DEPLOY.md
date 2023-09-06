@@ -69,13 +69,13 @@ sudo systemctl start docker
 To run the docker compose, you need to run the following command in the root directory of the project:
 
 ```bash
-docker-compose up -d
+docker-compose up -d --build -V
 ```
 
 Additionally, if you want to run the version with also the backup service enabled, you can run the following command:
 
 ```bash
-docker-compose --profile backup up -d
+docker-compose --profile backup up -d --build -V
 ```
 
 ### Common errors encountered when running the docker compose

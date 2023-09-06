@@ -1,7 +1,7 @@
 """API endpoints to manipulate taxons."""
 from flask import jsonify, request
 from ..models import Taxon
-from ..app import app
+from ..application import app
 from ..exceptions import APIException
 
 

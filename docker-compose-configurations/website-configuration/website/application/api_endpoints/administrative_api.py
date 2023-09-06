@@ -1,6 +1,6 @@
 """Subset of the APIs that require admin privileges."""
 from flask import jsonify
-from ..app import app
+from ..application import app
 from ..models import User
 
 # API endpoint to delete a user (requires admin permission)

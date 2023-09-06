@@ -1,7 +1,7 @@
 """Class providing methods to update textual entries in the database."""
 
 from flask import session
-from ..app import db, app
+from ..application import db, app
 from .user import User
 
 class Translation:

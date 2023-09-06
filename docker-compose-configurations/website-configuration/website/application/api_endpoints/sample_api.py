@@ -2,7 +2,7 @@
 
 from flask import jsonify, request
 from ..models import Sample
-from ..app import app
+from ..application import app
 from ..exceptions import APIException
 
 @app.route("/delete-sample/<int:sample_id>", methods=["DELETE"])

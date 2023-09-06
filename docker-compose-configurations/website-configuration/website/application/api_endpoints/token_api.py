@@ -1,6 +1,6 @@
 """APIs relative to token handling and operations possible with tokens."""
 from flask import jsonify
-from ..app import app
+from ..application import app
 from ..models import User
 
 

@@ -4,7 +4,7 @@ Such actions include but are not limited to:
 - Editing a textual label on the website so as to extend the website's internationalization support.
 """
 from flask import jsonify, request
-from ..app import app
+from ..application import app
 from ..models import Translation
 
 @app.route("/update-label/<lang>/<label>", methods=["POST"])

@@ -1,7 +1,9 @@
 flask
 flask_sqlalchemy
+psycopg2
 flask_login
 authlib
 Flask-SocketIO
 dict_hash
+requests
 enpkg_interfaces>=0.0.2

@@ -6,7 +6,7 @@ from flask import session
 
 from enpkg_interfaces import User as UserInterface
 
-from ..app import db
+from ..application import db
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
 
 
@@ -35,7 +35,7 @@ class User(UserInterface):
             If the token is not valid.
         """
         # To execute this operation, the user must not be already logged in.
-        if "user_id" in session:
+        if User.is_authenticated():
             raise APIException("User is already logged in.")
         user_id = db.session.query(
             db.table("tokens").column("user_id")
@@ -76,7 +76,7 @@ class User(UserInterface):
         inserted user.
         """
         # To execute this operation, the user must not be already logged in.
-        if "user_id" in session:
+        if User.is_authenticated():
             raise APIException("User is already logged in.")
 
         # We look up whether the ORCID exists in the orcid table of the database.
@@ -125,11 +125,16 @@ class User(UserInterface):
         The method removes the user ID from the Flask session.
         """
         session.pop("user_id", None)
+
+    @staticmethod
+    def is_authenticated() -> bool:
+        """Return whether the user is authenticated."""
+        return "user_id" in session
     
     @staticmethod
     def session_user_id() -> int:
         """Return a user id from the Flask session."""
-        if "user_id" not in session:
+        if not User.is_authenticated():
             raise NotLoggedIn()
         return session.get("user_id")
     

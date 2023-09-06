@@ -5,8 +5,8 @@ from .oauth import oauth
 
 orcid = oauth.register(
     name="orcid",
-    client_id=os.environ["ORCID_CLIENT_ID"],
-    client_secret=os.environ["ORCID_CLIENT_SECRET"],
+    client_id=os.environ["YOUR_ORCID_CLIENT_ID"],
+    client_secret=os.environ["YOUR_ORCID_CLIENT_SECRET"],
     access_token_url="https://orcid.org/oauth/token",
     access_token_params=None,
     authorize_url="https://orcid.org/oauth/authorize",
