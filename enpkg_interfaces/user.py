@@ -35,7 +35,6 @@ class User:
     
     def illegal_user_id_callback(self, illegal_user_id: int) -> None:
         """Method called upon detection of an illegal user ID."""
-        pass
 
     def is_administrator(self) -> bool:
         """Return True if the user is an administrator."""
