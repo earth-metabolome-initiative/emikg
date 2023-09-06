@@ -4,4 +4,4 @@ flask_login
 authlib
 Flask-SocketIO
 dict_hash
-enpkg_interfaces
+enpkg_interfaces>=0.0.2
