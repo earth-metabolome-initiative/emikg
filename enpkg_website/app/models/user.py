@@ -1,10 +1,13 @@
 """Concretely implements the proxy user interface using SQLAlchemy."""
-from flask import session
-from dict_hash import sha256
-from enpkg_interfaces import User as UserInterface
 from time import time
+
+from dict_hash import sha256
+from flask import session
+
+from enpkg_interfaces import User as UserInterface
+
 from ..app import db
-from ..exceptions import NotLoggedIn, Unauthorized, APIException
+from ..exceptions import APIException, NotLoggedIn, Unauthorized
 
 
 class User(UserInterface):
@@ -31,6 +34,9 @@ class User(UserInterface):
         NotLoggedIn
             If the token is not valid.
         """
+        # To execute this operation, the user must not be already logged in.
+        if "user_id" in session:
+            raise APIException("User is already logged in.")
         user_id = db.session.query(
             db.table("tokens").column("user_id")
         ).where(
@@ -38,9 +44,87 @@ class User(UserInterface):
         ).scalar()
         if user_id is None:
             raise Unauthorized()
+        
+        # We add the user ID to the Flask session.
+        session["user_id"] = user_id
+
         return User(
             user_id=user_id
         )
+    
+    @staticmethod
+    def from_orcid(orcid: str) -> "User":
+        """Return a user object from an ORCID.
+        
+        Parameters
+        ----------
+        orcid : str
+            ORCID.
+        
+        Implementation details
+        ----------------------
+        The method looks up whether the ORCID exists in the orcid
+        table of the database. If it does, we create a new user object
+        from the user ID associated with the ORCID. If it does not, then
+        we are currently creating a new user. We insert a new user in the
+        users table, and return a new user object from the user ID of the
+        newly inserted user. In the same transaction, we also insert the
+        ORCID in the orcid table alongside the user ID. The transactional
+        aspect is important, as it ensures that the ORCID is inserted only
+        if the user is successfully inserted.
+        Finally, we return a new user object from the user ID of the newly
+        inserted user.
+        """
+        # To execute this operation, the user must not be already logged in.
+        if "user_id" in session:
+            raise APIException("User is already logged in.")
+
+        # We look up whether the ORCID exists in the orcid table of the database.
+        # If it does, we create a new user object from the user ID associated with
+        # the ORCID.
+        user_id = db.session.query(
+            db.table("orcid").column("user_id")
+        ).where(
+            db.table("orcid").column("orcid") == orcid
+        ).scalar()
+
+        if user_id is None:
+            # Otherwise, we are currently creating a new user.
+            # We open a transaction, and insert a new user in the users table.
+            # We also insert the ORCID in the orcid table alongside the user ID.
+
+            with db.engine.begin() as connection:
+                # We insert a new user in the users table.
+                # We also insert the ORCID in the orcid table alongside the user ID.
+                user_id = connection.execute(
+                    db.insert("users").values(
+                        orcid=orcid
+                    )
+                ).lastrowid
+                connection.execute(
+                    db.insert("orcid").values(
+                        user_id=user_id,
+                        orcid=orcid
+                    )
+                )
+        # We add the user ID to the Flask session.
+        session["user_id"] = user_id
+
+        # Finally, we return a new user object from the user ID of the newly
+        # inserted user.
+        return User(
+            user_id=user_id
+        )
+    
+    @staticmethod
+    def logout() -> None:
+        """Logout the user.
+        
+        Implementation details
+        ----------------------
+        The method removes the user ID from the Flask session.
+        """
+        session.pop("user_id", None)
     
     @staticmethod
     def session_user_id() -> int:
@@ -355,5 +439,5 @@ class User(UserInterface):
         recently been banned or deleted, and that are still logged in.
         In such cases, we delete the session.
         """
-        if illegal_user_id == User.session_user_id():
-            session.clear()
+        if illegal_user_id == session.get("user_id", None):
+            User.logout()

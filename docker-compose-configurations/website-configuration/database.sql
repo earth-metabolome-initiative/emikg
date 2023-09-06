@@ -53,15 +53,13 @@ CREATE TABLE moderators (
     -- Add other moderator-related fields as needed
 );
 
--- Create the "oauth_connections" table to store OAuth provider connections
-CREATE TABLE oauth_connections (
+-- Create the "orcid" table to store ORCID information
+-- which is also used for authentication
+CREATE TABLE orcid (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    oauth_provider VARCHAR(255) NOT NULL,
-    oauth_user_id VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    -- Add other OAuth-related fields as needed
+    orcid VARCHAR(255) NOT NULL,
+    -- Add other ORCID-related fields as needed
 );
 
 -- Create the "taxons" table to store metadata about taxons
