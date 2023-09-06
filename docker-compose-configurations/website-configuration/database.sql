@@ -83,7 +83,8 @@ CREATE TABLE samples (
     sample_name VARCHAR(255) NOT NULL,
     -- Some samples are derived from other samples,
     -- except for the first sample, which is not
-    -- derived from any other sample
+    -- derived from any other sample. This means
+    -- that the "derived_from" column can be NULL.
     derived_from INT REFERENCES samples(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
