@@ -15,7 +15,7 @@ CREATE TABLE translations (
 
 -- Create the "users" table to store user information
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     -- Add other user-related fields as needed
@@ -66,17 +66,20 @@ CREATE TABLE oauth_connections (
 
 -- Create the "taxons" table to store metadata about taxons
 CREATE TABLE taxons (
-    taxon_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     taxon_name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- Add other metadata fields as needed
     user_id INT REFERENCES users(id) ON DELETE CASCADE
+    -- The taxon name must be unique
+    UNIQUE (taxon_name)
 );
 
 -- Create the "samples" table to store sample information
 CREATE TABLE samples (
     id SERIAL PRIMARY KEY,
+    -- The name of the sample, which should be unique
     sample_name VARCHAR(255) NOT NULL,
     -- Some samples are derived from other samples,
     -- except for the first sample, which is not
@@ -86,7 +89,10 @@ CREATE TABLE samples (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- Add other sample-related fields as needed
     user_id INT REFERENCES users(id) ON DELETE CASCADE
+    taxon_id INT REFERENCES taxons(id) ON DELETE CASCADE
+    -- We require for the sample name to be unique
+    UNIQUE (sample_name)
 );
 
 -- Create an index on the "user_id" column for faster queries
-CREATE INDEX idx_user_id ON species (user_id);
+CREATE INDEX idx_user_id ON taxons (user_id);

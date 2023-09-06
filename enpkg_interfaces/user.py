@@ -2,6 +2,7 @@
 from typing import Type
 
 from enpkg_interfaces.sample import Sample
+from enpkg_interfaces.taxon import Taxon
 
 
 class User:
@@ -49,13 +50,16 @@ class User:
         """Return True if the user is the author of the sample."""
         return self.get_user_id() == sample.get_author_user_id()
 
+    def is_author_of_taxon(self, taxon: Type[Taxon]) -> bool:
+        """Return True if the user is the author of the taxon."""
+        return self.get_user_id() == taxon.get_author_user_id()
+
     def delete(self):
         """Delete the user."""
         raise NotImplementedError(
             "Abstract method 'delete' must be implemented in subclass. "
             f"It was not implemented in {self.__class__.__name__}."
         )
-
 
     @classmethod
     def is_valid_user_id(cls, user_id: int) -> bool:
