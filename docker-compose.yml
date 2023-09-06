@@ -3,9 +3,9 @@ services:
   web:
     build:
       context: ./docker-compose-configurations/website-configuration
-      args:
-        - YOUR_ORCID_CLIENT_ID=${YOUR_ORCID_CLIENT_ID}
-        - YOUR_ORCID_CLIENT_SECRET=${YOUR_ORCID_CLIENT_SECRET}
+    environment:
+      YOUR_ORCID_CLIENT_ID: ${YOUR_ORCID_CLIENT_ID}
+      YOUR_ORCID_CLIENT_SECRET: ${YOUR_ORCID_CLIENT_SECRET}
     ports:
       - "80:80"
     depends_on:
@@ -22,7 +22,8 @@ services:
       timeout: 5s
       retries: 5
   postgres_database:
-    image: postgres:latest
+    build:
+      context: ./docker-compose-configurations/postgres-configuration
     volumes:
       - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
     environment:
