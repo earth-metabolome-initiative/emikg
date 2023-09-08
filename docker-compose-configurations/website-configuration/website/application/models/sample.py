@@ -5,8 +5,8 @@ from enpkg_interfaces import Sample as SampleInterface
 from .user import User
 from .taxon import Taxon
 from ..exceptions import APIException
+from ..tables import SamplesTable
 
-from ..application import db
 
 class Sample(SampleInterface):
     """Class to represent a sample."""
@@ -30,13 +30,7 @@ class Sample(SampleInterface):
         The method looks up whether the sample ID exists in id
         column of the samples table.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("samples").column("id") == sample_id
-                )
-            )
-        ).scalar()
+        return SamplesTable.is_valid_sample_id(sample_id)
     
     @staticmethod
     def is_valid_sample_name(sample_name: str) -> bool:
@@ -57,61 +51,25 @@ class Sample(SampleInterface):
         The method looks up whether the sample name exists in sample_name
         column of the samples table.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("samples").column("sample_name") == sample_name
-                )
-            )
-        ).scalar()
+        return SamplesTable.is_valid_sample_name(sample_name)
     
     def get_author_user_id(self) -> int:
         """Return the sample's author user ID"""
-        return db.session.execute(
-            """
-            SELECT author_user_id
-            FROM samples
-            WHERE id = :sample_id
-            """,
-            sample_id= self.get_sample_id()
-        ).scalar()
+        return SamplesTable.get_author_user_id_from_sample_id(self._sample_id)
     
     def _get_parent_sample(self) -> "Sample":
         """Return the parent sample."""
-        return Sample(db.session.execute(
-            """
-            SELECT parent_sample_id
-            FROM samples
-            WHERE id = :sample_id
-            """,
-            sample_id= self.get_sample_id()
-        ).scalar())
+        return Sample(SamplesTable.get_author_user_id_from_sample_id(self._sample_id))
     
     def get_child_samples(self) -> List["Sample"]:
         """Return the child samples."""
         return [
-            Sample(child_sample_id) for child_sample_id in db.session.execute(
-                """
-                SELECT id
-                FROM samples
-                WHERE parent_sample_id = :sample_id
-                """,
-                sample_id= self.get_sample_id()
-            ).fetchall()
+            Sample(child_sample_id) for child_sample_id in SamplesTable.get_child_samples_from_sample_id(self._sample_id)
         ]
     
     def is_derived_sample(self) -> bool:
         """Return True if sample is derived from another sample."""
-        return db.session.execute(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM samples
-                WHERE parent_sample_id = :sample_id
-            )
-            """,
-            sample_id=self.get_sample_id()
-        ).scalar()
+        return SamplesTable.is_derived_sample_from_sample_id(self._sample_id)
     
     def delete(self):
         """Delete the sample.
@@ -129,13 +87,7 @@ class Sample(SampleInterface):
         if not user.is_author_of_sample(self):
             User.must_be_moderator()
 
-        db.session.execute(
-            """
-            DELETE FROM samples
-            WHERE id = :sample_id
-            """,
-            sample_id= self.get_sample_id()
-        )
+        SamplesTable.delete_sample_from_sample_id(self._sample_id)
 
     @staticmethod
     def create(
@@ -189,28 +141,9 @@ class Sample(SampleInterface):
                 400
             )
 
-        sample_id = db.session.execute(
-            """
-            INSERT INTO samples (
-                taxon_id,
-                sample_name,
-                parent_sample_id,
-                author_user_id
-            )
-            VALUES (
-                :taxon_id,
-                :sample_name,
-                :parent_sample_id,
-                :author_user_id
-            )
-            RETURNING id
-            """,
-            {
-                "taxon_id": taxon_id,
-                "sample_name": sample_name,
-                "parent_sample_id": parent_sample_id,
-                "author_user_id": user.get_user_id()
-            }
-        ).scalar()
-
-        return sample_id
+        return SamplesTable.create_sample_from_sample_name(
+            sample_name=sample_name,
+            user_id=user.get_user_id(),
+            taxon_id=taxon_id,
+            parent_sample_id=parent_sample_id
+        )

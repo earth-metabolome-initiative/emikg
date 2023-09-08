@@ -1,10 +1,10 @@
-from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 # from flask_socketio import SocketIO, emit
+from ..application import app
 
-app = Flask(__name__)
-
-# We set the session secret key for the application
-app.secret_key = "hytrito8ew78ftoegfpdl"
+# We connected to the PostgreSQL database using SQLAlchemy.
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/postgres'
+db = SQLAlchemy(app)
 
 # socketio = SocketIO(app)
 

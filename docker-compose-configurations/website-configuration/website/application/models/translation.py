@@ -1,8 +1,9 @@
 """Class providing methods to update textual entries in the database."""
 
 from flask import session
-from ..application import db, app
+from ..application import app
 from .user import User
+from ..tables import TranslationsTable
 
 class Translation:
     """Class providing methods to update textual entries in the database."""
@@ -37,41 +38,26 @@ class Translation:
         # If not found, we return the label itself as the translation
         # and a message in all caps that the translation is missing.
 
-        translation = db.engine.execute(
-            """
-            SELECT translation
-            FROM translations
-            WHERE label = :label AND lang = :lang
-            """,
+        translation = TranslationsTable.get_translation_from_label_and_lang(
             label=label,
             lang=lang
-        ).scalar()
+        )
 
         # If the translation is not found in the requested language,
         # we try the default language, if the default language is not
         # the requested language.
         if translation is None and lang != "en":
-            translation = db.engine.execute(
-                """
-                SELECT translation
-                FROM translations
-                WHERE label = :label AND lang = :lang
-                """,
+            translation = TranslationsTable.get_translation_from_label_and_lang(
                 label=label,
                 lang="en"
-            ).scalar()
+            )
 
         # If the translation is not found in the requested language
         # or in the default language, we try any language.
         if translation is None:
-            translation = db.engine.execute(
-                """
-                SELECT translation
-                FROM translations
-                WHERE label = :label
-                """,
+            translation = TranslationsTable.get_translation_from_label(
                 label=label
-            ).scalar()
+            )
 
         # If the translation is still not found, we return the label
         # itself as the translation and a message in all caps that
@@ -123,18 +109,11 @@ class Translation:
         if len(lang) != 2:
             raise ValueError("Language must be a two-letter code")
 
-        db.engine.execute(
-            """
-            INSERT INTO translations (label, translation, lang, last_updated_by)
-            VALUES (:label, :translation, :lang, :user_id)
-            ON CONFLICT (label, lang) DO UPDATE SET
-                translation = :translation,
-                last_updated_by = :user_id
-            """,
+        TranslationsTable.update_translation(
             label=label,
             translation=translation,
             lang=lang,
-            user_id=User.session_user_id()
+            last_updated_by=User.get_current_user_id()
         )
 
 app.jinja_env.globals.update(translation=Translation.retrieve_from_label)

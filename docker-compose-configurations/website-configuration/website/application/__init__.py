@@ -1,4 +1,4 @@
-from .application import app, db
+from .application import app
 from .api_endpoints import *
 
-__all__ = ['app', 'db']
+__all__ = ['app']

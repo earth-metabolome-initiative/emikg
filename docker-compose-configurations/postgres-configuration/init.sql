@@ -42,15 +42,19 @@ CREATE TABLE tokens (
 -- Create the "administrators" table to store administrator information
 CREATE TABLE administrators (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     -- Add other administrator-related fields as needed
+    -- The user_id must be unique
+    UNIQUE (user_id)
 );
 
 -- Create the "moderators" table to store moderator information
 CREATE TABLE moderators (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     -- Add other moderator-related fields as needed
+    -- The user_id must be unique
+    UNIQUE (user_id)
 );
 
 -- Create the "orcid" table to store ORCID information
@@ -58,8 +62,10 @@ CREATE TABLE moderators (
 CREATE TABLE orcid (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    orcid VARCHAR(255) NOT NULL
+    orcid VARCHAR(255) NOT NULL,
     -- Add other ORCID-related fields as needed
+    -- The ORCID must be unique
+    UNIQUE (orcid)
 );
 
 -- Create the "taxons" table to store metadata about taxons

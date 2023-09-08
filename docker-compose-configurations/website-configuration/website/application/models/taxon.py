@@ -1,9 +1,9 @@
 """Concretely implements the proxy taxon interface using SQLAlchemy."""
 from enpkg_interfaces import Taxon as TaxonInterface
 
-from ..application import db
 from ..exceptions import APIException
 from .user import User
+from ..tables import TaxonsTable
 
 class Taxon(TaxonInterface):
     """Class to represent a taxon."""
@@ -27,13 +27,7 @@ class Taxon(TaxonInterface):
         The method looks up whether the taxon ID exists in taxon_id
         column of the taxons table.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("taxons").column("id") == taxon_id
-                )
-            )
-        ).scalar()
+        return TaxonsTable.is_valid_taxon_id(taxon_id)
     
     @staticmethod
     def is_valid_taxon_name(taxon_name: str) -> bool:
@@ -54,23 +48,11 @@ class Taxon(TaxonInterface):
         The method looks up whether the taxon name exists in taxon_name
         column of the taxons table.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("taxons").column("taxon_name") == taxon_name
-                )
-            )
-        ).scalar()
+        return TaxonsTable.is_valid_taxon_name(taxon_name)
     
     def get_author_user_id(self) -> int:
         """Return the taxon's author user ID"""
-        return db.session.execute(
-            """
-            SELECT created_by FROM taxons
-            WHERE id = :taxon_id
-            """,
-            taxon_id=self._taxon_id
-        ).scalar()
+        return TaxonsTable.get_author_user_id_from_taxon_id(self._taxon_id)
     
     def delete(self):
         """Delete a taxon.
@@ -102,13 +84,7 @@ class Taxon(TaxonInterface):
             User.must_be_moderator()
 
         # We delete the taxon from the database.
-        db.engine.execute(
-            """
-            DELETE FROM taxons
-            WHERE id = :taxon_id
-            """,
-            taxon_id=self._taxon_id
-        )
+        TaxonsTable.delete_taxon(self._taxon_id)
     
     @staticmethod
     def create(taxon_name: str) -> int:
@@ -138,22 +114,7 @@ class Taxon(TaxonInterface):
             )
         
         # We insert the taxon into the database.
-        db.engine.execute(
-            """
-            INSERT INTO taxons (taxon_name, created_by)
-            VALUES (:taxon_name, :user_id)
-            """,
+        return TaxonsTable.create_taxon_from_taxon_name(
             taxon_name=taxon_name,
             user_id=user.get_user_id()
         )
-
-        # We retrieve the ID of the newly created taxon.
-        taxon_id = db.session.execute(
-            """
-            SELECT id FROM taxons
-            WHERE taxon_name = :taxon_name
-            """,
-            taxon_name=taxon_name
-        ).scalar()
-
-        return taxon_id

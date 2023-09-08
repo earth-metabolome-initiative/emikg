@@ -1,13 +1,10 @@
 """Concretely implements the proxy user interface using SQLAlchemy."""
-from time import time
-
-from dict_hash import sha256
 from flask import session
 
 from enpkg_interfaces import User as UserInterface
 
-from ..application import db
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
+from ..tables import ORCIDTable, ModeratorsTable, AdministratorsTable, UsersTable, TokensTable
 
 
 class User(UserInterface):
@@ -37,11 +34,7 @@ class User(UserInterface):
         # To execute this operation, the user must not be already logged in.
         if User.is_authenticated():
             raise APIException("User is already logged in.")
-        user_id = db.session.query(
-            db.table("tokens").column("user_id")
-        ).where(
-            db.table("tokens").column("token") == token
-        ).scalar()
+        user_id = TokensTable.get_user_id_from_token(token)
         if user_id is None:
             raise Unauthorized()
         
@@ -82,31 +75,14 @@ class User(UserInterface):
         # We look up whether the ORCID exists in the orcid table of the database.
         # If it does, we create a new user object from the user ID associated with
         # the ORCID.
-        user_id = db.session.query(
-            db.table("orcid").column("user_id")
-        ).where(
-            db.table("orcid").column("orcid") == orcid
-        ).scalar()
+        user_id = ORCIDTable.get_user_id_from_orcid(orcid)
 
         if user_id is None:
             # Otherwise, we are currently creating a new user.
             # We open a transaction, and insert a new user in the users table.
             # We also insert the ORCID in the orcid table alongside the user ID.
+            UsersTable.create_user_from_orcid(orcid)
 
-            with db.engine.begin() as connection:
-                # We insert a new user in the users table.
-                # We also insert the ORCID in the orcid table alongside the user ID.
-                user_id = connection.execute(
-                    db.insert("users").values(
-                        orcid=orcid
-                    )
-                ).lastrowid
-                connection.execute(
-                    db.insert("orcid").values(
-                        user_id=user_id,
-                        orcid=orcid
-                    )
-                )
         # We add the user ID to the Flask session.
         session["user_id"] = user_id
 
@@ -159,13 +135,7 @@ class User(UserInterface):
         is the primary ID of the administrators table, and the latter is
         the user ID itself.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("administrators").column("user_id") == self.get_user_id()
-                )
-            )
-        ).scalar()
+        return AdministratorsTable.is_valid_user_id(self.get_user_id())
     
     @staticmethod
     def must_be_moderator() -> None:
@@ -184,13 +154,7 @@ class User(UserInterface):
         is the primary ID of the moderators table, and the latter is
         the user ID itself.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("moderators").column("user_id") == self.get_user_id()
-                )
-            )
-        ).scalar()
+        return ModeratorsTable.is_valid_user_id(self.get_user_id())
 
     @classmethod
     def is_valid_user_id(cls, user_id: int) -> bool:
@@ -201,13 +165,7 @@ class User(UserInterface):
         user_id : int
             User ID.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("users").column("user_id") == user_id
-                )
-            )
-        ).scalar()
+        return UsersTable.is_valid_user_id(user_id)
     
     def create_token(self, token_name: str) -> str:
         """Creates and returns a token for the current user with the given name."""
@@ -217,37 +175,10 @@ class User(UserInterface):
         if self.has_token(token_name):
             raise APIException("Token name already taken for the current user.")
         
-        # We insert the token name in the database.
-        # This insertion is done using SQLAlchemy, and as the token is
-        # required to be unique, we expect the insertion to fail if the
-        # token name is already taken. This should be extremely rare, as
-        # the token is created using as salt ingredients the current time,
-        # the user ID and the token name. Still, we check for this case.
-        # When such a case happens, we recreate the token and try again.
-        while True:
-             # We create a token for the current user with the given name.
-            token = sha256({
-                "time": time(),
-                "user_id": self.get_user_id(),
-                "token_name": token_name
-            })
-
-            try:
-                db.session.execute(
-                    db.insert("tokens").values(
-                        user_id=self.get_user_id(),
-                        token_name=token_name,
-                        token=token
-                    )
-                )
-                break
-            except Exception as exception:
-                if "UNIQUE constraint failed" in str(exception):
-                    continue
-                raise exception
-        
-        # We return the token.
-        return token
+        return TokensTable.create_token(
+            user_id=self.get_user_id(),
+            token_name=token_name
+        )
         
     def delete_token(self, token_name: str) -> None:
         """Delete a token for the current user with the given name.
@@ -267,14 +198,11 @@ class User(UserInterface):
         if not self.has_token(token_name):
             raise APIException("Token name not taken for the current user.")
 
-        db.session.execute(
-            db.delete("tokens").where(
-                db.and_(
-                    db.table("tokens").column("user_id") == self.get_user_id(),
-                    db.table("tokens").column("token_name") == token_name
-                )
-            )
+        TokensTable.delete_token_from_token_name_and_user_id(
+            user_id=self.get_user_id(),
+            token_name=token_name
         )
+        
 
     def has_token(self, token_name: str) -> bool:
         """Return True if the user has a token with the given name.
@@ -284,14 +212,10 @@ class User(UserInterface):
         token_name : str
             Token name.
         """
-        return db.session.query(
-            db.exists().where(
-                db.and_(
-                    db.table("tokens").column("user_id") == self.get_user_id(),
-                    db.table("tokens").column("token_name") == token_name
-                )
-            )
-        ).scalar()
+        return TokensTable.has_token_from_token_name_and_user_id(
+            user_id=self.get_user_id(),
+            token_name=token_name
+        )
 
     def delete(self):
         """Delete the user.
@@ -315,11 +239,7 @@ class User(UserInterface):
         
         # If the current user is the session user, or is an administrator,
         # then delete the user from the database
-        db.session.execute(
-            db.delete("users").where(
-                db.table("users").column("id") == self.get_user_id()
-            )
-        )
+        UsersTable.delete_user(self.get_user_id())
 
     def promote_admin(self):
         """Promote the user to administrator.
@@ -343,11 +263,7 @@ class User(UserInterface):
         
         # If the current user is the session user, or is an administrator,
         # then promote the user to administrator
-        db.session.execute(
-            db.insert("administrators").values(
-                user_id=self.get_user_id()
-            )
-        )
+        AdministratorsTable.create_administrator_from_user_id(self.get_user_id())
 
     def demote_admin(self):
         """Demote the user from administrator.
@@ -371,11 +287,7 @@ class User(UserInterface):
         
         # If the current user is the session user, or is an administrator,
         # then demote the user from administrator
-        db.session.execute(
-            db.delete("administrators").where(
-                db.table("administrators").column("user_id") == self.get_user_id()
-            )
-        )
+        AdministratorsTable.delete_administrator_from_user_id(self.get_user_id())
 
     def promote_moderator(self):
         """Promote the user to moderator.
@@ -399,11 +311,7 @@ class User(UserInterface):
         
         # If the current user is the session user, or is an administrator,
         # then promote the user to moderator
-        db.session.execute(
-            db.insert("moderators").values(
-                user_id=self.get_user_id()
-            )
-        )
+        ModeratorsTable.create_moderator_from_user_id(self.get_user_id())
 
     def demote_moderator(self):
         """Demote the user from moderator.
@@ -427,11 +335,7 @@ class User(UserInterface):
         
         # If the current user is the session user, or is an administrator,
         # then demote the user from moderator
-        db.session.execute(
-            db.delete("moderators").where(
-                db.table("moderators").column("user_id") == self.get_user_id()
-            )
-        )
+        ModeratorsTable.delete_moderator_from_user_id(self.get_user_id())
 
     def illegal_user_id_callback(self, illegal_user_id: int) -> None:
         """Method called upon detection of an illegal user ID.

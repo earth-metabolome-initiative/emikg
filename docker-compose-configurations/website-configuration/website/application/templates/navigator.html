@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ project_name }}</title>
+    <title>Kebab</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -15,7 +15,7 @@
             {% if current_user.is_authenticated %}
                 <p>Welcome, {{ current_user.username }}!</p>
             {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('orcid_login') }}">Login</a>
             {% endif %}
         </div>
     </header>
