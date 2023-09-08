@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
+import os
 # from flask_socketio import SocketIO, emit
 from ..application import app
 
 # We connected to the PostgreSQL database using SQLAlchemy.
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{os.environ['POSTGRES_USER']}:{os.environ['POSTGRES_PASSWORD']}@postgres_database:5432/{os.environ['POSTGRES_DB']}"
 db = SQLAlchemy(app)
 
 # socketio = SocketIO(app)

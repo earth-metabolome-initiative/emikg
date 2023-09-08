@@ -71,17 +71,18 @@ class User(UserInterface):
         # To execute this operation, the user must not be already logged in.
         if User.is_authenticated():
             raise APIException("User is already logged in.")
-
-        # We look up whether the ORCID exists in the orcid table of the database.
-        # If it does, we create a new user object from the user ID associated with
-        # the ORCID.
-        user_id = ORCIDTable.get_user_id_from_orcid(orcid)
-
-        if user_id is None:
+        
+        # We check whether the ORCID exists in the orcid table of the database.
+        if ORCIDTable.is_valid_orcid(orcid):
+            # We look up whether the ORCID exists in the orcid table of the database.
+            # If it does, we create a new user object from the user ID associated with
+            # the ORCID.
+            user_id = ORCIDTable.get_user_id_from_orcid(orcid)
+        else:
             # Otherwise, we are currently creating a new user.
             # We open a transaction, and insert a new user in the users table.
             # We also insert the ORCID in the orcid table alongside the user ID.
-            UsersTable.create_user_from_orcid(orcid)
+            user_id = UsersTable.create_user_from_orcid(orcid)
 
         # We add the user ID to the Flask session.
         session["user_id"] = user_id
