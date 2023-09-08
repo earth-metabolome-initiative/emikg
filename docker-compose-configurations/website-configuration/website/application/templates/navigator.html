@@ -12,8 +12,8 @@
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Project Logo">
         </div>
         <div class="user-info">
-            {% if current_user.is_authenticated %}
-                <p>Welcome, {{ current_user.username }}!</p>
+            {% if current_user.is_authenticated() %}
+                <p>Welcome!</p>
             {% else %}
                 <a href="{{ url_for('orcid_login') }}">Login</a>
             {% endif %}

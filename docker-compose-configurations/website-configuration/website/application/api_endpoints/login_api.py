@@ -44,5 +44,5 @@ def logout():
 def dashboard():
     """Render dashboard template."""
     if User.is_authenticated():
-        return render_template('dashboard.html', current_user=User.session_user_id())
+        return render_template('dashboard.html', current_user=User.from_flask_session())
     return render_template("home.html", current_user=None)
