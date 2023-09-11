@@ -1,0 +1,97 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+/* Navigation Bar Styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border-bottom: 1px solid #aa9639;
+    padding: 10px 20px;
+    z-index: 1000;
+}
+
+.navbar img {
+    position: absolute;
+    top: 50%;
+    margin-top: -25px;
+    left: 20px;
+    height: 50px;
+    width: 50px;
+}
+
+.navbar h1 a {
+    text-decoration: none !important;
+}
+
+
+.navbar h1 a span{
+    text-transform: uppercase;
+    font-weight: 100;
+    margin-left: 60px;
+    font-size: 50px;
+    color: #aa9639 !important;
+}
+
+.signup-button {
+    background-color: rgb(68, 116, 5);
+    border: 2px solid rgb(68, 116, 5);
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    padding: 0.7em;
+    width: auto;
+    text-decoration: none;
+    margin-bottom: 0;
+    display: inline-block;
+    font-size: inherit;
+    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+}
+
+/* When we hover the button, a small animation happens. */
+.signup-button:hover {
+    background-color: white;
+    color: rgb(68, 116, 5);
+}
+
+
+
+
+/* Responsive styles for smaller screens */
+@media screen and (max-width: 768px) {
+    .menu-icon {
+        display: flex;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user {
+        margin-top: 10px;
+    }
+
+    .user-dropdown {
+        margin-left: 0;
+    }
+
+    .dropdown-content {
+        top: 0;
+        right: -100%;
+    }
+}

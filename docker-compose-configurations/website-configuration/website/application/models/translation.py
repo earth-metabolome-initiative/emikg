@@ -9,6 +9,11 @@ class Translation:
     """Class providing methods to update textual entries in the database."""
 
     @staticmethod
+    def get_current_language() -> str:
+        """Return the current language."""
+        return session.get("lang", "en")
+
+    @staticmethod
     def retrieve_from_label(label: str) -> "Translation":
         """Retrieve a translation from its label and language.
 
@@ -30,7 +35,7 @@ class Translation:
         """
         # We determine whether the session language was set.
         # If not, we set it to the default language, i.e. English.
-        lang = session.get("lang", "en")
+        lang = Translation.get_current_language()
 
         # We first try to retrieve the translation in the requested
         # language. If not found, we try the default language.
@@ -66,6 +71,19 @@ class Translation:
             translation = f"{label} (TRANSLATION MISSING)"
 
         return translation
+    
+    @staticmethod
+    def retrieve_from_label_with_markup(label: str) -> "Translation":
+        """Retrieve a translation from its label and language, with markup."""
+        translation = Translation.retrieve_from_label(label)
+
+        if User.is_authenticated() and User.from_flask_session().is_moderator():
+            lang = Translation.get_current_language()
+
+            return f"<span data-label='{label}' data-lang='{lang}' class='translatable'>{translation}</span>"
+        
+        return translation
+
 
     @staticmethod
     def update_translation(label: str, translation: str, lang: str):
@@ -116,4 +134,10 @@ class Translation:
             last_updated_by=User.get_current_user_id()
         )
 
-app.jinja_env.globals.update(translation=Translation.retrieve_from_label)
+app.jinja_env.globals.update(
+    translation=Translation.retrieve_from_label_with_markup
+)
+
+app.jinja_env.globals.update(
+    current_language=Translation.get_current_language
+)

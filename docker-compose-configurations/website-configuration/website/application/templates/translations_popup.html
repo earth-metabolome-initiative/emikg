@@ -1,0 +1,41 @@
+<!-- Translations popup template -->
+<!-- 
+
+    The translations popup template is a popup that appears when a moderator clicks
+    three times on any object in the website with class "translatable". The popup
+    allows the moderator to edit the translations of the object in different languages.
+
+    The popup is a form that contains a textarea, and displays the label attribute of the
+    object that was clicked. The textarea contains the current translations of the object
+    in the current language, and the moderator can edit the translations and submit the
+    form to update the translations.
+
+    The popup darkens the background of the website, and the popup itself is a white box
+    that is centered in the middle of the screen. The popup can be closed by clicking
+    anywhere outside of the popup, or on the close button in the top right corner of the
+    popup.
+
+ -->
+
+ <div class="translations-popup" id="translationsPopup">
+    <div class="translations-popup-background" id="translationPopupBackground"></div>
+    <div class="translations-popup-content">
+        <div class="translations-popup-header">
+            <h2 id="currentTranslationLabel"></h2>
+            <button class="close" id="translationPopupCloseButton">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <form action="" method="POST" id="translationsForm">
+            <textarea id="translationsTextarea" rows="10" cols="50" required></textarea>
+            <button id="translationsPopupSubmitButton">
+                <i class="fa-solid fa-check"></i>
+                Save
+            </button>
+        </form>
+        <div class="translations-popup-footer">
+            <span class="current_language">
+                {{current_language()}}
+            </span>
+        </div>
+    </div>

@@ -11,17 +11,12 @@
     {% include 'navigator.html' %}
 
     <div class="dashboard-container">
-        <h1>Real-time Dashboard</h1>
         <div id="data-container">
             <!-- Data updates will be displayed here -->
         </div>
-        <button id="update-data-button" class="btn btn-primary">Update Data</button>
     </div>
 
-    <!-- Include the footer template for the footer -->
-    {% include 'footer.html' %}
-
-    <script>
+    <!-- <script>
         const socket = io.connect(window.location.origin);
 
         // Listen for data updates from the server
@@ -42,6 +37,6 @@
             const newData = 'New data to be sent to the server';
             socket.emit('update_data', newData);
         });
-    </script>
+    </script> -->
 </body>
 </html>

@@ -1,26 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kebab</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- If the user is logged in and is a moderator -->
+    {% if current_user and current_user.is_moderator() %}
+    <!-- we include the translations popup template -->
+    <link rel="stylesheet" href="/static/css/translations_popup.css">
+    {% endif %}
+    <title>Your Website</title>
 </head>
+
 <body>
-    <header>
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Project Logo">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>
+            <a href="/">
+                <img src="/static/img/logo.svg" alt="Website Logo">
+                <span>EMI</span>
+            </a>
+        </h1>
+        <div class="menu-icon">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
         </div>
-        <div class="user-info">
-            {% if current_user.is_authenticated() %}
-                <p>Welcome!</p>
+        <div class="user">
+            <!-- If the user is logged in, we show the user-related options. -->
+            {% if current_user %}
+            <div class="user-dropdown" id="userDropdown">
+                <button class="username-button" id="usernameBtn">{{ current_user.get_user_id() }}</button>
+                <div class="dropdown-content">
+                    <a href="/logout">{{translation("logout")}}</a>
+                    <a href="/settings">{{translation("settings")}}</a>
+                </div>
+            </div>
+            <!-- Otherwise, we show the login button. -->
             {% else %}
-                <a href="{{ url_for('orcid_login') }}">Login</a>
+            <a href="/login/orcid" class="signup-button" id="loginBtn">
+                <i class="fa-brands fa-orcid"></i>
+                Login with ORCID
+            </a>
             {% endif %}
         </div>
-    </header>
-    <div class="content">
-        {% block content %}{% endblock %}
-    </div>
+    </nav>
+
+    <!-- If the user is logged in and is a moderator -->
+    {% if current_user and current_user.is_moderator() %}
+    <!-- we include the translations popup template -->
+    {% include 'translations_popup.html' %}
+    {% endif %}
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; {{ current_year }} {{ project_name }}</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/script.js"></script>
+    <!-- If the user is logged in and is a moderator -->
+    {% if current_user and current_user.is_moderator() %}
+    <!-- we include the translations popup script -->
+    <script src="/static/js/translations_popup.js"></script>
+    {% endif %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/a9d47abff9.js" crossorigin="anonymous"></script>
 </body>
+
 </html>

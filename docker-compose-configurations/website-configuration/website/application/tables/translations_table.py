@@ -53,7 +53,10 @@ class TranslationsTable(db.Model):
         str
             translation.
         """
-        return TranslationsTable.query.filter_by(label=label, lang=lang).first().translation
+        result = TranslationsTable.query.filter_by(label=label, lang=lang).first()
+        if result is not None:
+            return result.translation
+        return None
     
     @staticmethod
     def get_translation_from_label(label: str) -> str:
@@ -69,8 +72,11 @@ class TranslationsTable(db.Model):
         str
             translation.
         """
-        return TranslationsTable.query.filter_by(label=label).first().translation
-    
+        result = TranslationsTable.query.filter_by(label=label).first()
+        if result is not None:
+            return result.translation
+        return None 
+   
     @staticmethod
     def update_translation(label: str, translation: str, lang: str, last_updated_by: int):
         """Update translation.

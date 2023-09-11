@@ -4,7 +4,7 @@ Implementative details
 ----------------------
 The API is implemented using authlib's OAuth 2.0 framework.
 """
-from flask import redirect, render_template
+from flask import redirect, render_template, session
 
 from ..application import app
 from ..models import User
@@ -39,10 +39,15 @@ def orcid_login():
 def logout():
     """Logout route to clear the session."""
     User.logout()
+    return redirect("/")
 
+
+# Landing page with language subdirectory
 @app.route('/')
-def dashboard():
+@app.route("/<lang>")
+def dashboard(lang: str = "en"):
     """Render dashboard template."""
+    session['lang'] = lang
     if User.is_authenticated():
         return render_template('dashboard.html', current_user=User.from_flask_session())
     return render_template("home.html", current_user=None)

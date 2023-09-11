@@ -1,0 +1,109 @@
+/* Styling for the translations popup.
+
+The popup has a fixed position and is centered on the screen. It has a
+white background and a border. The border is 1px wide and has a color
+of #aa9639. When the popup is open, the rest of the page is
+darkened. 
+
+The popup is composed of a header, a body and a footer. The header
+contains the h2 title with the label associated to the current translation
+and a close button. The second portion is the form that contains the
+textarea and the submit button. The footer contains on the right hand side
+the current language code.
+*/
+
+/* The background. */
+.translations-popup-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* The background is darkened. */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transition: background-color 0.1s ease-in-out;
+}
+
+/* The popup. */
+.translations-popup-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* The popup is centered on the screen. */
+    width: 50%;
+    height: 50%;
+    background-color: white;
+    border: 1px solid #aa9639;
+    z-index: 1001;
+    /* We animate a fade-in up transition */
+    animation: fade-in-up 0.5s ease-in-out;
+}
+
+/* The header. */
+.translations-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #aa9639;
+    color: white;
+    padding: 10px 20px;
+}
+
+/* The title. */
+.translations-popup-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* The close button. */
+.translations-popup-header .close {
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.5em;
+}
+
+/* The body. */
+.translations-popup-content form {
+    padding: 10px 20px;
+}
+
+/* The textarea. */
+.translations-popup-content form textarea {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: none;
+    outline: none;
+    font-size: 1.2em;
+}
+
+/* The footer. */
+.translations-popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: #aa9639;
+    color: white;
+    padding: 10px 20px;
+}
+
+/* The language code. */
+.translations-popup-footer span {
+    font-size: 1.5em;
+}
+
+/* The animation for the popup. */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
