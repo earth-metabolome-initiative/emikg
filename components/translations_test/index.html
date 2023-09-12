@@ -1,0 +1,62 @@
+<!-- 
+    This document provides a test page for the translations component.
+
+    The translations component is a simple component that allows a moderator to
+    update the translations for a given language. The component is accessed via
+    either triple click on a page textual element with the class 'translatable',
+    or via the key combination 'ctrl + alt + t' on any page. The component is only 
+    available to moderators.
+
+    The component shows a list of all translatable elements on the page, and
+    allows the moderator to update the translations for each element.
+
+    When activated, the component will fade out the website with a transparent
+    dark background and fade in the component. The component will be closed by
+    clicking the dark background, or by pressing the 'esc' key, or by clicking
+    the 'close' button in the top right corner of the component.
+
+    The left side of the component shows a list of all translatable elements on
+    the page, shown as a scrollable bar with vertical overflow. Each element is
+    shown as a button with the text 'Translate' and the element's text. Clicking
+    on an element will show the translation panel on the right side of the
+    component, which includes a text area with the current translation, and a
+    button to save the translation. The translation panel also includes a select
+    element with all available languages, and a button to add a new language.
+
+    The component interacts with the server via AJAX requests. See the script.js
+    file for more information on the Javascript implementation.
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Translations Test</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="normal_content translatable" data-label="latin">
+        lorem ipsum dolor sit amet, consectetur adipiscing elit. donec auctor
+        libero eget odio aliquam, vitae ultricies nisl ultricies. donec
+        ullamcorper, nunc eu aliquam ultricies, nunc nisl aliquet nunc, eu
+        aliquam nisl nisl vitae nunc. donec auctor libero eget odio aliquam,
+        vitae ultricies nisl ultricies. donec ullamcorper, nunc eu aliquam
+        ultricies, nunc nisl aliquet nunc, eu aliquam nisl nisl vitae nunc.
+    </div>
+    <div class="normal_content translatable" data-label="italian">
+        Nel mezzo del cammin di nostra vita mi ritrovai per una selva oscura,
+        ché la diritta via era smarrita. Ahi quanto a dir qual era è cosa dura
+        esta selva selvaggia e aspra e forte che nel pensier rinova la paura!
+    </div>
+    <div id="translation_widjet">
+        <div id="translation_widjet_background"></div>
+        <div class="form_container"></div>
+    </div>
+    <!-- We include jQuery from the Google repository -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
