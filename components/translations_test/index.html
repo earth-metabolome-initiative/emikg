@@ -37,25 +37,30 @@
 </head>
 
 <body>
-    <div class="normal_content translatable" data-label="latin">
-        lorem ipsum dolor sit amet, consectetur adipiscing elit. donec auctor
-        libero eget odio aliquam, vitae ultricies nisl ultricies. donec
-        ullamcorper, nunc eu aliquam ultricies, nunc nisl aliquet nunc, eu
-        aliquam nisl nisl vitae nunc. donec auctor libero eget odio aliquam,
-        vitae ultricies nisl ultricies. donec ullamcorper, nunc eu aliquam
-        ultricies, nunc nisl aliquet nunc, eu aliquam nisl nisl vitae nunc.
-    </div>
-    <div class="normal_content translatable" data-label="italian">
-        Nel mezzo del cammin di nostra vita mi ritrovai per una selva oscura,
-        ché la diritta via era smarrita. Ahi quanto a dir qual era è cosa dura
-        esta selva selvaggia e aspra e forte che nel pensier rinova la paura!
-    </div>
+    <div class="normal_content translatable" data-label="latin">lorem ipsum dolor sit amet, consectetur adipiscing elit. donec auctor libero eget odio aliquam, vitae ultricies nisl ultricies. donec ullamcorper, nunc eu aliquam ultricies, nunc nisl aliquet nunc, eu aliquam nisl nisl vitae nunc. donec auctor libero eget odio aliquam, vitae ultricies nisl ultricies. donec ullamcorper, nunc eu aliquam ultricies, nunc nisl aliquet nunc, eu aliquam nisl nisl vitae nunc.</div>
+    <div class="normal_content translatable" data-label="italian">Nel mezzo del cammin di nostra vita mi ritrovai per una selva oscura, ché la diritta via era smarrita. Ahi quanto a dir qual era è cosa dura esta selva selvaggia e aspra e forte che nel pensier rinova la paura!</div>
+    <div class="normal_content translatable" data-label="pizza">In the beginning the Universe was created. This has made a lot of people very angry and been widely regarded as a bad move.</div>
+    <div class="normal_content translatable" data-label="kebab">The ships hung in the sky in much the same way that bricks don't.</div>
+    <div class="normal_content translatable" data-label="tortelli">The Answer to the Great Question... Of Life, the Universe and Everything... Is... Forty-two,' said Deep Thought, with infinite majesty and calm.</div>
+    <div class="normal_content translatable" data-label="gnocchi">Take relativity and quantum mechanics, merge them together, and you will have a theory of everything. However, when you do this, you will also have a theory of nothing, because the theory of everything and the theory of nothing are mathematically equivalent.</div>
+
     <div id="translation_widjet">
         <div id="translation_widjet_background"></div>
-        <div class="form_container"></div>
+        <div class="translation_widjet_container">
+            <div class="translations_side_bar">
+                <h2>Page labels</h2>
+                <ul id="translations_list"></ul>
+            </div>
+            <form action="/update-translation/{lang}/{label}">
+                <textarea name="current_translation" id="current_translation"></textarea>
+                <button id="save_translation"><i class="fas fa-save"></i> Save</button>
+            </form>
+            <i class="fa-solid fa-xmark" id ="translation_widjet_close"></i>
+        </div>
     </div>
     <!-- We include jQuery from the Google repository -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/a9d47abff9.js" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
 
