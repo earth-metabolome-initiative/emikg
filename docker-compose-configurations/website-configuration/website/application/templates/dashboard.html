@@ -1,42 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-time Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-</head>
-<body>
-    <!-- Include the navigator template for the header -->
-    {% include 'navigator.html' %}
+{% extends 'navigator.html' %}
 
-    <div class="dashboard-container">
-        <div id="data-container">
-            <!-- Data updates will be displayed here -->
-        </div>
+{% block content %}
+    <div class="landing-container">
+        <h1>Welcome to Your Website</h1>
+        <p>Discover our amazing features:</p>
+        <ul>
+            <li>Feature 1</li>
+            <li>Feature 2</li>
+            <li>Feature 3</li>
+            <!-- Add more features as needed -->
+        </ul>
+        <p>Get started by clicking the button below:</p>
+        <a href="{{ url_for('orcid_login') }}" class="btn btn-primary">Login</a>
     </div>
-
-    <!-- <script>
-        const socket = io.connect(window.location.origin);
-
-        // Listen for data updates from the server
-        socket.on('data_updated', (data) => {
-            // Update the UI with the received data
-            updateUI(data);
-        });
-
-        function updateUI(data) {
-            // Update the UI elements with the new data
-            const dataContainer = document.getElementById('data-container');
-            dataContainer.innerHTML = `<p>Data: ${data}</p>`;
-        }
-
-        // JavaScript code for updating data on the server
-        const updateDataButton = document.getElementById('update-data-button');
-        updateDataButton.addEventListener('click', () => {
-            const newData = 'New data to be sent to the server';
-            socket.emit('update_data', newData);
-        });
-    </script> -->
-</body>
-</html>
+{% endblock %}

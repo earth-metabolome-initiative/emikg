@@ -10,23 +10,24 @@
 }
 
 #hamburgerButton{
-    width: 50px;
-    height: 50px;
+    left: 0;
+    right: 0;
+    position: absolute;
+    width: 60px;
+    height: 60px;
     z-index: 1001;
     cursor: pointer;
-    display: block;
-    background-color: white;
+    display: inline;
     box-sizing: border-box;
     transition: all 0.1s ease-in-out;
 }
 
 #hamburgerButton:hover {
     background-color: #aa9639;
-    border-bottom-right-radius: 3px;
 }
 
 #hamburgerButton li {
-    width: 90%;
+    width: 80%;
     margin: 12.5% auto;
     height: 15%;
     border-radius: 1em;
@@ -53,7 +54,8 @@
     z-index: 1000;
     box-sizing: border-box;
     list-style: none;
-    padding-top: 80px;
+    background-color: white;
+    padding-top: 60px;
     border-right: 1px solid #aa9639;
     transition: all 0.1s ease-in-out;
     overflow-y: scroll;
@@ -61,10 +63,6 @@
 
 #LateralBar ul {
     list-style: none;
-}
-
-#LateralBar>li:first-child {
-    border-top: 1px solid #aa9639;
 }
 
 #LateralBar ul li {

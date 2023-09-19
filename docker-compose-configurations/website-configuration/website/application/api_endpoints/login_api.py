@@ -49,5 +49,13 @@ def dashboard(lang: str = "en"):
     """Render dashboard template."""
     session['lang'] = lang
     if User.is_authenticated():
-        return render_template('dashboard.html', current_user=User.from_flask_session())
-    return render_template("home.html", current_user=None)
+        return render_template(
+            'dashboard.html',
+            current_user=User.from_flask_session(),
+            lang=lang
+        )
+    return render_template(
+        "home.html",
+        current_user=None,
+        lang=lang
+    )

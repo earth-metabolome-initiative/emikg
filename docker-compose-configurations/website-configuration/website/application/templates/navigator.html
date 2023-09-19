@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/form.css">
     <!-- if the user is logged in-->
     {% if current_user %}
     <link rel="stylesheet" href="/static/css/lateral_bar.css">
@@ -18,20 +19,20 @@
 </head>
 
 <body>
+    {% if current_user %}
+    {% include 'lateral_bar.html' %}
+    {% endif %}
     <!-- Navigation Bar -->
     <nav class="navbar">
+        {% if current_user %}
+        <ul id="hamburgerButton">
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+        {% endif %}
         <h1>
-            {% if current_user %}
-            <ul id="hamburgerButton">
-                <li></li>
-                <li></li>
-                <li></li>
-            </ul>
-            {% endif %}
-            <a href="/">
-                <img src="/static/img/logo.svg" alt="Website Logo">
-                <span>EMI</span>
-            </a>
+            <a href="/"><img src="/static/img/logo.svg" alt="Website Logo"></a>
         </h1>
         <div class="user">
             <!-- If the user is logged in, we show the user-related options. -->
@@ -51,10 +52,12 @@
             </a>
             {% endif %}
         </div>
-        {% if current_user %}
-        {% include 'lateral_bar.html' %}
-        {% endif %}
     </nav>
+
+    <!-- Content -->
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
 
     <!-- If the user is logged in and is a moderator -->
     {% if current_user and current_user.is_moderator() %}
@@ -64,7 +67,7 @@
 
     <footer>
         <div class="footer-content">
-            <p>&copy; {{ current_year }} {{ project_name }}</p>
+            <!-- <p>&copy; {{ current_year }} {{ project_name }}</p> -->
         </div>
     </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>

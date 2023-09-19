@@ -118,6 +118,11 @@ class User(UserInterface):
     def is_session_user(self) -> bool:
         """Return whether the current user instance is the session user."""
         return self.get_user_id() == User.session_user_id()
+    
+    @staticmethod
+    def get_session_user_language() -> str:
+        """Return the language of the session user."""
+        return session.get("lang", "en")
 
     @staticmethod
     def must_be_administrator() -> None:

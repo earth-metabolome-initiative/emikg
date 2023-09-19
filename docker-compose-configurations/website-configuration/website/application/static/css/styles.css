@@ -15,32 +15,41 @@ body {
     top: 0;
     left: 0;
     right: 0;
+    height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: white;
     border-bottom: 1px solid #aa9639;
-    padding: 10px 20px;
-    height: 80px;
     z-index: 1000;
 }
 
-.navbar img {
-    height: 50px;
-    width: 50px;
+.navbar .user {
+    display: none;
+}
+
+.navbar h1 img {
+    display: inline;
+    height: 60px;
+    width: 60px;
+    padding: 5px;
+}
+
+.navbar h1 {
+    display: inline;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    font-weight: 300;
+    font-size: 50px;
 }
 
 .navbar h1 a {
-    text-decoration: none !important;
-}
-
-
-.navbar h1 a span{
-    text-transform: uppercase;
-    font-weight: 100;
-    margin-left: 60px;
-    font-size: 50px;
-    color: #aa9639 !important;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    text-decoration: none;
+    color: #aa9639;
 }
 
 .signup-button {
@@ -69,26 +78,8 @@ body {
 
 
 /* Responsive styles for smaller screens */
-@media screen and (max-width: 768px) {
-    .menu-icon {
-        display: flex;
-    }
-
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .user {
-        margin-top: 10px;
-    }
-
-    .user-dropdown {
-        margin-left: 0;
-    }
-
-    .dropdown-content {
-        top: 0;
-        right: -100%;
+@media screen and (min-width: 800px) {
+    .navbar h1 {
+        text-align: left;
     }
 }

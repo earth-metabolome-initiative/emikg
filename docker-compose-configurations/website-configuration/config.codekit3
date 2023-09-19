@@ -105,6 +105,14 @@
 		"oAP": "/website/application/api_endpoints/__pycache__/administrative_api.cpython-38.pyc",
 		"oF": 0
 		},
+	"/website/application/api_endpoints/__pycache__/dashboard_pages.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/dashboard_pages.cpython-38.pyc",
+		"oF": 0
+		},
 	"/website/application/api_endpoints/__pycache__/login_api.cpython-38.pyc": {
 		"cB": 0,
 		"ft": 8192,
@@ -159,6 +167,14 @@
 		"hM": 0,
 		"oA": 0,
 		"oAP": "/website/application/api_endpoints/administrative_api.py",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/dashboard_pages.py": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/dashboard_pages.py",
 		"oF": 0
 		},
 	"/website/application/api_endpoints/login_api.py": {
@@ -384,6 +400,16 @@
 		"oA": 0,
 		"oAP": "/website/application/oauth/orcid.py",
 		"oF": 0
+		},
+	"/website/application/static/css/form.css": {
+		"aP": 1,
+		"bl": 0,
+		"ft": 16,
+		"ma": 0,
+		"oA": 0,
+		"oAP": "/website/application/static/css/form-min.css",
+		"oF": 0,
+		"oS": 3
 		},
 	"/website/application/static/css/lateral_bar-min.css": {
 		"aP": 1,
@@ -687,6 +713,14 @@
 		"hM": 0,
 		"oA": 0,
 		"oAP": "/website/application/templates/navigator.html",
+		"oF": 0
+		},
+	"/website/application/templates/new_taxon.html": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/templates/new_taxon.html",
 		"oF": 0
 		},
 	"/website/application/templates/translations_popup.html": {
