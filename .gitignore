@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 database_tmp/*
 database_tmp
+config.codekit3

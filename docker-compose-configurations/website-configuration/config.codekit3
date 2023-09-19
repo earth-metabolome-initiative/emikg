@@ -41,6 +41,14 @@
 		"oAP": "/website/__init__.py",
 		"oF": 0
 		},
+	"/website/__pycache__/__init__.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 1,
+		"oAP": "/website/__pycache__/__init__.cpython-38.pyc",
+		"oF": 0
+		},
 	"/website/__version__.py": {
 		"cB": 0,
 		"ft": 8192,
@@ -57,12 +65,92 @@
 		"oAP": "/website/application/__init__.py",
 		"oF": 0
 		},
+	"/website/application/__pycache__/__init__.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 1,
+		"oAP": "/website/application/__pycache__/__init__.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/__pycache__/application.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/__pycache__/application.cpython-38.pyc",
+		"oF": 0
+		},
 	"/website/application/api_endpoints/__init__.py": {
 		"cB": 0,
 		"ft": 8192,
 		"hM": 0,
 		"oA": 1,
 		"oAP": "/website/application/api_endpoints/__init__.py",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/__init__.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 1,
+		"oAP": "/website/application/api_endpoints/__pycache__/__init__.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/administrative_api.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/administrative_api.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/login_api.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/login_api.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/moderators_api.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/moderators_api.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/sample_api.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/sample_api.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/static_api.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/static_api.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/taxons_api.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/taxons_api.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/api_endpoints/__pycache__/token_api.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/api_endpoints/__pycache__/token_api.cpython-38.pyc",
 		"oF": 0
 		},
 	"/website/application/api_endpoints/administrative_api.py": {
@@ -137,6 +225,38 @@
 		"oAP": "/website/application/exceptions/__init__.py",
 		"oF": 0
 		},
+	"/website/application/exceptions/__pycache__/__init__.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 1,
+		"oAP": "/website/application/exceptions/__pycache__/__init__.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/exceptions/__pycache__/api_exception.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/exceptions/__pycache__/api_exception.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/exceptions/__pycache__/not_logged_in.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/exceptions/__pycache__/not_logged_in.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/exceptions/__pycache__/unauthorized.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/exceptions/__pycache__/unauthorized.cpython-38.pyc",
+		"oF": 0
+		},
 	"/website/application/exceptions/api_exception.py": {
 		"cB": 0,
 		"ft": 8192,
@@ -167,6 +287,46 @@
 		"hM": 0,
 		"oA": 1,
 		"oAP": "/website/application/models/__init__.py",
+		"oF": 0
+		},
+	"/website/application/models/__pycache__/__init__.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 1,
+		"oAP": "/website/application/models/__pycache__/__init__.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/models/__pycache__/sample.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/models/__pycache__/sample.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/models/__pycache__/taxon.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/models/__pycache__/taxon.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/models/__pycache__/translation.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/models/__pycache__/translation.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/models/__pycache__/user.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/models/__pycache__/user.cpython-38.pyc",
 		"oF": 0
 		},
 	"/website/application/models/sample.py": {
@@ -225,6 +385,26 @@
 		"oAP": "/website/application/oauth/orcid.py",
 		"oF": 0
 		},
+	"/website/application/static/css/lateral_bar-min.css": {
+		"aP": 1,
+		"bl": 0,
+		"ft": 16,
+		"ma": 0,
+		"oA": 0,
+		"oAP": "/website/application/static/css/lateral_bar-min-min.css",
+		"oF": 0,
+		"oS": 3
+		},
+	"/website/application/static/css/lateral_bar.css": {
+		"aP": 1,
+		"bl": 0,
+		"ft": 16,
+		"ma": 0,
+		"oA": 0,
+		"oAP": "/website/application/static/css/lateral_bar-min.css",
+		"oF": 0,
+		"oS": 3
+		},
 	"/website/application/static/css/styles-min.css": {
 		"aP": 1,
 		"bl": 0,
@@ -265,6 +445,28 @@
 		"plM": 52780316221407,
 		"prP": 0
 		},
+	"/website/application/static/js/lateral_bar-min.js": {
+		"bF": 0,
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 0,
+		"oAP": "/website/application/static/js/lateral_bar-min-min.js",
+		"oF": 0,
+		"sC": 3,
+		"tS": 0
+		},
+	"/website/application/static/js/lateral_bar.js": {
+		"bF": 0,
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 0,
+		"oAP": "/website/application/static/js/lateral_bar-min.js",
+		"oF": 0,
+		"sC": 3,
+		"tS": 0
+		},
 	"/website/application/static/js/script.js": {
 		"bF": 0,
 		"ft": 64,
@@ -293,6 +495,86 @@
 		"hM": 0,
 		"oA": 1,
 		"oAP": "/website/application/tables/__init__.py",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/__init__.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 1,
+		"oAP": "/website/application/tables/__pycache__/__init__.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/administrators_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/administrators_table.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/database.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/database.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/moderators_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/moderators_table.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/orcid_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/orcid_table.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/samples_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/samples_table.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/taxons_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/taxons_table.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/tokens_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/tokens_table.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/translations_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/translations_table.cpython-38.pyc",
+		"oF": 0
+		},
+	"/website/application/tables/__pycache__/users_table.cpython-38.pyc": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/tables/__pycache__/users_table.cpython-38.pyc",
 		"oF": 0
 		},
 	"/website/application/tables/administrators_table.py": {
@@ -381,6 +663,14 @@
 		"hM": 0,
 		"oA": 0,
 		"oAP": "/website/application/templates/home.html",
+		"oF": 0
+		},
+	"/website/application/templates/lateral_bar.html": {
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
+		"oA": 0,
+		"oAP": "/website/application/templates/lateral_bar.html",
 		"oF": 0
 		},
 	"/website/application/templates/login.html": {
@@ -582,7 +872,7 @@
 "projectSettings": {
 	"abortBuildOnError": 1,
 	"allowInjectionReloads": 1,
-	"alwaysUseExternalServer": 0,
+	"alwaysUseExternalServer": 1,
 	"animateCSSInjections": 1,
 	"autoBuildNewItems": 1,
 	"autoprefixerEnableIEGrid": 0,
@@ -2075,7 +2365,7 @@
 			}
 		},
 	"esLintSourceType": 0,
-	"externalServerAddress": "http://localhost:8888",
+	"externalServerAddress": "http://localhost:4000",
 	"gitIgnoreBuildFolder": 1,
 	"hideConfigFile": 0,
 	"jsCheckerReservedNamesString": "",

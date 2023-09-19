@@ -13,6 +13,8 @@ services:
       - "4000:5000"
     depends_on:
       - postgres_database
+    volumes:
+      - "./docker-compose-configurations/website-configuration:/app"
     tmpfs:
       - /run
       - /run/lock

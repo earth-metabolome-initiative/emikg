@@ -1,0 +1,71 @@
+<!-- 
+Lateral Bar Test
+----------------
+This is a test page to prototype the lateral bar.
+
+The lateral bar is a component of the dashboard, and is displayed by default on screens larger than 800px.
+In screens smaller than 800px, an hamburher button is displayed on the top left corner of the screen, and when clicked,
+the lateral bar is displayed. Additionally, the bar is displayed if the cursor is stuck on the side of the screen for
+more than 3 seconds (i.e. the first 50 pixels on the left of the screen).
+
+The lateral bar contains buttons to the main sections of the dashboard, which include:
+- Taxons
+    - New taxon
+    - Search taxon
+- Samples
+    - New sample
+    - Search sample
+- Users (only for admins)
+    - New user
+    - Search user
+- Settings
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lateral Bar Test</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <ul id="hamburgerButton">
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <ul id="LateralBar">
+        <li>
+            <ul>
+                <li><a href="/{lang}/taxons">Taxons</a></li>
+                <li><a href="/{lang}/taxons/new">Create new taxon</a></li>
+                <li><a href="/{lang}/taxons/search">Search taxon</a></li>
+            </ul>
+        </li>
+        <li>
+            <ul>
+                <li><a href="/{lang}/samples">Samples</a></li>
+                <li><a href="/{lang}/samples/new">Create new sample</a></li>
+                <li><a href="/{lang}/samples/search">Search sample</a></li>
+            </ul>
+        </li>
+        <li>
+            <ul>
+                <li><a href="/{lang}/users">Users</a></li>
+                <li><a href="/{lang}/users/new">Create new user</a></li>
+                <li><a href="/{lang}/users/search">Search user</a></li>
+            </ul>
+        </li>
+        <li>
+            <ul>
+                <li><a href="/{lang}/settings">Settings</a></li>
+            </ul>
+        </li>
+    </ul>
+    <!-- We include jQuery from the Google repository -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
