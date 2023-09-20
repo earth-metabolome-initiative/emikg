@@ -74,8 +74,26 @@ body {
     color: rgb(68, 116, 5);
 }
 
+.content {
+    width: 800px;
+    max-width: 100%;
+    padding-top: 60px;
+    margin: 0 auto;
+}
 
+.content h2 {
+    border-bottom: 2px solid #aa9639;
+    color: #aa9639;
+    font-size: 20px;
+    margin-bottom: 1em;
+}
 
+/* When the page is larger than 800px, we need to account for the navigation bar on the left. */
+@media screen and (min-width: 800px) {
+    .content {
+        padding-left: 200px;
+    }
+}
 
 /* Responsive styles for smaller screens */
 @media screen and (min-width: 800px) {

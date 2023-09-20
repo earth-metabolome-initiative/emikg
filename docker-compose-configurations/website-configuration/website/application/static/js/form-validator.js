@@ -99,28 +99,48 @@ function check_not_empty(input) {
     return true;
 }
 
+function validation_callback(input){
+    // We remove error messages associated
+    // to the input field, as defined by p objects
+    // with the class "error-message" and with
+    // the attribute "for" equal to the name of the
+    // input field.
+    $('p.error-message[for="' + input.attr('name') + '"]').remove();
+    // We remove the class "error".
+    input.removeClass('error');
+    input.removeClass('valid');
+    // We check if the input is empty.
+    if (check_not_empty(input)) {
+        input.addClass('valid');
+        // If the parent form is now valid, we enable the submit button.
+    }
+    input.parents('form').find('button[type="submit"]').prop('disabled', !form_is_valid(input.parents('form')));
+}
+
 $(document).ready(function () {
     // When the user goes out of focus of the input with
     // class "validate", we validate the input.
     $('.validate').blur(function () {
-        // We retrieve the input field.
-        var input = $(this);
-        // We remove error messages associated
-        // to the input field, as defined by p objects
-        // with the class "error-message" and with
-        // the attribute "for" equal to the name of the
-        // input field.
-        $('p.error-message[for="' + input.attr('name') + '"]').remove();
-        // We remove the class "error".
-        input.removeClass('error');
-        input.removeClass('valid');
-        // We check if the input is empty.
-        if (check_not_empty(input)) {
-            input.addClass('valid');
-            // If the parent form is now valid, we enable the submit button.
-        }
-        input.parents('form').find('button[type="submit"]').prop('disabled', !form_is_valid(input.parents('form')));
+        validation_callback($(this));
     });
+
+    // When the user has a keyup event on the input with
+    // class "validate", and stops typing for 500 milliseconds,
+    // we validate the input.
+    $('.validate').keyup(function () {
+        var input = $(this);
+        // We set up a timeout to validate the input after 500 milliseconds.
+        var timeout = null;
+        // If there is a timeout, we clear it.
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        // We set up a new timeout.
+        timeout = setTimeout(function () {
+            validation_callback(input);
+        }, 300);
+    });
+
 
     // We iterate across all form objects and if any of them
     // contains an input field with class "validate" which does
@@ -137,8 +157,50 @@ $(document).ready(function () {
     // not have the class "valid", we prevent the form from
     // being submitted.
     $('form').submit(function (event) {
+        // We always stop the form from being submitted.
+        event.preventDefault();
+        // We check if the form is valid.
         if (!form_is_valid($(this))) {
-            event.preventDefault();
+            // If the form is not valid, we return.
+            return;
         }
+        // We send the form via ajax.
+        var form = $(this);
+        var url = form.attr('action');
+        var method = form.attr('method');
+        var data = form.serialize();
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            success: function (data) {
+                // We clear out the form.
+                form.find('input').val('');
+                form.find('textarea').val('');
+
+                // On success, we redirect the user to the
+                // page defined by the url attribute of the
+                // data returned, if any.
+                if (!('redirect_url' in data)) {
+                    return;
+                }
+                
+                var redirect_url = data['redirect_url'];
+                window.location.replace(redirect_url); 
+            },
+            error: function (data) {
+                // We retrieve the error messages from the backend.
+                var errors = data['errors'];
+                // We iterate across the error messages.
+                for (var i = 0; i < errors; i++) {
+                    // We retrieve the error message.
+                    var error = errors[i];
+                    // We retrieve the input field.
+                    var input = form.find('input[name="' + error['field'] + '"]');
+                    // We display the error message.
+                    show_error_message(input, error['message']);
+                }
+            }
+        });
     });
 });

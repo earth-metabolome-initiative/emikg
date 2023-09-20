@@ -72,10 +72,12 @@ CREATE TABLE orcid (
 CREATE TABLE taxons (
     id SERIAL PRIMARY KEY,
     taxon_name VARCHAR(255) NOT NULL,
+    taxon_description TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- Add other metadata fields as needed
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    created_by INT REFERENCES users(id) ON DELETE CASCADE,
+    updated_by INT REFERENCES users(id) ON DELETE CASCADE,
     -- The taxon name must be unique
     UNIQUE (taxon_name)
 );
@@ -93,11 +95,12 @@ CREATE TABLE samples (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- Add other sample-related fields as needed
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    created_by INT REFERENCES users(id) ON DELETE CASCADE,
+    updated_by INT REFERENCES users(id) ON DELETE CASCADE,
     taxon_id INT REFERENCES taxons(id) ON DELETE CASCADE,
     -- We require for the sample name to be unique
     UNIQUE (sample_name)
 );
 
 -- Create an index on the "user_id" column for faster queries
-CREATE INDEX idx_user_id ON taxons (user_id);
+-- CREATE INDEX idx_user_id ON taxons (user_id);

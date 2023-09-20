@@ -144,7 +144,7 @@ class Translation:
             label=label,
             translation=translation,
             lang=lang,
-            last_updated_by=User.get_current_user_id()
+            last_updated_by=User.session_user_id()
         )
 
 app.jinja_env.globals.update(

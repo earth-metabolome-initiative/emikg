@@ -42,14 +42,37 @@ def create_taxon():
         If the user is not logged in.
 
     """
-    if "taxon_name" not in request.form:
-        raise APIException("The 'taxon_name' field is missing in the request.", 400)
-    taxon_id = Taxon.create(request.form.get("taxon_name"))
-    return jsonify({"taxon_id": taxon_id, "message": "Taxon created successfully."})
+    if "taxon-name" not in request.form:
+        raise APIException("The 'taxon-name' field is missing in the request.", 400)
+    if "taxon-description" not in request.form:
+        raise APIException(
+            "The 'taxon-description' field is missing in the request.", 400
+        )
+    taxon = Taxon.create(
+        taxon_name=request.form.get("taxon-name"),
+        description=request.form.get("taxon-description"),
+    )
+    return jsonify(
+        {
+            "redirect_url": taxon.get_taxon_url(),
+            "message": "Taxon created successfully.",
+        }
+    )
 
 
 @app.route("/autocomplete-taxons/", methods=["POST"])
 def autocomplete_taxon():
     """Autocomplete a taxon."""
-    candidate_taxon_name = request.args.get("candidate_taxon_name")
-    return jsonify(matching_results=TaxonsTable.find_taxons_like(candidate_taxon_name))
+    # We get the JSON data from the request.
+    search = request.form["search"]
+
+    return jsonify(
+        matching_results=[
+            {
+                "name": taxon.get_taxon_name(),
+                "url": taxon.get_taxon_url(),
+                "id": taxon.get_taxon_id(),
+            }
+            for taxon in Taxon.find_taxons_like(search)
+        ]
+    )

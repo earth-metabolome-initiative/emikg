@@ -1,12 +1,35 @@
 """Concretely implements the proxy taxon interface using SQLAlchemy."""
 from enpkg_interfaces import Taxon as TaxonInterface
-
+from typing import List
+from ...application import app
 from ..exceptions import APIException
 from .user import User
+from .translation import Translation
 from ..tables import TaxonsTable
+
 
 class Taxon(TaxonInterface):
     """Class to represent a taxon."""
+
+    def __init__(self, taxon_id: int) -> None:
+        """Initialize taxon object.
+
+        Parameters
+        ----------
+        taxon_id : int
+            taxon ID.
+
+        Raises
+        ------
+        ValueError
+            If the taxon ID does not exist.
+        """
+        if not self.is_valid_taxon_id(taxon_id):
+            raise ValueError(f"Taxon ID #{taxon_id} does not exist.")
+
+        self._entry = TaxonsTable.get_entry_from_taxon_id(taxon_id)
+
+        super().__init__(taxon_id)
 
     @staticmethod
     def is_valid_taxon_id(taxon_id: int) -> bool:
@@ -28,7 +51,7 @@ class Taxon(TaxonInterface):
         column of the taxons table.
         """
         return TaxonsTable.is_valid_taxon_id(taxon_id)
-    
+
     @staticmethod
     def is_valid_taxon_name(taxon_name: str) -> bool:
         """Check if taxon name exists.
@@ -49,11 +72,45 @@ class Taxon(TaxonInterface):
         column of the taxons table.
         """
         return TaxonsTable.is_valid_taxon_name(taxon_name)
-    
+
     def get_author_user_id(self) -> int:
         """Return the taxon's author user ID"""
-        return TaxonsTable.get_author_user_id_from_taxon_id(self._taxon_id)
+        return self._entry.created_by
+
+    def get_taxon_name(self) -> str:
+        """Return taxon name."""
+        return self._entry.taxon_name
     
+    def get_taxon_id(self) -> int:
+        """Return taxon ID."""
+        return self._entry.id
+    
+    def get_taxon_description(self) -> str:
+        """Return taxon description."""
+        return self._entry.taxon_description
+
+    def get_taxon_url(self) -> str:
+        """Return taxon URL."""
+        return f"/{Translation.get_current_language()}/taxons/{self._entry.id}"
+
+    @staticmethod
+    def get_last_n_modified_taxons(number_of_taxons: int) -> List["Taxon"]:
+        """Return the last n taxons modified.
+
+        Parameters
+        ----------
+        number_of_taxons : int
+            Number of taxons to return.
+
+        Returns
+        -------
+        List[Taxon]
+            List of taxons.
+        """
+        return [
+            taxon for taxon in TaxonsTable.get_last_n_modified_taxons(number_of_taxons)
+        ]
+
     def delete(self):
         """Delete a taxon.
 
@@ -85,15 +142,36 @@ class Taxon(TaxonInterface):
 
         # We delete the taxon from the database.
         TaxonsTable.delete_taxon(self._taxon_id)
-    
+
     @staticmethod
-    def create(taxon_name: str) -> int:
+    def find_taxons_like(needle: str) -> List["Taxon"]:
+        """Find taxons like a needle.
+
+        Parameters
+        ----------
+        needle : str
+            Needle.
+
+        Returns
+        -------
+        List[str]
+            List of taxon names.
+        """
+        return [
+            Taxon(taxon.id)
+            for taxon in TaxonsTable.find_taxons_like(needle)
+        ]
+
+    @staticmethod
+    def create(taxon_name: str, description: str) -> "Taxon":
         """Create a taxon and return its ID.
 
         Parameters
         ----------
         taxon_name : str
             Name of the taxon.
+        description : str
+            Description of the taxon.
 
         Raises
         ------
@@ -110,11 +188,18 @@ class Taxon(TaxonInterface):
         if Taxon.is_valid_taxon_name(taxon_name):
             raise APIException(
                 "Taxon with the provided name already exists.",
-                status_code=409
             )
-        
+
         # We insert the taxon into the database.
-        return TaxonsTable.create_taxon_from_taxon_name(
-            taxon_name=taxon_name,
-            user_id=user.get_user_id()
+        return Taxon(
+            TaxonsTable.create_taxon(
+                taxon_name=taxon_name,
+                description=description,
+                user_id=user.get_user_id()
+            )
         )
+
+
+app.jinja_env.globals.update(
+    get_last_n_modified_taxons=Taxon.get_last_n_modified_taxons
+)

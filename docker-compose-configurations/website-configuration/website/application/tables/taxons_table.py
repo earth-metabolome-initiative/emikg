@@ -8,10 +8,12 @@ The SQL creation statement for the taxons table is the following:
 CREATE TABLE taxons (
     id SERIAL PRIMARY KEY,
     taxon_name VARCHAR(255) NOT NULL,
+    taxon_description TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- Add other metadata fields as needed
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    created_by INT REFERENCES users(id) ON DELETE CASCADE,
+    updated_by INT REFERENCES users(id) ON DELETE CASCADE,
     -- The taxon name must be unique
     UNIQUE (taxon_name)
 );
@@ -19,6 +21,7 @@ CREATE TABLE taxons (
 
 """
 from typing import List
+import datetime
 from .database import db
 
 
@@ -28,9 +31,15 @@ class TaxonsTable(db.Model):
     __tablename__ = "taxons"
     id = db.Column(db.Integer, primary_key=True)
     taxon_name = db.Column(db.String(255), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
-    updated_at = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    taxon_description = db.Column(db.Text, nullable=False)
+    created_at = db.Column(
+        db.TIMESTAMP, nullable=False, default=datetime.datetime.utcnow
+    )
+    updated_at = db.Column(
+        db.TIMESTAMP, nullable=False, default=datetime.datetime.utcnow
+    )
+    created_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    updated_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     def __repr__(self):
         return f"<Taxon #{self.id}>"
@@ -50,6 +59,66 @@ class TaxonsTable(db.Model):
             True if taxon ID exists, False otherwise.
         """
         return TaxonsTable.query.filter_by(id=taxon_id).count() > 0
+    
+    @staticmethod
+    def get_entry_from_taxon_id(taxon_id: int) -> "TaxonsTable":
+        """Check if taxon ID exists.
+
+        Parameters
+        ----------
+        taxon_id : int
+            taxon ID.
+
+        Returns
+        -------
+        bool
+            True if taxon ID exists, False otherwise.
+        """
+        return TaxonsTable.query.filter_by(id=taxon_id).first()
+
+    @staticmethod
+    def get_last_n_modified_taxons(number_of_taxons: int) -> List[str]:
+        """Return the last n taxons modified.
+
+        Parameters
+        ----------
+        number_of_taxons : int
+            Number of taxons to return.
+
+        Returns
+        -------
+        List[str]
+            List of taxon names.
+        """
+        query = TaxonsTable.query.order_by(TaxonsTable.updated_at.desc()).limit(
+            number_of_taxons
+        )
+        return [mv for mv in query.all()]
+
+    @staticmethod
+    def get_last_n_taxons_updated_by_user_id(
+        number_of_taxons: int, user_id: int
+    ) -> List[str]:
+        """Return the last n taxons updated by a user.
+
+        Parameters
+        ----------
+        number_of_taxons : int
+            Number of taxons to return.
+        user_id : int
+            User ID.
+
+        Returns
+        -------
+        List[str]
+            List of taxon names.
+        """
+        query = (
+            TaxonsTable.query.filter_by(updated_by=user_id)
+            .order_by(TaxonsTable.updated_at.desc())
+            .limit(number_of_taxons)
+        )
+        return [mv for mv in query.all()]
 
     @staticmethod
     def is_valid_taxon_name(taxon_name: str) -> bool:
@@ -68,13 +137,15 @@ class TaxonsTable(db.Model):
         return TaxonsTable.query.filter_by(taxon_name=taxon_name).count() > 0
 
     @staticmethod
-    def create_taxon_from_taxon_name(taxon_name: str, user_id: int) -> int:
+    def create_taxon(taxon_name: str, description: str, user_id: int) -> int:
         """Create a new taxon from a taxon name.
 
         Parameters
         ----------
         taxon_name : str
             taxon name.
+        description : str
+            taxon description.
         user_id : int
             user ID.
 
@@ -88,7 +159,12 @@ class TaxonsTable(db.Model):
 
         with db.session.begin_nested():
             # We insert a new taxon in the taxons table.
-            taxon = TaxonsTable(taxon_name=taxon_name, user_id=user_id)
+            taxon = TaxonsTable(
+                taxon_name=taxon_name,
+                taxon_description=description,
+                created_by=user_id,
+                updated_by=user_id,
+            )
             db.session.add(taxon)
             db.session.flush()
             taxon_id = taxon.id
@@ -137,7 +213,7 @@ class TaxonsTable(db.Model):
         db.session.commit()
 
     @staticmethod
-    def find_taxons_like(needle: str) -> List[str]:
+    def find_taxons_like(needle: str) -> List["TaxonsTable"]:
         """Find taxons like a needle.
 
         Parameters
@@ -153,4 +229,4 @@ class TaxonsTable(db.Model):
         query = TaxonsTable.query.filter(
             TaxonsTable.taxon_name.ilike(f"%{needle}%")
         ).limit(10)
-        return [mv[0] for mv in query.all()]
+        return [mv for mv in query.all()]

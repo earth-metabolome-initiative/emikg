@@ -13,10 +13,13 @@ class User(UserInterface):
     @staticmethod
     def from_flask_session() -> "User":
         """Return a user object from the Flask session."""
-        return User(
-            user_id=User.session_user_id()
-        )
-    
+        try:
+            return User(
+                user_id=User.session_user_id()
+            )
+        except ValueError:
+            User.logout()
+
     @staticmethod
     def from_token(token: str) -> "User":
         """Return a user object from a token.

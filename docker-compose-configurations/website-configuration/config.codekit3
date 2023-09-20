@@ -513,6 +513,18 @@
       "oF" : 0,
       "pg" : 0
     },
+    "\/website\/application\/static\/css\/taxons.css" : {
+      "aP" : 1,
+      "bl" : 0,
+      "ci" : 0,
+      "co" : 0,
+      "ft" : 16,
+      "ma" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/static\/css\/taxons-min.css",
+      "oF" : 0,
+      "pg" : 0
+    },
     "\/website\/application\/static\/css\/translations_popup.css" : {
       "aP" : 1,
       "bl" : 0,
@@ -837,6 +849,14 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/templates\/new_taxon.html",
+      "oF" : 0
+    },
+    "\/website\/application\/templates\/taxons.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/templates\/taxons.html",
       "oF" : 0
     },
     "\/website\/application\/templates\/translations_popup.html" : {

@@ -1,0 +1,21 @@
+<!-- 
+Page containing informations regarding the taxons and the last 10 created taxons.
+-->
+{% extends 'navigator.html' %}
+
+{% block content %}
+<div class="taxons-container">
+    <div class="taxons">
+        <h2>Taxons</h2>
+        <ul>
+            {% for taxon in get_last_n_modified_taxons(10) %}
+            <li>
+                <a href="/taxon/{{ taxon.id }}/">
+                    <h3>{{ taxon.taxon_name }}</h3>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

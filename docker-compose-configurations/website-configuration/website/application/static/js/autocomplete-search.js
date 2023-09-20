@@ -47,11 +47,8 @@ function create_search_result(target, result) {
     var li = $('<li></li>');
     var a = $('<a></a>');
     var span = $('<span></span>');
-    // We retrieve the language from the html tag.
-    var lang = $('html').attr('lang');
-    // We compose the URL from the lang, target and the id.
-    var url = '/' + lang + '/' + target + '/' + result.id;
-    a.attr('href', url);
+
+    a.attr('href', result.url);
     a.text(result.name);
     span.text(result.description);
     li.append(a);
@@ -67,10 +64,11 @@ function autocomplete_search() {
     // For each ul object with class "autocomplete-search"...
     $('ul.autocomplete-search').each(function() {
         // We retrieve the input field name, the action and the method.
-        var input_name = $(this).attr('for');
-        var action = $(this).attr('action');
+        var automplete = $(this);
+        var input_name = automplete.attr('for');
+        var action = automplete.attr('action');
         var url = "/autocomplete-" + action + "/";
-        var method = $(this).attr('method');
+        var method = automplete.attr('method');
         // We retrieve the input field.
         var input = $('input[name="' + input_name + '"]');
         // We set up a timeout to send the ajax request every 500 milliseconds.
@@ -96,13 +94,13 @@ function autocomplete_search() {
                     },
                     success: function(data) {
                         // We empty the ul object.
-                        $(this).empty();
+                        automplete.empty();
                         // We iterate over the results.
-                        for (var i = 0; i < data.length; i++) {
+                        for (var i = 0; i < data.matching_results.length; i++) {
                             // We create a search result.
-                            var result = create_search_result(action, data[i]);
+                            var result = create_search_result(action, data.matching_results[i]);
                             // We append the search result to the ul object.
-                            $(this).append(result);
+                            automplete.append(result);
                         }
                     },
                     complete: function() {
@@ -110,7 +108,7 @@ function autocomplete_search() {
                         loader.remove();
                     }
                 });
-            }, 500);
+            }, 50);
         });
     });
 }
