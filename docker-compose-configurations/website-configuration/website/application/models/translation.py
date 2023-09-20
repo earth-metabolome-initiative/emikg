@@ -14,29 +14,16 @@ class Translation:
         return session.get("lang", "en")
 
     @staticmethod
-    def retrieve_from_label(label: str) -> "Translation":
+    def retrieve_from_label_and_language(label: str, lang: str) -> "Translation":
         """Retrieve a translation from its label and language.
 
         Parameters
         ----------
         label: str
             Label of the translation to retrieve.
-
-        Implementative details
-        ----------------------
-        If the translation is not found in the requested language, then
-        the translation is searched in the default language (English).
-        If the translation is not found in the default language either,
-        then the translation is searched in any language. If the
-        translation is still not found, then we return the textual
-        label itself as the translation, plus the message in all caps
-        that the translation is missing. A moderator can then add the
-        missing translation by clicking on the message.
+        lang: str
+            Language of the translation to retrieve.
         """
-        # We determine whether the session language was set.
-        # If not, we set it to the default language, i.e. English.
-        lang = Translation.get_current_language()
-
         # We first try to retrieve the translation in the requested
         # language. If not found, we try the default language.
         # If not found, we try any language.
@@ -71,7 +58,33 @@ class Translation:
             translation = f"{label} (TRANSLATION MISSING)"
 
         return translation
-    
+
+    @staticmethod
+    def retrieve_from_label(label: str) -> "Translation":
+        """Retrieve a translation from its label and language.
+
+        Parameters
+        ----------
+        label: str
+            Label of the translation to retrieve.
+
+        Implementative details
+        ----------------------
+        If the translation is not found in the requested language, then
+        the translation is searched in the default language (English).
+        If the translation is not found in the default language either,
+        then the translation is searched in any language. If the
+        translation is still not found, then we return the textual
+        label itself as the translation, plus the message in all caps
+        that the translation is missing. A moderator can then add the
+        missing translation by clicking on the message.
+        """
+        return Translation.retrieve_from_label_and_language(
+            label=label,
+            lang=Translation.get_current_language()
+        )
+
+
     @staticmethod
     def retrieve_from_label_with_markup(label: str) -> "Translation":
         """Retrieve a translation from its label and language, with markup."""

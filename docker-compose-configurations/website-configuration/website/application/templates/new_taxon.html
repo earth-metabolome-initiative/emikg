@@ -5,13 +5,24 @@ Form to allow a user to create a new taxon.
 
 {% block content %}
 <div class="form-container">
-    <form action="">
-        <h2>Create new taxon</h2>
-        <p>
-            <label for="taxon-name">Taxon Name:</label>
-            <input name="taxon-name" type="text" placeholder="Your new taxon name">    
-        </p>
-        <input type="submit" value="Create" class="create" disabled>
+    <form action="/create-taxon/">
+        <h2>Create new Taxon</h2>
+        <div class="row">
+            <p class="flex">
+                <label for="taxon-name">Taxon Name:</label>
+                <input class="validate" name="taxon-name" type="text" placeholder="Your new taxon name">
+            </p>
+            <ul action="taxons" method="POST" class="autocomplete-search" for="taxon-name"></ul>
+        </div>
+        <div class="row">
+            <p class="flex">
+                <label for="taxon-description">Description:</label>
+                <textarea class="validate" name="taxon-description" placeholder="Your new taxon description"></textarea>
+            </p>
+        </div>
+        <button type="submit" class="create">
+            <i class="fa-regular fa-floppy-disk"></i> Create
+        </button>
     </form>
 </div>
 {% endblock %}

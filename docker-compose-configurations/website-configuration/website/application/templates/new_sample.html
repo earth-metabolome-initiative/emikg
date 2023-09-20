@@ -1,0 +1,21 @@
+<!-- 
+Form to allow a user to create a new sample.
+-->
+{% extends 'navigator.html' %}
+
+{% block content %}
+<div class="form-container">
+    <form action="">
+        <h2>Create new Sample</h2>
+        <p>
+            <label for="sample-name">Sample name:</label>
+            <input name="sample-name" type="text" placeholder="Your new sample name">    
+        </p>
+        <p>
+            <label for="taxon-name">Taxon name:</label>
+            <input name="taxon-name" type="text" placeholder="The new sample taxon name">    
+        </p>
+        <input type="submit" value="Create" class="create" disabled>
+    </form>
+</div>
+{% endblock %}

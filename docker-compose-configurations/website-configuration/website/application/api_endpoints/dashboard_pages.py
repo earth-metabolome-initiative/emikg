@@ -30,3 +30,32 @@ def dashboard_create_taxon(
         current_user=None,
         lang=lang
     )
+
+
+@app.route("/samples/new")
+@app.route("/<lang>/samples/new")
+def dashboard_create_sample(
+    lang: str = "en"
+):
+    """Create a sample.
+
+    Raises
+    ------
+    APIException
+        If the sample with the provided name already exists.
+    NotLogged
+        If the user is not logged in.
+
+    """
+    session['lang'] = lang
+    if User.is_authenticated():
+        return render_template(
+            'new_sample.html',
+            current_user=User.from_flask_session(),
+            lang=lang
+        )
+    return render_template(
+        "home.html",
+        current_user=None,
+        lang=lang
+    )

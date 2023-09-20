@@ -1,1 +1,1 @@
-$(document).ready((function(){$("#hamburgerButton").click((function(){$("#LateralBar").toggleClass("displayed")}))}));
+$(document).ready((function(){$("#hamburgerButton").click((function(){$("#LateralBar").toggleClass("displayed")})),$(document).click((function(a){var t=$("#LateralBar"),e=$("#hamburgerButton"),n=$(a.target);n.is(t)||n.is(e)||0!==t.has(n).length||0!==e.has(n).length||t.removeClass("displayed")}))}));
