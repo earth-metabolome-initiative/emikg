@@ -67,3 +67,31 @@ class Taxon:
             "Abstract method 'get_author_user_id' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )
+    
+    def get_taxon_name(self) -> str:
+        """Return taxon name."""
+        raise NotImplementedError(
+            "Abstract method 'get_taxon_name' should be implemented in derived class. "
+            f"It was not implemented in class {self.__class__.__name__}."
+        )
+    
+    def get_taxon_id(self) -> int:
+        """Return taxon ID."""
+        raise NotImplementedError(
+            "Abstract method 'get_taxon_id' should be implemented in derived class. "
+            f"It was not implemented in class {self.__class__.__name__}."
+        )
+    
+    def get_taxon_description(self) -> str:
+        """Return taxon description."""
+        raise NotImplementedError(
+            "Abstract method 'get_taxon_description' should be implemented in derived class. "
+            f"It was not implemented in class {self.__class__.__name__}."
+        )
+    
+    def get_taxon_url(self) -> str:
+        """Return taxon URL."""
+        raise NotImplementedError(
+            "Abstract method 'get_taxon_url' should be implemented in derived class. "
+            f"It was not implemented in class {self.__class__.__name__}."
+        )
