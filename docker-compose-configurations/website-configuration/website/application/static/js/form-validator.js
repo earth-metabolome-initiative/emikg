@@ -99,6 +99,34 @@ function check_not_empty(input) {
     return true;
 }
 
+// Function that checks whether the provided field has
+// the must_be_equal_to attribute, and if so, whether
+// the value of the field is equal to the value of the
+// field with the name provided by the must_be_equal_to
+// attribute.
+function check_must_be_equal_to(input) {
+    // If the input has the attribute "must_be_equal_to",
+    // we check whether the value of the input field is
+    // equal to the value of the input field with the name
+    // provided by the must_be_equal_to attribute.
+    if (input.attr('must_be_equal_to') != undefined) {
+        // We retrieve the value of the input field.
+        var value = input.val();
+        // We retrieve the value of the attribute.
+        var expected_value = input.attr('must_be_equal_to');
+        // If the values are not equal, we return the error message.
+        if (value != expected_value) {
+            show_error_message(
+                input,
+                "must_be_equal_to"
+            );
+            return false;
+        }
+    }
+    return true;
+}
+
+
 function validation_callback(input){
     // We remove error messages associated
     // to the input field, as defined by p objects
@@ -110,7 +138,10 @@ function validation_callback(input){
     input.removeClass('error');
     input.removeClass('valid');
     // We check if the input is empty.
-    if (check_not_empty(input)) {
+    if (
+        check_not_empty(input) &&
+        check_must_be_equal_to(input)
+    ) {
         input.addClass('valid');
         // If the parent form is now valid, we enable the submit button.
     }
@@ -184,7 +215,7 @@ $(document).ready(function () {
                 if (!('redirect_url' in data)) {
                     return;
                 }
-                
+
                 var redirect_url = data['redirect_url'];
                 window.location.replace(redirect_url); 
             },

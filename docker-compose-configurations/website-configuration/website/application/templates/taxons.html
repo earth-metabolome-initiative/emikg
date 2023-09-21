@@ -7,12 +7,11 @@ Page containing informations regarding the taxons and the last 10 created taxons
 <div class="taxons-container">
     <div class="taxons">
         <h2>Taxons</h2>
-        <ul>
+        <ul class="search-results">
             {% for taxon in get_last_n_modified_taxons(10) %}
             <li>
-                <a href="/taxon/{{ taxon.id }}/">
-                    <h3>{{ taxon.taxon_name }}</h3>
-                </a>
+                <h4><a href="{{taxon.get_taxon_url()}}">{{ taxon.get_taxon_name() }}</a></h4>
+                <span>{{ taxon.get_taxon_description() }}</span>
             </li>
             {% endfor %}
         </ul>

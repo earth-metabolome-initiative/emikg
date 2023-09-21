@@ -138,3 +138,15 @@ def search_sample_page(
         current_user=User.from_flask_session() if User.is_authenticated() else None,
         lang=lang
     )
+
+@app.route("/users/search")
+@app.route("/<lang>/users/search")
+def search_user_page(
+    lang: str = "en",
+):
+    """Return the sample page."""
+    return render_template(
+        "search_user.html",
+        current_user=User.from_flask_session() if User.is_authenticated() else None,
+        lang=lang
+    )

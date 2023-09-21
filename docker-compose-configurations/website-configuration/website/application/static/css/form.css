@@ -2,6 +2,12 @@
     padding: 1em;
 }
 
+.form-container form::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
 .form-container form div.row{
     margin-bottom: 0.5em;
 }
@@ -73,6 +79,12 @@
     color: #fff;
 }
 
+.form-container form button[type=submit].deprecate {
+    background-color: #FFA500;
+    border: 2px solid #FFA500;
+    color: #fff;
+}
+
 /* When a button is disabled, we grey it out and it is not clickable but shows a block sign. */
 .form-container form button[type=submit]:disabled {
     background-color: #ccc;
@@ -93,7 +105,69 @@
     color: rgb(116, 5, 5);
 }
 
+.form-container form button[type=submit].deprecate:hover {
+    background-color: white;
+    color: #FFA500;
+}
+
 .form-container form button[type=submit]:disabled:hover {
     background-color: #ddd;
     color: #fff;
+}
+
+/* Area of settings where some non-reversible operation can be performed. */
+.danger_zone, .admin_zone  {
+    border: 5px solid;
+    border-radius: 1em;
+    margin-top: 1em;
+}
+
+.danger_zone {
+    border-color: #ed2e38;
+}
+
+.admin_zone {
+    border-color: #FFA500;
+}
+
+.danger_zone h3 {
+    background-color: #ed2e38;
+}
+
+.danger_zone h3, .admin_zone h3 {
+    padding: 0.5em;
+    box-sizing: border-box;
+    color: #fff;
+}
+
+.admin_zone h3 {
+    background-color: #FFA500;
+}
+
+.danger_zone h4, .admin_zone h4 {
+    padding: 0.5em;
+    border-bottom: 1px solid;
+}
+
+.danger_zone h4 {
+    color: #ed2e38;
+    border-color: #ed2e38;
+}
+
+.admin_zone h4 {
+    color: #FFA500;
+    border-color: #FFA500;
+}
+
+.danger_zone h5, .admin_zone h5 {
+    padding: 0.2em 0.5em;
+}
+
+.danger_zone h5 {
+    color: #ed2e38;
+}
+
+.danger_zone p, .admin_zone p {
+    padding: 0.5em;
+    color: #333;
 }

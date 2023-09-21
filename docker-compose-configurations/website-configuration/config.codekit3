@@ -911,6 +911,14 @@
       "oAP" : "\/website\/application\/templates\/search_taxon.html",
       "oF" : 0
     },
+    "\/website\/application\/templates\/search_user.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/templates\/search_user.html",
+      "oF" : 0
+    },
     "\/website\/application\/templates\/taxon.html" : {
       "cB" : 0,
       "ft" : 8192,

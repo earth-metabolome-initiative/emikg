@@ -1,4 +1,4 @@
-ul.autocomplete-search{
+ul.search-results{
     list-style-type: none;
     padding: 0;
     margin: 0;
@@ -11,28 +11,31 @@ ul.autocomplete-search{
     max-height: 200px;
     overflow-y: scroll;
     border-radius: 0.5em;
-    display: none;
     margin-top: 1em;
     -webkit-columns: 2;
     -moz-columns: 2;
     columns: 2;
 }
 
-ul.autocomplete-search li{
+ul.autocomplete-search {
+    display: none;
+}
+
+ul.search-results li{
     padding: 0.5em;
     cursor: pointer;
     transition: background-color 0.1s ease-in-out;
 }
 
-ul.autocomplete-search li h4 a{
+ul.search-results li h4 a{
     color: #aa9639;
     text-decoration: underline;
 }
 
-ul.autocomplete-search li:hover{
+ul.search-results li:hover{
     background-color: #eee;
 }
 
-ul.autocomplete-search li{
+ul.search-results li{
     background-color: #fff;
 }

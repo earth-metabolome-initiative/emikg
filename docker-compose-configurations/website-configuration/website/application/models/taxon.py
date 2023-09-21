@@ -108,7 +108,7 @@ class Taxon(TaxonInterface):
             List of taxons.
         """
         return [
-            taxon for taxon in TaxonsTable.get_last_n_modified_taxons(number_of_taxons)
+            Taxon(taxon.id) for taxon in TaxonsTable.get_last_n_modified_taxons(number_of_taxons)
         ]
 
     def delete(self):
