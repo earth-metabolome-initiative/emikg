@@ -5,17 +5,30 @@ Form to allow a user to create a new sample.
 
 {% block content %}
 <div class="form-container">
-    <form action="">
+    <form action="/create-sample/" method="POST">
         <h2>Create new Sample</h2>
-        <p>
-            <label for="sample-name">Sample name:</label>
-            <input name="sample-name" type="text" placeholder="Your new sample name">    
-        </p>
-        <p>
-            <label for="taxon-name">Taxon name:</label>
-            <input name="taxon-name" type="text" placeholder="The new sample taxon name">    
-        </p>
-        <input type="submit" value="Create" class="create" disabled>
+        <div class="row">
+            <p class="flex">
+                <label for="sample-name">Sample Name:</label>
+                <input class="validate" name="sample-name" type="text" placeholder="Your new sample name">
+            </p>
+            <ul action="samples" method="POST" class="autocomplete-search" for="sample-name"></ul>
+        </div>
+        <div class="row">
+            <p class="flex">
+                <label for="taxon-name">Taxon Name:</label>
+                <input class="validate autocomplete-field" method="POST" action="taxons" name="taxon-name" type="text" placeholder="The sample's taxon">
+            </p>
+        </div>
+        <div class="row">
+            <p class="flex">
+                <label for="sample-description">Description:</label>
+                <textarea class="validate" name="sample-description" placeholder="Your new sample description"></textarea>
+            </p>
+        </div>
+        <button type="submit" class="create">
+            <i class="fa-regular fa-floppy-disk"></i> Create
+        </button>
     </form>
 </div>
 {% endblock %}

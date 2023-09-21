@@ -66,9 +66,11 @@ def autocomplete_taxon():
     # We get the JSON data from the request.
     search = request.form["search"]
 
+    only_name = request.form.get("only_name", False)
+
     return jsonify(
         matching_results=[
-            {
+            taxon.get_taxon_name() if only_name else {
                 "name": taxon.get_taxon_name(),
                 "description": taxon.get_taxon_description(),
                 "url": taxon.get_taxon_url(),
