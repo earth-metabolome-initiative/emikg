@@ -70,6 +70,7 @@ def autocomplete_taxon():
         matching_results=[
             {
                 "name": taxon.get_taxon_name(),
+                "description": taxon.get_taxon_description(),
                 "url": taxon.get_taxon_url(),
                 "id": taxon.get_taxon_id(),
             }

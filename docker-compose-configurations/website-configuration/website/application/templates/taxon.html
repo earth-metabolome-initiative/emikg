@@ -1,0 +1,10 @@
+{% extends 'navigator.html' %}
+
+{% block content %}
+<div class="taxons-container">
+    <div class="taxons">
+        <h2>{{taxon.get_taxon_name()}}</h2>
+        <p>{{taxon.get_taxon_description()}}</p>
+    </div>
+</div>
+{% endblock %}

@@ -46,12 +46,15 @@
 function create_search_result(target, result) {
     var li = $('<li></li>');
     var a = $('<a></a>');
+    var h4 = $('<h4></h4>');
     var span = $('<span></span>');
 
     a.attr('href', result.url);
     a.text(result.name);
+    h4.append(a);
     span.text(result.description);
-    li.append(a);
+    li.append(h4);
+    li.append(span);
     return li;
 }
 
@@ -65,6 +68,7 @@ function autocomplete_search() {
     $('ul.autocomplete-search').each(function() {
         // We retrieve the input field name, the action and the method.
         var automplete = $(this);
+        automplete.hide();
         var input_name = automplete.attr('for');
         var action = automplete.attr('action');
         var url = "/autocomplete-" + action + "/";
@@ -82,6 +86,13 @@ function autocomplete_search() {
             timeout = setTimeout(function() {
                 // We retrieve the search value.
                 var search = input.val();
+                // If the value is empty, we empty the ul object and return.
+                if (search == '') {
+                    automplete.empty();
+                    automplete.hide(300);
+                    return;
+                }
+
                 // We create a loader, i.e. a span object with class "loader".
                 var loader = $('<span></span>');
                 loader.addClass('loader');
@@ -101,6 +112,11 @@ function autocomplete_search() {
                             var result = create_search_result(action, data.matching_results[i]);
                             // We append the search result to the ul object.
                             automplete.append(result);
+                        }
+                        if (data.matching_results.length > 0) {
+                            automplete.show(300);
+                        } else {
+                            automplete.hide(300);
                         }
                     },
                     complete: function() {

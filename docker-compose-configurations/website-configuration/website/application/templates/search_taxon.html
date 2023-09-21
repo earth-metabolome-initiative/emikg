@@ -1,0 +1,19 @@
+<!-- 
+    Form to allow a user to search for a taxon.
+-->
+{% extends 'navigator.html' %}
+
+{% block content %}
+<div class="form-container">
+    <form action="" method="">
+        <h2>Search Taxon</h2>
+        <div class="row">
+            <p class="flex">
+                <label for="taxon-name">Search taxon:</label>
+                <input name="taxon-name" type="text" placeholder="Search taxon" empty>
+            </p>
+            <ul action="taxons" method="POST" class="autocomplete-search" for="taxon-name"></ul>
+        </div>
+    </form>
+</div>
+{% endblock %}

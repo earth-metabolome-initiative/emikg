@@ -1,0 +1,10 @@
+{% extends 'navigator.html' %}
+
+{% block content %}
+<div class="samples-container">
+    <div class="samples">
+        <h2>{{sample.get_sample_name()}}</h2>
+        <p>{{sample.get_sample_description()}}</p>
+    </div>
+</div>
+{% endblock %}
