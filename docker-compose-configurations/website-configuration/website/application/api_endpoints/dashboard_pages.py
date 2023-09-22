@@ -1,6 +1,6 @@
 """API endpoints regardin the dashboard."""
 from flask import session, render_template, abort
-from ..models import User, Taxon, Sample
+from ..models import User, Taxon, Sample, Specter
 from ..application import app
 
 def dashboard_page(
@@ -35,16 +35,7 @@ def dashboard_page(
 def dashboard_taxons(
     lang: str = "en"
 ):
-    """Create a taxon.
-
-    Raises
-    ------
-    APIException
-        If the taxon with the provided name already exists.
-    NotLogged
-        If the user is not logged in.
-
-    """
+    """Load the taxons page."""
     return dashboard_page("taxons", lang)
 
 @app.route("/samples")
@@ -54,6 +45,14 @@ def dashboard_samples(
 ):
     """Load the samples page."""
     return dashboard_page("samples", lang)
+
+@app.route("/specters")
+@app.route("/<lang>/specters")
+def dashboard_specters(
+    lang: str = "en"
+):
+    """Load the specters page."""
+    return dashboard_page("specters", lang)
 
 @app.route("/taxons/new")
 @app.route("/<lang>/taxons/new")
@@ -90,6 +89,23 @@ def dashboard_create_sample(
     """
     return dashboard_page("new_sample", lang)
 
+@app.route("/specters/new")
+@app.route("/<lang>/specters/new")
+def dashboard_create_specter(
+    lang: str = "en"
+):
+    """Create a specter.
+
+    Raises
+    ------
+    APIException
+        If the specter with the provided name already exists.
+    NotLogged
+        If the user is not logged in.
+
+    """
+    return dashboard_page("new_specter", lang)
+
 @app.route("/taxons/<int:taxon_id>")
 @app.route("/<lang>/taxons/<int:taxon_id>")
 def taxon_page(
@@ -118,7 +134,6 @@ def search_taxon_page(
         lang=lang
     )
 
-
 @app.route("/samples/<int:sample_id>")
 @app.route("/<lang>/samples/<int:sample_id>")
 def sample_page(
@@ -143,6 +158,34 @@ def search_sample_page(
     """Return the sample page."""
     return render_template(
         "search_sample.html",
+        current_user=User.from_flask_session() if User.is_authenticated() else None,
+        lang=lang
+    )
+
+@app.route("/specters/<int:specter_id>")
+@app.route("/<lang>/specters/<int:specter_id>")
+def specter_page(
+    lang: str = "en",
+    specter_id: int = None
+):
+    """Return the specter page."""
+    if not Specter.is_valid_specter_id(specter_id):
+        abort(404)
+    return render_template(
+        "specter.html",
+        specter=Specter(specter_id),
+        current_user=User.from_flask_session() if User.is_authenticated() else None,
+        lang=lang
+    )
+
+@app.route("/specters/search")
+@app.route("/<lang>/specters/search")
+def search_specter_page(
+    lang: str = "en",
+):
+    """Return the specter page."""
+    return render_template(
+        "search_specter.html",
         current_user=User.from_flask_session() if User.is_authenticated() else None,
         lang=lang
     )
