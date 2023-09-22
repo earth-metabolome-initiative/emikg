@@ -22,6 +22,13 @@ Form to allow a user to create a new sample.
         </div>
         <div class="row">
             <p class="flex">
+                <label for="parent-sample-name">Parent Sample Name:</label>
+                <input class="validate" name="parent-sample-name" type="text" placeholder="The sample's parent" empty>
+            </p>
+            <ul action="samples" method="POST" class="autocomplete-search" for="parent-sample-name"></ul>
+        </div>
+        <div class="row">
+            <p class="flex">
                 <label for="sample-description">Description:</label>
                 <textarea class="validate" name="sample-description" placeholder="Your new sample description"></textarea>
             </p>

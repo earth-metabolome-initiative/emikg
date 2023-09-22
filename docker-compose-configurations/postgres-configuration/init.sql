@@ -102,5 +102,24 @@ CREATE TABLE samples (
     UNIQUE (sample_name)
 );
 
+-- Create the "specters" table to store the MASCOT file with molecular specters.
+CREATE TABLE specters (
+    id SERIAL PRIMARY KEY,
+    -- The name of the specter, which should be unique
+    specter_name VARCHAR(255) NOT NULL,
+    -- The sample id from which this specter was derived
+    derived_from INT REFERENCES samples(id) ON DELETE CASCADE,
+    -- The path to the MASCOT file
+    path VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    -- Add other specter-related fields as needed
+    created_by INT REFERENCES users(id) ON DELETE CASCADE,
+    updated_by INT REFERENCES users(id) ON DELETE CASCADE,
+    -- We require for the specter name to be unique
+    UNIQUE (specter_name)
+);
+
+
 -- Create an index on the "user_id" column for faster queries
 -- CREATE INDEX idx_user_id ON taxons (user_id);

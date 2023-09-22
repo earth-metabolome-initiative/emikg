@@ -7,6 +7,7 @@ from .samples_table import SamplesTable
 from .taxons_table import TaxonsTable
 from .translations_table import TranslationsTable
 from .tokens_table import TokensTable
+from .specters_table import SpectersTable
 
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     'TaxonsTable',
     'TranslationsTable',
     'TokensTable',
+    'SpectersTable'
 ]

@@ -2,6 +2,7 @@
 
 from typing import List, Optional
 from enpkg_interfaces import Sample as SampleInterface
+from ..application import app
 from .user import User
 from .taxon import Taxon
 from ..exceptions import APIException
@@ -59,7 +60,7 @@ class Sample(SampleInterface):
     
     def _get_parent_sample(self) -> "Sample":
         """Return the parent sample."""
-        return Sample(SamplesTable.get_author_user_id_from_sample_id(self._sample_id))
+        return Sample(SamplesTable.get_parent_sample_id_from_sample_id(self._sample_id))
     
     def get_child_samples(self) -> List["Sample"]:
         """Return the child samples."""
@@ -147,3 +148,25 @@ class Sample(SampleInterface):
             taxon_id=taxon_id,
             parent_sample_id=parent_sample_id
         )
+    
+    @staticmethod
+    def get_last_n_modified_samples(number_of_samples: int) -> List["Sample"]:
+        """Return the last n samples modified.
+
+        Parameters
+        ----------
+        number_of_samples: int
+            Number of samples to return.
+
+        Returns
+        -------
+        List[sample]
+            List of samples.
+        """
+        return [
+            Sample(sample.id) for sample in SamplesTable.get_last_n_modified_samples(number_of_samples)
+        ]
+    
+app.jinja_env.globals.update(
+    get_last_n_modified_samples=Sample.get_last_n_modified_samples
+)

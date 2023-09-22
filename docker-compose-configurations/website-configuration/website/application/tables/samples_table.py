@@ -18,7 +18,8 @@ CREATE TABLE samples (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- Add other sample-related fields as needed
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    created_by INT REFERENCES users(id) ON DELETE CASCADE,
+    updated_by INT REFERENCES users(id) ON DELETE CASCADE,
     taxon_id INT REFERENCES taxons(id) ON DELETE CASCADE,
     -- We require for the sample name to be unique
     UNIQUE (sample_name)
@@ -39,7 +40,8 @@ class SamplesTable(db.Model):
     derived_from = db.Column(db.Integer, db.ForeignKey('samples.id'))
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    updated_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     taxon_id = db.Column(db.Integer, db.ForeignKey('taxons.id'), nullable=False)
 
     def __repr__(self):
@@ -91,7 +93,7 @@ class SamplesTable(db.Model):
         bool
             True if user ID exists, False otherwise.
         """
-        return SamplesTable.query.filter_by(user_id=user_id).count() > 0
+        return SamplesTable.query.filter_by(created_by=user_id).count() > 0
     
     @staticmethod
     def get_author_user_id_from_sample_id(sample_id: int) -> int:
@@ -110,7 +112,7 @@ class SamplesTable(db.Model):
         return SamplesTable.query.filter_by(id=sample_id).first().user_id
     
     @staticmethod
-    def _get_parent_sample_id_from_sample_id(sample_id: int) -> int:
+    def get_parent_sample_id_from_sample_id(sample_id: int) -> int:
         """Return the parent sample ID of a sample.
 
         Parameters
@@ -196,7 +198,7 @@ class SamplesTable(db.Model):
 
         with db.session.begin_nested():
             # We insert a new sample in the samples table.
-            sample = SamplesTable(sample_name=sample_name, user_id=user_id, taxon_id=taxon_id, derived_from=parent_sample_id)
+            sample = SamplesTable(sample_name=sample_name, created_by=user_id, taxon_id=taxon_id, derived_from=parent_sample_id)
             db.session.add(sample)
             db.session.flush()
             sample_id = sample.id
@@ -205,3 +207,47 @@ class SamplesTable(db.Model):
             db.session.commit()
 
         return sample_id
+    
+    @staticmethod
+    def get_last_n_modified_samples(number_of_samples: int) -> List[str]:
+        """Return the last n samples modified.
+
+        Parameters
+        ----------
+        number_of_samples : int
+            Number of samples to return.
+
+        Returns
+        -------
+        List[str]
+            List of taxon names.
+        """
+        query = SamplesTable.query.order_by(SamplesTable.updated_at.desc()).limit(
+            number_of_samples
+        )
+        return [mv for mv in query.all()]
+
+    @staticmethod
+    def get_last_n_samples_updated_by_user_id(
+        number_of_samples: int, user_id: int
+    ) -> List[str]:
+        """Return the last n samples updated by a user.
+
+        Parameters
+        ----------
+        number_of_samples : int
+            Number of samples to return.
+        user_id : int
+            User ID.
+
+        Returns
+        -------
+        List[str]
+            List of taxon names.
+        """
+        query = (
+            SamplesTable.query.filter_by(updated_by=user_id)
+            .order_by(SamplesTable.updated_at.desc())
+            .limit(number_of_samples)
+        )
+        return [mv for mv in query.all()]

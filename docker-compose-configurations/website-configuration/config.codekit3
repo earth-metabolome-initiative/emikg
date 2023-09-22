@@ -137,6 +137,14 @@
       "oAP" : "\/website\/application\/api_endpoints\/__pycache__\/sample_api.cpython-38.pyc",
       "oF" : 0
     },
+    "\/website\/application\/api_endpoints\/__pycache__\/specter_api.cpython-38.pyc" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/api_endpoints\/__pycache__\/specter_api.cpython-38.pyc",
+      "oF" : 0
+    },
     "\/website\/application\/api_endpoints\/__pycache__\/static_api.cpython-38.pyc" : {
       "cB" : 0,
       "ft" : 8192,
@@ -207,6 +215,14 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/api_endpoints\/sample_api.py",
+      "oF" : 0
+    },
+    "\/website\/application\/api_endpoints\/specter_api.py" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/api_endpoints\/specter_api.py",
       "oF" : 0
     },
     "\/website\/application\/api_endpoints\/static_api.py" : {
@@ -337,6 +353,14 @@
       "oAP" : "\/website\/application\/models\/__pycache__\/sample.cpython-38.pyc",
       "oF" : 0
     },
+    "\/website\/application\/models\/__pycache__\/specter.cpython-38.pyc" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/models\/__pycache__\/specter.cpython-38.pyc",
+      "oF" : 0
+    },
     "\/website\/application\/models\/__pycache__\/taxon.cpython-38.pyc" : {
       "cB" : 0,
       "ft" : 8192,
@@ -367,6 +391,14 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/models\/sample.py",
+      "oF" : 0
+    },
+    "\/website\/application\/models\/specter.py" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/models\/specter.py",
       "oF" : 0
     },
     "\/website\/application\/models\/taxon.py" : {
@@ -438,6 +470,30 @@
       "ma" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/static\/css\/autocomplete-search-min.css",
+      "oF" : 0,
+      "pg" : 0
+    },
+    "\/website\/application\/static\/css\/dashboard-min.css" : {
+      "aP" : 1,
+      "bl" : 0,
+      "ci" : 0,
+      "co" : 0,
+      "ft" : 16,
+      "ma" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/static\/css\/dashboard-min-min.css",
+      "oF" : 0,
+      "pg" : 0
+    },
+    "\/website\/application\/static\/css\/dashboard.css" : {
+      "aP" : 1,
+      "bl" : 0,
+      "ci" : 0,
+      "co" : 0,
+      "ft" : 16,
+      "ma" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/static\/css\/dashboard-min.css",
       "oF" : 0,
       "pg" : 0
     },
@@ -534,30 +590,6 @@
       "ma" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/static\/css\/styles-min.css",
-      "oF" : 0,
-      "pg" : 0
-    },
-    "\/website\/application\/static\/css\/taxons-min.css" : {
-      "aP" : 1,
-      "bl" : 0,
-      "ci" : 0,
-      "co" : 0,
-      "ft" : 16,
-      "ma" : 0,
-      "oA" : 0,
-      "oAP" : "\/website\/application\/static\/css\/taxons-min-min.css",
-      "oF" : 0,
-      "pg" : 0
-    },
-    "\/website\/application\/static\/css\/taxons.css" : {
-      "aP" : 1,
-      "bl" : 0,
-      "ci" : 0,
-      "co" : 0,
-      "ft" : 16,
-      "ma" : 0,
-      "oA" : 0,
-      "oAP" : "\/website\/application\/static\/css\/taxons-min.css",
       "oF" : 0,
       "pg" : 0
     },
@@ -727,6 +759,14 @@
       "oAP" : "\/website\/application\/tables\/__pycache__\/samples_table.cpython-38.pyc",
       "oF" : 0
     },
+    "\/website\/application\/tables\/__pycache__\/specters_table.cpython-38.pyc" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/tables\/__pycache__\/specters_table.cpython-38.pyc",
+      "oF" : 0
+    },
     "\/website\/application\/tables\/__pycache__\/taxons_table.cpython-38.pyc" : {
       "cB" : 0,
       "ft" : 8192,
@@ -797,6 +837,14 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/tables\/samples_table.py",
+      "oF" : 0
+    },
+    "\/website\/application\/tables\/specters_table.py" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/tables\/specters_table.py",
       "oF" : 0
     },
     "\/website\/application\/tables\/taxons_table.py" : {
@@ -879,6 +927,14 @@
       "oAP" : "\/website\/application\/templates\/new_sample.html",
       "oF" : 0
     },
+    "\/website\/application\/templates\/new_specter.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/templates\/new_specter.html",
+      "oF" : 0
+    },
     "\/website\/application\/templates\/new_taxon.html" : {
       "cB" : 0,
       "ft" : 8192,
@@ -895,12 +951,28 @@
       "oAP" : "\/website\/application\/templates\/sample.html",
       "oF" : 0
     },
+    "\/website\/application\/templates\/samples.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/templates\/samples.html",
+      "oF" : 0
+    },
     "\/website\/application\/templates\/search_sample.html" : {
       "cB" : 0,
       "ft" : 8192,
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/templates\/search_sample.html",
+      "oF" : 0
+    },
+    "\/website\/application\/templates\/search_specter.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/templates\/search_specter.html",
       "oF" : 0
     },
     "\/website\/application\/templates\/search_taxon.html" : {
@@ -917,6 +989,14 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/templates\/search_user.html",
+      "oF" : 0
+    },
+    "\/website\/application\/templates\/specters.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/templates\/specters.html",
       "oF" : 0
     },
     "\/website\/application\/templates\/taxon.html" : {

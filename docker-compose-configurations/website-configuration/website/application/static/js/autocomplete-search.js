@@ -86,8 +86,8 @@ function autocomplete_search() {
             timeout = setTimeout(function() {
                 // We retrieve the search value.
                 var search = input.val();
-                // If the value is empty, we empty the ul object and return.
-                if (search == '') {
+                // If the value has less than 2 characters, we return.
+                if (search.length <= 2) {
                     automplete.empty();
                     automplete.hide(300);
                     return;
@@ -128,38 +128,5 @@ function autocomplete_search() {
         });
     });
 }
-
-
-$(document).ready(function() {
-    // For all input fields with class "autocomplete"
-    // we set up the autocomplete search. 
-    $("input.autocomplete-field").each(function() {
-        var input = $(this);
-        input.autocomplete({
-            source:function(request, response) {
-                // We set a variable for the input field.
-                // We retrieve the url for the endpoint to query
-                // from the input field attribute "action".
-                var action = input.attr('action');
-                var url = "/autocomplete-" + action + "/";
-                var method = input.attr('method');
-                $.getJSON(
-                    url,
-                    {
-                        search: request.term,
-                        only_name: true
-                    },
-                    method: method,
-                    function(data) {
-                    response(data.matching_results); // matching_results from jsonify
-                });
-            },
-            minLength: 2,
-            select: function(event, ui) {
-                console.log(ui.item.value); // not in your question, but might help later
-            }
-        }); 
-    });
-})
 
 $(document).ready(autocomplete_search);

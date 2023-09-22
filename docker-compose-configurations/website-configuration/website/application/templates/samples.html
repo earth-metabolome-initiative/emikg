@@ -1,0 +1,22 @@
+<!-- 
+Page containing informations regarding the samples and the last 10 created samples.
+-->
+{% extends 'navigator.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="samples">
+        <h2>Samples</h2>
+        <p>You can </p>
+        <h3>Recent samples</h3>
+        <ul class="search-results">
+            {% for sample in get_last_n_modified_samples(10) %}
+            <li>
+                <h4><a href="{{sample.get_sample_url()}}">{{ sample.get_sample_name() }}</a></h4>
+                <span>{{ sample.get_sample_description() }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

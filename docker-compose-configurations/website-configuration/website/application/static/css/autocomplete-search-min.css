@@ -23,6 +23,9 @@ ul.autocomplete-search {
 
 ul.search-results li{
     padding: 0.5em;
+    -webkit-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
+    break-inside: avoid-column;
     cursor: pointer;
     transition: background-color 0.1s ease-in-out;
 }

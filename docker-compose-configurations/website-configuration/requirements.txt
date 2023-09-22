@@ -6,4 +6,4 @@ authlib
 Flask-SocketIO
 dict_hash
 requests
-enpkg_interfaces>=0.0.2
+enpkg_interfaces>=0.0.5

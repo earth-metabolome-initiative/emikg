@@ -47,6 +47,14 @@ def dashboard_taxons(
     """
     return dashboard_page("taxons", lang)
 
+@app.route("/samples")
+@app.route("/<lang>/samples")
+def dashboard_samples(
+    lang: str = "en"
+):
+    """Load the samples page."""
+    return dashboard_page("samples", lang)
+
 @app.route("/taxons/new")
 @app.route("/<lang>/taxons/new")
 def dashboard_create_taxon(

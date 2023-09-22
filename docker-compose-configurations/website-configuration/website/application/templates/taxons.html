@@ -4,9 +4,11 @@ Page containing informations regarding the taxons and the last 10 created taxons
 {% extends 'navigator.html' %}
 
 {% block content %}
-<div class="taxons-container">
+<div class="dashboard-container">
     <div class="taxons">
         <h2>Taxons</h2>
+
+        <h3>Recent taxons</h3>
         <ul class="search-results">
             {% for taxon in get_last_n_modified_taxons(10) %}
             <li>
