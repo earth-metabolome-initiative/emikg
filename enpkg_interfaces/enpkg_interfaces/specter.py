@@ -1,12 +1,13 @@
 """Abstract interface for specter objects."""
 from typing import Type
 
+
 class Specter:
     """Abstract class to represent a specter."""
 
     def __init__(self, specter_id: int) -> None:
         """Initialize specter object.
-        
+
         Parameters
         ----------
         specter_id : int
@@ -18,10 +19,8 @@ class Specter:
             If the specter ID does not exist.
         """
         if not Specter.is_valid_specter_id(specter_id):
-            raise ValueError(
-                f"Specter ID #{specter_id} does not exist."
-            )
-        
+            raise ValueError(f"Specter ID #{specter_id} does not exist.")
+
         self._specter_id = specter_id
 
     @staticmethod
@@ -41,7 +40,7 @@ class Specter:
         raise NotImplementedError(
             "Abstract method 'is_valid_specter_id' should be implemented in derived class. "
         )
-    
+
     @staticmethod
     def is_valid_specter_name(specter_name: str) -> bool:
         """Check if specter name exists.
@@ -70,7 +69,7 @@ class Specter:
             "Abstract method '_get_parent_sample' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )
-    
+
     def get_author_user_id(self) -> int:
         """Return author user ID."""
         raise NotImplementedError(
