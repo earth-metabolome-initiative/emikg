@@ -214,6 +214,7 @@ the current language code.
     position: fixed;
     top: 50%;
     left: 50%;
+    -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     /* The popup is centered on the screen. */
     width: 50%;
@@ -222,6 +223,7 @@ the current language code.
     border: 1px solid #aa9639;
     z-index: 1001;
     /* We animate a fade-in up transition */
+    -webkit-animation: fade-in-up 0.5s ease-in-out;
     animation: fade-in-up 0.5s ease-in-out;
 }
 
@@ -281,13 +283,27 @@ the current language code.
 }
 
 /* The animation for the popup. */
-@keyframes fade-in-up {
+@-webkit-keyframes fade-in-up {
     from {
         opacity: 0;
+        -webkit-transform: translate(-50%, -60%);
         transform: translate(-50%, -60%);
     }
     to {
         opacity: 1;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+}
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        -webkit-transform: translate(-50%, -60%);
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: translate(-50%, -50%);
         transform: translate(-50%, -50%);
     }
 }

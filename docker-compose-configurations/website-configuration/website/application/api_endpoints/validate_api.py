@@ -1,4 +1,4 @@
-"""APIs relative to token handling and operations possible with tokens."""
+"""APIs relative to validation."""
 from flask import jsonify, request
 from ..application import app
 from ..models import Taxon
@@ -7,9 +7,17 @@ from ..models import Taxon
 
 @app.route("/validate/<group_name>", methods=["POST"])
 def validate_group(group_name: str):
+    """Validate a candidate value for a given group.
+    
+    Parameters
+    ----------
+    group_name : str
+        The name of the group to validate the candidate value for.
+    """
 
     callbacks = {
-        "taxon-name": Taxon.is_valid_taxon_name
+        "taxon-name": Taxon.is_valid_taxon_name,
+        "taxon-id": Taxon.is_valid_taxon_id,
     }
 
     if group_name not in callbacks:

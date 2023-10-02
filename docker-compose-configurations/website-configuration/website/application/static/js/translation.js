@@ -1,167 +1,206 @@
-/// Translations
-///
-/// This file is included in the template of the website when the user is logged in
-/// and is a moderator. It is used to provide an interface for translating the website
-/// into other languages, and to easily allow moderators to correct mistakes in the
-/// translations.
-/// 
-/// The translations are stored in the database, and are loaded into the page when
-/// the page is loaded via Jinja population, so no javascript is required to load
-/// the translations in the first place. A moderator can then edit the translations
-/// by clicking 3 times on the text they want to edit, which causes a popup to appear
-/// containing a textarea with the current translation in it. The same interface also
-/// includes the language code for the language being translated, and the label associated
-/// with the text being translated. The moderator can then edit the translation and click
-/// the save button to save the translation to the database.
-///
-/// The endpoint being used to save the translations via AJAX is /update-label/<lang>/<label>,
-/// where <lang> is the language code for the language being translated, and <label> is the
-/// label of the text being translated. The endpoint expects a POST request with the new
-/// translation in the body of the request. The endpoint will return a 200 status code if
-/// the translation was successfully saved, and a 400 status code if the translation was
-/// not saved. The endpoint will also return a JSON object with the success message if the
-/// translation was saved, and an error message if the translation was not saved.
-///
-/// The client side text is updated via javascript upon successful saving of the translation,
-/// so that the user can see the updated translation without having to refresh the page.
-/// The translation popup is also closed upon successful saving of the translation.
-///
+// Translations widget
+// -------------------
+// 
+// The translation widjet is a jQuery-based widget that allows website moderators to
+// translate a text into a different language.
+//
+// It is displayed when a moderator user either:
+// - clicks 3 times on short succession on an element they want to translate with the class "translatable"
+// - hits the hot-keys "Ctrl + Alt + T"
+// 
+// It is hidden when the user either:
+// - clicks on the "translation_widjet_close" button
+// - clicks on the background, with id "translation_widjet_background"
+// - hits the hot-keys "Ctrl + Alt + T"
+// - hits the "Escape" key
+//
+// The widjet has the ID "translation_widjet".
 
-function tripleClick(element, callback) {
-    let clickCount = 0;
-    let clickTimeout;
+/**
+ * On click of the "translation_item" element, we set the value of the textarea
+ * and set the class of the translation item as "selected", removing the class
+ * from the previously selected translation item. Additionally, we set the save
+ * button as disabled until any edit is made to the textarea.
+ */
+function selectTranslationItem(translation_item) {
+    var textarea = $("#current_translation");
+    var translation_label = translation_item.attr("reference-label");
+    var textual_item = $("[data-label='" + translation_label + "']");
+    textarea.val(textual_item.text());
+    $(".selected_translation_item").removeClass("selected_translation_item");
+    translation_item.addClass("selected_translation_item");
+    $("#save_translation").addClass("disabled");
 
-    element.addEventListener("click", function () {
-        clickCount++;
+    // If the translation item happens to not be visible because
+    // of the scroll, we scroll to it.
+    var translations_list = $("#translations_list");
+    var translation_item_position = translation_item.position();
+    var translation_item_top = translation_item_position.top;
+    var translation_item_height = translation_item.height();
+    var translations_list_height = translations_list.height();
+    var translations_list_top = translations_list.scrollTop();
+    var translations_list_bottom = translations_list_top + translations_list_height;
+    var translation_item_bottom = translation_item_top + translation_item_height;
+    if (translation_item_top < translations_list_top) {
+        translations_list.scrollTop(translation_item_top);
+    } else if (translation_item_bottom > translations_list_bottom) {
+        translations_list.scrollTop(translation_item_bottom - translations_list_height);
+    }
 
-        if (clickCount === 1) {
-            // First click
-            clickTimeout = setTimeout(function () {
-                clickCount = 0; // Reset click count if the user doesn't click again within a set time
-            }, 300); // Adjust the time window (in milliseconds) for a triple click
-        } else if (clickCount === 3) {
-            // Third click (triple-click)
-            clearTimeout(clickTimeout); // Clear the timeout
-
-            // Call the callback function
-            if (typeof callback === "function") {
-                callback();
-            }
-
-            clickCount = 0; // Reset click count after triple-click
-        }
-    });
+    textarea.focus();
 }
 
-/// Set up the event listeners for the triple click on a text with class "translatable"
-/// to open the translation popup
-function setupTranslationPopup() {
-    // Get all the elements with class "translatable"
-    let translatableElements = document.getElementsByClassName("translatable");
+/**
+ * Pupulate the translations widget's translations_list with elements with the class "translatable".
+ */
+function populateTranslationsList() {
+    var translations = $(".translatable");
+    var translations_list = $("#translations_list");
+    translations_list.empty();
+    var first = true;
+    translations.each(function() {
+        var translation = $(this);
+        var translation_label = translation.attr("data-label");
+        var translation_item = $("<li></li>");
 
-    // Loop through the elements and add the event listener to each one
-    for (let i = 0; i < translatableElements.length; i++) {
-        // For each element, we add an event listener for the triple click
-        tripleClick(translatableElements[i], function () {
-            // When the triple click is detected, we call the function to open the translation popup
-            openTranslationPopup(translatableElements[i]);
+        // We set an attribute "reference-label" on the translation_item
+        // so that we can easily retrieve the translation_item
+        // when the user clicks on it.
+        translation_item.attr("reference-label", translation_label);
+
+        translation_item.text(translation_label);
+        translations_list.append(translation_item);
+
+        // We set the onclick event of the translation_item
+        // to call the selectTranslationItem function if the
+        // translation_item is clicked.
+        translation_item.click(function() {
+            selectTranslationItem(translation_item);
         });
-    }
-}
 
-/// Open the translation popup for the given element
-function openTranslationPopup(element) {
-    // Get the language code and label from the element
-    let lang = element.getAttribute("data-lang");
-    let label = element.getAttribute("data-label");
-
-    // Get the translation from the element
-    let translation = element.innerHTML;
-
-    // Get the translation popup
-    let translationPopup = document.getElementById("translation-popup");
-
-    // Get the translation popup form h2 element to update
-    // the name of the label currently being translated
-    let translationPopupFormH2 = document.getElementById("currentTranslationLabel");
-
-    // Get the translation popup background
-    let translationPopupBackground = document.getElementById("translationPopupBackground");
-
-    // Get the translation popup close button
-    let translationPopupCloseButton = document.getElementById("translationPopupCloseButton");
-
-    // Get the translation popup form textarea
-    let translationPopupFormTextarea = document.getElementById("translation-popup-form-textarea");
-
-    // Get the translation popup form save button
-    let translationPopupFormSaveButton = document.getElementById("translationsPopupSubmitButton");
-
-    // Set the translation popup form label input value
-    translationPopupFormLabel.value = label;
-
-    // Set the translation popup form textarea value
-    translationPopupFormTextarea.value = translation;
-
-    // Set the translation popup form save button onclick function
-    translationPopupFormSaveButton.onclick = function () {
-        // When the save button is clicked, we call the function to save the translation
-        saveTranslation(
-            lang,
-            label,
-            translationPopupFormTextarea.value,
-            element
-        );
-    };
-
-    // We set that a click on the close button or the
-    // background should close the translation popup
-    translationPopupCloseButton.onclick = function () {
-        closeTranslationPopup();
-    };
-
-    translationPopupBackground.onclick = function () {
-        closeTranslationPopup();
-    }
-
-    // Show the translation popup
-    translationPopup.style.display = "block";
-}
-
-/// Close the translation popup
-function closeTranslationPopup() {
-    // Get the translation popup
-    let translationPopup = document.getElementById("translation-popup");
-
-    // Hide the translation popup
-    translationPopup.style.display = "none";
-}
-
-/// Save the translation to the database
-function saveTranslation(lang, label, updated_translation, element) {
-    // Get the translation popup form save button
-    let translationPopupFormSaveButton = document.getElementById("translationsPopupSubmitButton");
-
-    // Disable the save button
-    translationPopupFormSaveButton.disabled = true;
-
-    // Make the AJAX request to save the translation
-    $.ajax({
-        url: "/update-label/" + lang + "/" + label,
-        type: "POST",
-        data: updated_translation,
-        contentType: "text/plain",
-        success: function (data) {
-            // If the translation was successfully saved, we update the text on the page
-            // and close the translation popup
-            element.innerHTML = updated_translation;
-            closeTranslationPopup();
-        },
-        error: function (error) {
-            // If there was an error saving the translation, we display an error message
-            // and re-enable the save button
-            alert("Error saving translation: " + error.responseText);
-            translationPopupFormSaveButton.disabled = false;
+        if (first) {
+            first = false;
+            selectTranslationItem(translation_item);
         }
     });
 }
+
+/**
+ * Displayes the translations widget.
+ */
+function displayTranslationsWidget() {
+    var widget = $("#translation_widjet");
+    populateTranslationsList();
+    widget.show();
+}
+
+/**
+ * Hides the translations widget.
+ */
+function hideTranslationsWidget() {
+    var widget = $("#translation_widjet");
+    widget.hide();
+}
+
+/**
+ * Toggles the translations widget.
+ * If the widget is hidden, it is displayed.
+ * If the widget is displayed, it is hidden.
+ */
+function toggleTranslationsWidget() {
+    var widget = $("#translation_widjet");
+    if (widget.is(":visible")) {
+        hideTranslationsWidget();
+    } else {
+        displayTranslationsWidget();
+    }
+}
+
+/**
+ * Hides the translations widget if it is visible upon the user clicking ESC.
+ */
+function hideTranslationsWidgetOnEsc() {
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) {
+            hideTranslationsWidget();
+        }
+    });
+}
+
+/**
+ * Hides the translations widget if the user clicks on the background.
+ * The background has the ID "translation_widjet_background".
+ */
+function hideTranslationsWidgetOnBackgroundClick() {
+    $("#translation_widjet_background").click(function() {
+        hideTranslationsWidget();
+    });
+}
+
+/**
+ * Hides the translations widget if the user clicks on the "translation_widjet_close" button.
+ */
+function hideTranslationsWidgetOnCloseButtonClick() {
+    $("#translation_widjet_close").click(function() {
+        hideTranslationsWidget();
+    });
+}
+
+/**
+ * Shows the translations widget if the user clicks 3 times in short succession on an element with the class "translatable".
+ */
+function showTranslationsWidgetOnTripleClick() {
+    var clicks = 0;
+    var timeout = 0;
+    $(".translatable").click(function() {
+        clicks++;
+        if (clicks == 1) {
+            timeout = setTimeout(function() {
+                clicks = 0;
+            }, 400);
+        } else if (clicks == 3) {
+            clearTimeout(timeout);
+            clicks = 0;
+            displayTranslationsWidget();
+
+            // We click on the translation_item that has the same "reference-label"
+            // as the element that was clicked.
+            var translation_label = $(this).attr("data-label");
+            var translation_item = $("li[reference-label='" + translation_label + "']");
+            translation_item.click();
+        }
+    });
+}
+
+/**
+ * Toggle the translations widget if the user hits the hot-keys "Ctrl + Alt + T".
+ */
+function toggleTranslationsWidgetOnHotKeys() {
+    $(document).keydown(function(e) {
+        if (e.ctrlKey && e.altKey && e.keyCode == 84) {
+            toggleTranslationsWidget();
+        }
+    });
+}
+
+/** 
+ * When there is any keystroke to the textarea with ID "current_translation",
+ * we enable the save button with ID "save_translation".
+ */
+function enableSaveButtonOnKeystroke() {
+    $("#current_translation").keyup(function() {
+        $("#save_translation").removeClass("disabled");
+    });
+}
+
+/**
+ * Enables all of the events described above upon the document being ready.
+ */
+$(document).ready(function() {
+    hideTranslationsWidgetOnEsc();
+    hideTranslationsWidgetOnBackgroundClick();
+    hideTranslationsWidgetOnCloseButtonClick();
+    showTranslationsWidgetOnTripleClick();
+    toggleTranslationsWidgetOnHotKeys();
+    enableSaveButtonOnKeystroke();
+});

@@ -16,10 +16,8 @@
     <link rel="stylesheet" href="/static/css/lateral_bar.css">
     {% endif %}
     <!-- If the user is logged in and is a moderator -->
-    {% if current_user and current_user.is_moderator() %}
     <!-- we include the translations popup template -->
     <link rel="stylesheet" href="/static/css/translations_popup.css">
-    {% endif %}
     <title>Your Website</title>
 </head>
 
@@ -65,10 +63,8 @@
     </div>
 
     <!-- If the user is logged in and is a moderator -->
-    {% if current_user and current_user.is_moderator() %}
     <!-- we include the translations popup template -->
     {% include 'translations_popup.html' %}
-    {% endif %}
 
     <footer>
         <div class="footer-content">
@@ -85,10 +81,8 @@
     <script src="/static/js/lateral_bar.js"></script>
     {% endif %}
     <!-- If the user is logged in and is a moderator -->
-    {% if current_user and current_user.is_moderator() %}
     <!-- we include the translations popup script -->
-    <script src="/static/js/translations_popup.js"></script>
-    {% endif %}
+    <script src="/static/js/translation.js"></script>
     <script src="https://kit.fontawesome.com/a9d47abff9.js" crossorigin="anonymous"></script>
 </body>
 

@@ -16,26 +16,17 @@
     popup.
 
  -->
-
- <div class="translations-popup" id="translationsPopup">
-    <div class="translations-popup-background" id="translationPopupBackground"></div>
-    <div class="translations-popup-content">
-        <div class="translations-popup-header">
-            <h2 id="currentTranslationLabel"></h2>
-            <button class="close" id="translationPopupCloseButton">
-                <i class="fa-solid fa-times"></i>
-            </button>
+ <div id="translation_widjet">
+    <div id="translation_widjet_background"></div>
+    <div class="translation_widjet_container">
+        <div class="translations_side_bar">
+            <h2>Page labels</h2>
+            <ul id="translations_list"></ul>
         </div>
-        <form action="" method="POST" id="translationsForm">
-            <textarea id="translationsTextarea" rows="10" cols="50" required></textarea>
-            <button id="translationsPopupSubmitButton">
-                <i class="fa-solid fa-check"></i>
-                Save
-            </button>
+        <form action="/update-translation/{lang}/{label}">
+            <textarea name="current_translation" id="current_translation"></textarea>
+            <button id="save_translation"><i class="fas fa-save"></i> Save</button>
         </form>
-        <div class="translations-popup-footer">
-            <span class="current_language">
-                {{current_language()}}
-            </span>
-        </div>
+        <i class="fa-solid fa-xmark" id ="translation_widjet_close"></i>
     </div>
+</div>
