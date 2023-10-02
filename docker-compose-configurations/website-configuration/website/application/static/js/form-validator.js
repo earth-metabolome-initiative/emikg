@@ -76,6 +76,15 @@ function show_error_message(input, message_label) {
     parent.after(p);
     // We add the class "error" to the input field.
     input.addClass('error');
+    // We hide the error message after 10 seconds, or
+    // after the user clicks on the error message.
+    setTimeout(function () {
+        p.remove(300);
+    }, 10 * 1000);
+    p.click(function () {
+        p.remove(300);
+        input.focus();
+    });
 }
 
 // Function that checks if the input is empty.
@@ -126,50 +135,148 @@ function check_must_be_equal_to(input) {
     return true;
 }
 
+// Function that checks whether the provided field has a value
+// that is contained within the group defined by the group attribute.
+// The group attribute can either be 'taxon-name' or 'sample-name', 'taxon-id' or 'sample-id'. An
+// error message is displayed if the value is not contained within
+// the group.
+function check_in_group(input) {
+    // If the input has the attribute "in-group",
+    // we check whether the value of the input field is
+    // equal to the value of the input field with the name
+    // provided by the must_be_equal_to attribute.
+    if (input.attr('in-group') != undefined) {
+        // We retrieve the value of the input field.
+        var value = input.val();
+        // We retrieve the value of the attribute.
+        var group = input.attr('in-group');
+        // We execute an ajax request to check whether the value
+        // is contained within the group.
+        let url = '/validate/' + group;
+        let data = {
+            candidate: value
+        };
+        let status = false;
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: data,
+            async: false,
+            success: function (data) {
+                status = data['valid'];
+                if (data['valid'] == false) {
+                    show_error_message(
+                        input,
+                        "not_in_group"
+                    );
+                }
+            }
+        });
+        return status;
+    }
+    return true;
+}
 
-function validation_callback(input){
+// Function that checks whether the provided field has a value
+// that is not contained within the group defined by the group attribute.
+function check_not_in_group(input) {
+    // If the input has the attribute "not-in-group",
+    // we check whether the value of the input field is
+    // equal to the value of the input field with the name
+    // provided by the must_be_equal_to attribute.
+    if (input.attr('not-in-group') != undefined) {
+        // We retrieve the value of the input field.
+        var value = input.val();
+        // We retrieve the value of the attribute.
+        var group = input.attr('not-in-group');
+        // We execute an ajax request to check whether the value
+        // is contained within the group.
+        let url = '/validate/' + group;
+        let data = {
+            candidate: value
+        };
+        let status = false;
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: data,
+            async: false,
+            success: function (data) {
+                status = !data['valid'];
+                if (data['valid']) {
+                    show_error_message(
+                        input,
+                        "in_group"
+                    );
+                }
+            }
+        });
+        return status;
+    }
+    return true;
+}
+
+
+function validation_callback(input) {
+    // We check whether the input already has a last-valid-value
+    // attribute. If it has, we check that it is not equal to the
+    // current value, otherwise we return.
+    if (input.attr('last-valid-value') != undefined && input.attr('last-valid-value') != "" && input.attr('last-valid-value') == input.val()) {
+        return;
+    }
     // We remove error messages associated
     // to the input field, as defined by p objects
     // with the class "error-message" and with
     // the attribute "for" equal to the name of the
     // input field.
     $('p.error-message[for="' + input.attr('name') + '"]').remove();
-    // We remove the class "error".
-    input.removeClass('error');
-    input.removeClass('valid');
+
+    // We set the last-valid-value attribute to the
+    // current value of the input field.
+    input.attr('last-valid-value', input.val());
+
     // We check if the input is empty.
     if (
         check_not_empty(input) &&
-        check_must_be_equal_to(input)
+        check_must_be_equal_to(input) &&
+        check_in_group(input) &&
+        check_not_in_group(input)
     ) {
+        input.removeClass('error');
         input.addClass('valid');
-        // If the parent form is now valid, we enable the submit button.
+    } else {
+        input.removeClass('valid');
+        input.addClass('error');
     }
+    // If the parent form is now valid, we enable the submit button.
     input.parents('form').find('button[type="submit"]').prop('disabled', !form_is_valid(input.parents('form')));
+}
+
+// We set up a timeout to validate the input after 500 milliseconds.
+var timeout = null;
+function timed_validation_callback(input) {
+    // If there is a timeout, we clear it.
+    if (timeout) {
+        clearTimeout(timeout);
+    }
+    // We set up a new timeout.
+    timeout = setTimeout(function () {
+        validation_callback(input);
+    }, 300);
 }
 
 $(document).ready(function () {
     // When the user goes out of focus of the input with
     // class "validate", we validate the input.
     $('.validate').blur(function () {
-        validation_callback($(this));
+        timed_validation_callback($(this));
     });
 
     // When the user has a keyup event on the input with
     // class "validate", and stops typing for 500 milliseconds,
     // we validate the input.
     $('.validate').keyup(function () {
-        var input = $(this);
-        // We set up a timeout to validate the input after 500 milliseconds.
-        var timeout = null;
-        // If there is a timeout, we clear it.
-        if (timeout) {
-            clearTimeout(timeout);
-        }
-        // We set up a new timeout.
-        timeout = setTimeout(function () {
-            validation_callback(input);
-        }, 300);
+        timed_validation_callback($(this));
     });
 
 
@@ -217,7 +324,7 @@ $(document).ready(function () {
                 }
 
                 var redirect_url = data['redirect_url'];
-                window.location.replace(redirect_url); 
+                window.location.replace(redirect_url);
             },
             error: function (data) {
                 // We retrieve the error messages from the backend.
@@ -232,6 +339,40 @@ $(document).ready(function () {
                     show_error_message(input, error['message']);
                 }
             }
+        });
+    });
+
+    // For all labels of file inputs with class dropzone,
+    // we handle the drop, dragin and dragout events.
+    $('label.dropzone').each(function () {
+        var label = $(this);
+        var input = label.find('input[type="file"]');
+        // We handle the drop event.
+        label.on('drop', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            // We remove the class "dragover" from the label.
+            label.removeClass('dragover');
+            // We retrieve the files.
+            var files = event.originalEvent.dataTransfer.files;
+            // We set the files in the input field.
+            input.prop('files', files);
+            // We add the dropped property to the dropzone.
+            label.addClass('dropped');
+        });
+        // We handle the dragover event.
+        label.on('dragover', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            // We add the class "dragover" to the label.
+            label.addClass('dragover');
+        });
+        // We handle the dragout event.
+        label.on('dragout', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            // We remove the class "dragover" from the label.
+            label.removeClass('dragover');
         });
     });
 });

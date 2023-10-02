@@ -7,13 +7,13 @@
 <div class="form-container">
     <form action="" method="">
         <h2>Search Taxon</h2>
-        <div class="row">
+        <fieldset>
             <p class="flex">
                 <label for="taxon-name">Search taxon:</label>
                 <input name="taxon-name" type="text" placeholder="Search taxon" empty>
             </p>
             <ul action="taxons" method="POST" class="search-results autocomplete-search" for="taxon-name"></ul>
-        </div>
+        </fieldset>
     </form>
 </div>
 {% endblock %}

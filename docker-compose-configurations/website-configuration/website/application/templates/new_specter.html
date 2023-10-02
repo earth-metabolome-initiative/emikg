@@ -7,32 +7,31 @@ Form to allow a user to create a new specter.
 <div class="form-container">
     <form action="/create-specter/" method="POST">
         <h2>Create new Specter</h2>
-        <div class="row">
+        <fieldset>
             <p class="flex">
                 <label for="specter-name">Specter Name:</label>
                 <input class="validate" name="specter-name" type="text" placeholder="Your new specter name">
             </p>
             <ul action="specters" method="POST" class="autocomplete-search" for="specter-name"></ul>
-        </div>
-        <div class="row">
+        </fieldset>
+        <fieldset>
+            <label for="file" class="dropzone">Select a file
+                <input name="file" type="file">
+            </label>
+        </fieldset>
+        <fieldset>
             <p class="flex">
-                <label for="taxon-name">Taxon Name:</label>
-                <input class="validate autocomplete-field" method="POST" action="taxons" name="taxon-name" type="text" placeholder="The specter's taxon">
+                <label for="parent-sample-name">Parent Sample Name:</label>
+                <input class="validate" name="parent-sample-name" type="text" placeholder="The specter's sample">
             </p>
-        </div>
-        <div class="row">
-            <p class="flex">
-                <label for="parent-specter-name">Parent Specter Name:</label>
-                <input class="validate" name="parent-specter-name" type="text" placeholder="The specter's parent" empty>
-            </p>
-            <ul action="specters" method="POST" class="autocomplete-search" for="parent-specter-name"></ul>
-        </div>
-        <div class="row">
+            <ul action="samples" method="POST" class="autocomplete-search" for="parent-sample-name"></ul>
+        </fieldset>
+        <fieldset>
             <p class="flex">
                 <label for="specter-description">Description:</label>
                 <textarea class="validate" name="specter-description" placeholder="Your new specter description"></textarea>
             </p>
-        </div>
+        </fieldset>
         <button type="submit" class="create">
             <i class="fa-regular fa-floppy-disk"></i> Create
         </button>

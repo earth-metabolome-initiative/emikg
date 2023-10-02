@@ -9,3 +9,4 @@ from .static_api import *
 from .dashboard_pages import *
 from .translations_api import *
 from .specter_api import *
+from .validate_api import *

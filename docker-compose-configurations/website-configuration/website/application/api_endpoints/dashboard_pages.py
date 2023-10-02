@@ -30,6 +30,14 @@ def dashboard_page(
         lang=lang
     )
 
+@app.route("/settings")
+@app.route("/<lang>/settings")
+def dashboard_settings(
+    lang: str = "en"
+):
+    """Load the settings page."""
+    return dashboard_page("settings", lang)
+
 @app.route("/taxons")
 @app.route("/<lang>/taxons")
 def dashboard_taxons(

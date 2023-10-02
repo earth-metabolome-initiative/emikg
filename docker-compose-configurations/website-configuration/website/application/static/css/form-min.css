@@ -8,7 +8,7 @@
     display: table;
 }
 
-.form-container form div.row{
+.form-container form fieldset {
     margin-bottom: 0.5em;
 }
 
@@ -33,6 +33,40 @@
     flex: 1;
 }
 
+/* We stylize the file input fields as a drop area. */
+
+.form-container form input[type=file] {
+    cursor: pointer;
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.form-container form label.dropzone {
+    border: 1px dashed #aa9639;
+    width: 100%;
+    position: relative;
+    border-radius: 4px;
+    padding: 2em;
+    text-align: center;
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.1s ease-in-out;
+}
+
+.form-container form label.dropzone.dropped {
+    background-color: #aa9639;
+    color: white;
+}
+
+.form-container form label.dropzone:hover, .form-container form label.dropzone.dragover {
+    background-color: #aa9639;
+    color: white;
+}
+
 .form-container form input[type=text].validate.error, .form-container form textarea.validate.error {
     border: 1px solid red;
     background-color: #fee;
@@ -47,6 +81,8 @@
     color: red;
     display: block;
     font-size: 12px;
+    min-width: 100%;
+    width: 100%;
     padding: 0.5em;
     text-align: right;
 }

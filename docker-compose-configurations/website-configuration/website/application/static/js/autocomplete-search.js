@@ -110,6 +110,16 @@ function autocomplete_search() {
                         for (var i = 0; i < data.matching_results.length; i++) {
                             // We create a search result.
                             var result = create_search_result(action, data.matching_results[i]);
+                            // If the user clicks on this result, we autocomplete
+                            // the input field with the name of the result.
+                            result.click(function() {
+                                input.val($(this).find('a').text());
+                                
+                                // We trigger the keyup event to send the ajax request.
+                                input.trigger('keyup');
+
+                                automplete.hide(300);
+                            });
                             // We append the search result to the ul object.
                             automplete.append(result);
                         }

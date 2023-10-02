@@ -177,6 +177,14 @@
       "oAP" : "\/website\/application\/api_endpoints\/__pycache__\/translations_api.cpython-38.pyc",
       "oF" : 0
     },
+    "\/website\/application\/api_endpoints\/__pycache__\/validate_api.cpython-38.pyc" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/api_endpoints\/__pycache__\/validate_api.cpython-38.pyc",
+      "oF" : 0
+    },
     "\/website\/application\/api_endpoints\/administrative_api.py" : {
       "cB" : 0,
       "ft" : 8192,
@@ -255,6 +263,14 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/api_endpoints\/translations_api.py",
+      "oF" : 0
+    },
+    "\/website\/application\/api_endpoints\/validate_api.py" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/api_endpoints\/validate_api.py",
       "oF" : 0
     },
     "\/website\/application\/application.py" : {
@@ -989,6 +1005,14 @@
       "hM" : 0,
       "oA" : 0,
       "oAP" : "\/website\/application\/templates\/search_user.html",
+      "oF" : 0
+    },
+    "\/website\/application\/templates\/settings.html" : {
+      "cB" : 0,
+      "ft" : 8192,
+      "hM" : 0,
+      "oA" : 0,
+      "oAP" : "\/website\/application\/templates\/settings.html",
       "oF" : 0
     },
     "\/website\/application\/templates\/specters.html" : {
