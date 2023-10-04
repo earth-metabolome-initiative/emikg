@@ -3,7 +3,7 @@
 Implementative details
 ----------------------
 The Enricher class is an abstract class that must be extended by a subclass to be used.
-Each child enricher class has a curresponding entry in the enrichers table of the database, which
+Each child enricher class has a corresponding entry in the enrichers table of the database, which
 identifies it uniquely by its name.
 
 When a new task is started, the enricher object first creates an entry in the enrichment_tasks table
