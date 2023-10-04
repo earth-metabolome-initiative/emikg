@@ -18,9 +18,7 @@ Several tasks require us to query remote services, and it may be the case that w
 number of requests per second. When the task is started, the status is set to STARTED, and when it is
 finished, the status is set to SUCCESS or FAILURE depending on whether the task was successful or not.
 """
-from typing import Type
 from time import sleep
-from .enrichable import Enrichable
 from .models import EnrichmentTask, Enricher as EnricherModel
 
 
@@ -59,12 +57,12 @@ class Enricher:
             f"This was not done for the {cls.__class__.__name__} class."
         )
 
-    def _can_enrich(self, enrichable: Type[Enrichable]) -> bool:
+    def _can_enrich(self, enrichable) -> bool:
         """Returns whether the Enricher can enrich the metadata of the enrichable class.
 
         Parameters
         ----------
-        enrichable: Type[Enrichable]
+        enrichable
             enrichable class to enrich.
         """
         raise NotImplementedError(
@@ -72,13 +70,17 @@ class Enricher:
             f"This was not done for the {self.__class__.__name__} class."
         )
 
-    def _enrich(self, enrichable: Type[Enrichable], task: EnrichmentTask):
+    def _enrich(self, enrichable, task: EnrichmentTask) -> bool:
         """Enrich the metadata of a enrichable class.
 
         Parameters
         ----------
-        enrichable: Type[Enrichable]
+        enrichable
             enrichable class to enrich.
+
+        Returns
+        -------
+        Whether the enrichment was successful or not.
         """
         raise NotImplementedError(
             "The enrich method of the Enricher class must be implemented by a subclass. "
@@ -86,7 +88,7 @@ class Enricher:
             f"This class should retrieve the metadata relative to the repository {self.repository()}."
         )
 
-    def _create_new_task(self, enrichable: Type[Enrichable]) -> EnrichmentTask:
+    def _create_new_task(self, enrichable) -> EnrichmentTask:
         """Create a new task for the enricher.
 
         Implementative details
@@ -103,9 +105,7 @@ class Enricher:
         )
         return enrichment_task
 
-    def _task_can_start(
-        self, enrichable: Type[Enrichable], task: EnrichmentTask
-    ) -> bool:
+    def _task_can_start(self, enrichable, task: EnrichmentTask) -> bool:
         """Returns whether the task can be started.
 
         Implementative details
@@ -125,21 +125,18 @@ class Enricher:
             f"This was not done for the {self.__class__.__name__} class."
         )
 
-    def enrich(self, enrichable: Type[Enrichable]):
+    def enrich(self, enrichable):
         """Enrich the metadata of a enrichable class.
 
         Parameters
         ----------
-        enrichable: Type[Enrichable]
+        enrichable
             enrichable class to enrich.
         """
-        assert issubclass(enrichable, Enrichable), (
-            f"The enrichable argument of the enrich method of the Enricher class must be a subclass of Enrichable. "
-            f"The {enrichable.__class__.__name__} class is not a subclass of Enrichable."
-        )
         if not self._can_enrich(enrichable):
             raise ValueError(
-                f"The enricher {self.name()} cannot enrich the {enrichable.__class__.__name__} class."
+                f"The enricher {self.name()} cannot "
+                f"enrich the {enrichable.__class__.__name__} class."
             )
 
         task = self._create_new_task(enrichable)
@@ -149,4 +146,11 @@ class Enricher:
 
         task.start()
 
-        self._enrich(enrichable, task)
+        success = self._enrich(enrichable, task)
+
+        if success:
+            task.success()
+        else:
+            task.failure()
+
+        task.save()

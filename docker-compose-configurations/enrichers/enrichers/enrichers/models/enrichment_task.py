@@ -27,3 +27,11 @@ class EnrichmentTask(Base):
     def start(self):
         """Start the task."""
         self.status = "STARTED"
+
+    def success(self):
+        """Finish the task successfully."""
+        self.status = "SUCCESS"
+
+    def failure(self):
+        """Finish the task with a failure."""
+        self.status = "FAILURE"

@@ -12,22 +12,22 @@ class OTLEnricher(TaxonEnricher):
         """Name of the repository providing these specific metadata."""
         return "Open Tree of Life"
 
-    def _can_enrich(self, enrichable: Type[Enrichable]) -> bool:
+    def _can_enrich(self, enrichable) -> bool:
         """Returns whether the Enricher can enrich the metadata of the enrichable class.
 
         Parameters
         ----------
-        enrichable: Type[Enrichable]
+        enrichable
             enrichable class to enrich.
         """
         return True
     
-    def _enrich(self, enrichable: Type[Enrichable]) -> Type[Enrichable]:
+    def _enrich(self, enrichable):
         """Enrich the metadata of a enrichable class.
 
         Parameters
         ----------
-        enrichable: Type[Enrichable]
+        enrichable
             enrichable class to enrich.
         """
         return enrichable
