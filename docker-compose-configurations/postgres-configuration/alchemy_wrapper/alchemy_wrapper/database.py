@@ -3,8 +3,6 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-
-
 DATABASE_URL = (
     f"postgresql://{os.environ['POSTGRES_USER']}:"
     f"{os.environ['POSTGRES_PASSWORD']}@postgres_database:5432"

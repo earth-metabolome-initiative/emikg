@@ -1,5 +1,4 @@
 """Concrete implementation for the Open Tree of Life taxon Enricher."""
-from typing import Type
 from enrichers import TaxonEnricher
 
 
@@ -21,7 +20,7 @@ class OTLEnricher(TaxonEnricher):
             enrichable class to enrich.
         """
         return True
-    
+
     def _enrich(self, enrichable):
         """Enrich the metadata of a enrichable class.
 
