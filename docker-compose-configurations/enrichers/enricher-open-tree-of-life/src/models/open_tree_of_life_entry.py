@@ -1,5 +1,5 @@
 """SQLAlchemy database proxy relative to the open tree of life table."""
-from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy import Column, Integer, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -12,6 +12,7 @@ class OpenTreeOfLifeEntry(Base):
 
     id = Column(Integer, primary_key=True)
     ott_id = Column(Integer, nullable=False)
+    taxon_id = Column(Integer, ForeignKey("taxons.id", ondelete="CASCADE"), nullable=False)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
