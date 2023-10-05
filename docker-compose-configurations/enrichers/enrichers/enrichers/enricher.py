@@ -18,7 +18,9 @@ Several tasks require us to query remote services, and it may be the case that w
 number of requests per second. When the task is started, the status is set to STARTED, and when it is
 finished, the status is set to SUCCESS or FAILURE depending on whether the task was successful or not.
 """
+from typing import List, Any
 from time import sleep
+from alchemy_wrapper import Session
 from .models import EnrichmentTask, Enricher as EnricherModel
 
 
@@ -27,13 +29,15 @@ class Enricher:
 
     def __init__(self) -> None:
         """Initialize the enricher object."""
+        self._session = Session()
         # Create the enricher entry in the enrichers table
         # if it does not already exist. An enricher is uniquely
         # identified by its name.
         enricher = EnricherModel.query.filter_by(name=self.name()).first()
         if enricher is None:
             enricher = EnricherModel(name=self.name())
-            enricher.save()
+            self._session.add(enricher)
+            self._session.commit()
         self._enricher = enricher
 
     @property
@@ -103,6 +107,8 @@ class Enricher:
         enrichment_task = EnrichmentTask(
             enricher_id=self.id,
         )
+        self._session.add(enrichment_task)
+        self._session.commit()
         return enrichment_task
 
     def _task_can_start(self, enrichable, task: EnrichmentTask) -> bool:
@@ -125,7 +131,19 @@ class Enricher:
             f"This was not done for the {self.__class__.__name__} class."
         )
 
-    def enrich(self, enrichable):
+    def _get_new_elements_to_enrich(self) -> List[Any]:
+        """Returns list of elements to enrich."""
+        raise NotImplementedError(
+            "The _get_new_elements_to_enrich method of the Enricher class must be implemented by a subclass. "
+            f"This was not done for the {self.__class__.__name__} class."
+        )
+
+    def ping(self) -> None:
+        """Ping the enricher."""
+        self._enricher.ping()
+        self._session.commit()
+
+    def enrich(self, enrichable) -> bool:
         """Enrich the metadata of a enrichable class.
 
         Parameters
@@ -145,12 +163,39 @@ class Enricher:
             sleep(self._get_sleep_time_between_start_attempts())
 
         task.start()
+        self._session.commit()
 
-        success = self._enrich(enrichable, task)
+        try:
+            success = self._enrich(enrichable, task)
+        except Exception:
+            success = False
 
         if success:
             task.success()
         else:
             task.failure()
 
-        task.save()
+        self._session.commit()
+
+        return success
+
+    def enrich_all(self) -> bool:
+        """Enrich the metadata of all the enrichable classes."""
+        some_success = False
+        for enrichable in self._get_new_elements_to_enrich():
+            some_success |= self.enrich(enrichable)
+        return some_success
+
+    def start_service(self):
+        """Start the enricher service."""
+        minimal_sleep_time = 1
+        maximal_sleep_time = 60
+        sleep_time_seconds = minimal_sleep_time
+        while True:
+            self.ping()
+            some_success = self.enrich_all()
+            if some_success:
+                sleep_time_seconds = minimal_sleep_time
+            else:
+                sleep_time_seconds = min(2 * sleep_time_seconds, maximal_sleep_time)
+            sleep(sleep_time_seconds * 1000)

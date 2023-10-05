@@ -12,7 +12,12 @@ class OpenTreeOfLifeEntry(Base):
 
     id = Column(Integer, primary_key=True)
     ott_id = Column(Integer, nullable=False)
-    taxon_id = Column(Integer, ForeignKey("taxons.id", ondelete="CASCADE"), nullable=False)
+    taxon_id = Column(
+        Integer,
+        ForeignKey("taxons.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+    )
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
