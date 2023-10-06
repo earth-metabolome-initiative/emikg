@@ -195,7 +195,7 @@ class Enricher:
             self.ping()
             some_success = self.enrich_all()
             if some_success:
-                sleep_time_seconds = minimal_sleep_time
+                sleep_time_seconds = max(minimal_sleep_time, sleep_time_seconds / 2)
             else:
                 sleep_time_seconds = min(2 * sleep_time_seconds, maximal_sleep_time)
             sleep(sleep_time_seconds * 1000)

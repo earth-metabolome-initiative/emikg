@@ -1,5 +1,5 @@
 """Run the website locally."""
-from website.application import app
+from website import app
 
 if __name__ == "__main__":
     app.run(
