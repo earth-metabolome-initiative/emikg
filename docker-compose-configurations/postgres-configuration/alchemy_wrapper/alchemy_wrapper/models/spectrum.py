@@ -12,3 +12,5 @@ class Spectrum(Base):
     updated_at = Column(
         DateTime, nullable=False, default=DateTime.utcnow, onupdate=DateTime.utcnow
     )
+    author_id  = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    
