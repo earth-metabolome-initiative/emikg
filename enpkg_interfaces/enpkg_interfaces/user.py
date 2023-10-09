@@ -1,19 +1,12 @@
 """Abstract interface for user objects."""
 from typing import Type
 
-from enpkg_interfaces.sample import Sample
-from enpkg_interfaces.taxon import Taxon
+from enpkg_interfaces.from_identifier import FromIdentifier
+from enpkg_interfaces.authored import Authored
 
 
-class User:
+class User(FromIdentifier):
     """Abstract class to represent a user."""
-
-    def get_user_id(self) -> int:
-        """Return user ID."""
-        raise NotImplementedError(
-            "Abstract method 'get_user_id' must be implemented in subclass. "
-            f"It was not implemented in {self.__class__.__name__}."
-        )
 
     def is_administrator(self) -> bool:
         """Return True if the user is an administrator."""
@@ -29,13 +22,9 @@ class User:
             f"It was not implemented in {self.__class__.__name__}."
         )
 
-    def is_author_of_sample(self, sample: Type[Sample]) -> bool:
-        """Return True if the user is the author of the sample."""
-        return self.get_user_id() == sample.get_author_user_id()
-
-    def is_author_of_taxon(self, taxon: Type[Taxon]) -> bool:
-        """Return True if the user is the author of the taxon."""
-        return self.get_user_id() == taxon.get_author_user_id()
+    def is_author_of(self, authored: Type[Authored]) -> bool:
+        """Return True if the user is the author of the provided authored object."""
+        return self.get_id() == authored.get_author().get_id()
 
     def delete(self):
         """Delete the user."""

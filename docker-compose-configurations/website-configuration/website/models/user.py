@@ -12,40 +12,36 @@ class User(UserInterface):
 
     def __init__(self, user_id: int) -> None:
         """Initialize user object.
-        
+
         Parameters
         ----------
         user_id : int
             User ID.
-        
+
         Raises
         ------
         ValueError
             If the user ID does not exist.
         """
-        super().__init__(user_id)
         self._user = UsersTable(user_id)
 
-
     @staticmethod
-    def from_flask_session() -> "User": 
+    def from_flask_session() -> "User":
         """Return a user object from the Flask session."""
         try:
-            return User(
-                user_id=User.session_user_id()
-            )
+            return User(user_id=User.session_user_id())
         except ValueError:
             User.logout()
-    
+
     @staticmethod
     def from_orcid(orcid: str) -> "User":
         """Return a user object from an ORCID.
-        
+
         Parameters
         ----------
         orcid : str
             ORCID.
-        
+
         Implementation details
         ----------------------
         The method looks up whether the ORCID exists in the orcid
@@ -63,7 +59,7 @@ class User(UserInterface):
         # To execute this operation, the user must not be already logged in.
         if User.is_authenticated():
             raise APIException("User is already logged in.")
-        
+
         # We check whether the ORCID exists in the orcid table of the database.
         if ORCIDTable.is_valid_orcid(orcid):
             # We look up whether the ORCID exists in the orcid table of the database.
@@ -81,14 +77,12 @@ class User(UserInterface):
 
         # Finally, we return a new user object from the user ID of the newly
         # inserted user.
-        return User(
-            user_id=user_id
-        )
-    
+        return User(user_id=user_id)
+
     @staticmethod
     def logout() -> None:
         """Logout the user.
-        
+
         Implementation details
         ----------------------
         The method removes the user ID from the Flask session.
@@ -99,18 +93,18 @@ class User(UserInterface):
     def is_authenticated() -> bool:
         """Return whether the user is authenticated."""
         return "user_id" in session
-    
+
     @staticmethod
     def session_user_id() -> int:
         """Return a user id from the Flask session."""
         if not User.is_authenticated():
             raise NotLoggedIn()
         return session.get("user_id")
-    
+
     def is_session_user(self) -> bool:
         """Return whether the current user instance is the session user."""
         return self.get_user_id() == User.session_user_id()
-    
+
     @staticmethod
     def get_session_user_language() -> str:
         """Return the language of the session user."""
@@ -124,7 +118,7 @@ class User(UserInterface):
 
     def is_administrator(self) -> bool:
         """Return True if the user is an administrator.
-        
+
         Implementative details
         ----------------------
         This method is implemented by looking up whether the user id
@@ -134,7 +128,7 @@ class User(UserInterface):
         the user ID itself.
         """
         return AdministratorsTable.is_valid_user_id(self.get_user_id())
-    
+
     @staticmethod
     def must_be_moderator() -> None:
         """Raise ValueError if the user is not an moderator."""
@@ -143,7 +137,7 @@ class User(UserInterface):
 
     def is_moderator(self) -> bool:
         """Return True if the user is a moderator.
-        
+
         Implementative details
         ----------------------
         This method is implemented by looking up whether the user id
@@ -157,14 +151,14 @@ class User(UserInterface):
     @classmethod
     def is_valid_user_id(cls, user_id: int) -> bool:
         """Return True if the user ID is valid.
-        
+
         Parameters
         ----------
         user_id : int
             User ID.
         """
         return UsersTable.is_valid_user_id(user_id)
-    
+
     def create_token(self, token_name: str) -> str:
         """Creates and returns a token for the current user with the given name."""
 
@@ -172,15 +166,14 @@ class User(UserInterface):
         # If there is, we raise an exception.
         if self.has_token(token_name):
             raise APIException("Token name already taken for the current user.")
-        
+
         return TokensTable.create_token(
-            user_id=self.get_user_id(),
-            token_name=token_name
+            user_id=self.get_user_id(), token_name=token_name
         )
-        
+
     def delete_token(self, token_name: str) -> None:
         """Delete a token for the current user with the given name.
-        
+
         Parameters
         ----------
         token_name: str
@@ -197,27 +190,24 @@ class User(UserInterface):
             raise APIException("Token name not taken for the current user.")
 
         TokensTable.delete_token_from_token_name_and_user_id(
-            user_id=self.get_user_id(),
-            token_name=token_name
+            user_id=self.get_user_id(), token_name=token_name
         )
-        
 
     def has_token(self, token_name: str) -> bool:
         """Return True if the user has a token with the given name.
-        
+
         Parameters
         ----------
         token_name : str
             Token name.
         """
         return TokensTable.has_token_from_token_name_and_user_id(
-            user_id=self.get_user_id(),
-            token_name=token_name
+            user_id=self.get_user_id(), token_name=token_name
         )
 
     def delete(self):
         """Delete the user.
-        
+
         Raises
         ------
         Unauthorized
@@ -234,14 +224,14 @@ class User(UserInterface):
         if not self.is_session_user():
             # The current user session must be an administrator
             User.must_be_administrator()
-        
+
         # If the current user is the session user, or is an administrator,
         # then delete the user from the database
         UsersTable.delete_user(self.get_user_id())
 
     def promote_admin(self):
         """Promote the user to administrator.
-        
+
         Raises
         ------
         Unauthorized
@@ -258,14 +248,14 @@ class User(UserInterface):
         # If the current user is already an administrator, then we raise an exception
         if self.is_administrator():
             raise APIException("User is already an administrator.")
-        
+
         # If the current user is the session user, or is an administrator,
         # then promote the user to administrator
         AdministratorsTable.create_administrator_from_user_id(self.get_user_id())
 
     def demote_admin(self):
         """Demote the user from administrator.
-        
+
         Raises
         ------
         Unauthorized
@@ -282,14 +272,14 @@ class User(UserInterface):
         # If the current user is NOT an administrator, then we raise an exception
         if not self.is_administrator():
             raise APIException("User is not an administrator.")
-        
+
         # If the current user is the session user, or is an administrator,
         # then demote the user from administrator
         AdministratorsTable.delete_administrator_from_user_id(self.get_user_id())
 
     def promote_moderator(self):
         """Promote the user to moderator.
-        
+
         Raises
         ------
         Unauthorized
@@ -306,14 +296,14 @@ class User(UserInterface):
         # If the current user is already a moderator, then we raise an exception
         if self.is_moderator():
             raise APIException("User is already a moderator.")
-        
+
         # If the current user is the session user, or is an administrator,
         # then promote the user to moderator
         ModeratorsTable.create_moderator_from_user_id(self.get_user_id())
 
     def demote_moderator(self):
         """Demote the user from moderator.
-        
+
         Raises
         ------
         Unauthorized
@@ -330,14 +320,14 @@ class User(UserInterface):
         # If the current user is NOT a moderator, then we raise an exception
         if not self.is_moderator():
             raise APIException("User is not a moderator.")
-        
+
         # If the current user is the session user, or is an administrator,
         # then demote the user from moderator
         ModeratorsTable.delete_moderator_from_user_id(self.get_user_id())
 
     def illegal_user_id_callback(self, illegal_user_id: int) -> None:
         """Method called upon detection of an illegal user ID.
-        
+
         Implementative details
         ----------------------
         This method handles the corner case where the provided user ID
