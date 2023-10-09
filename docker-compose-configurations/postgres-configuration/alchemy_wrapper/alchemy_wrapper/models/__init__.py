@@ -10,4 +10,15 @@ from .token import Token
 from .translation import Translation
 from .spectrum import Spectrum
 
-__all__ = ["Base", "Taxon", "User", "Moderator", "Administrator"]
+__all__ = [
+    "Base",
+    "Taxon",
+    "User",
+    "Moderator",
+    "Administrator",
+    "ORCID",
+    "Sample",
+    "Token",
+    "Translation",
+    "Spectrum",
+]

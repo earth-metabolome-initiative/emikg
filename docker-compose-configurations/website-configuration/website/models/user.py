@@ -2,16 +2,33 @@
 from flask import session
 
 from enpkg_interfaces import User as UserInterface
+from alchemy_wrapper.models import User as UsersTable
 
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
-from ..tables import ORCIDTable, ModeratorsTable, AdministratorsTable, UsersTable, TokensTable
 
 
 class User(UserInterface):
     """Concrete implementation of the user interface using SQLAlchemy."""
 
+    def __init__(self, user_id: int) -> None:
+        """Initialize user object.
+        
+        Parameters
+        ----------
+        user_id : int
+            User ID.
+        
+        Raises
+        ------
+        ValueError
+            If the user ID does not exist.
+        """
+        super().__init__(user_id)
+        self._user = UsersTable(user_id)
+
+
     @staticmethod
-    def from_flask_session() -> "User":
+    def from_flask_session() -> "User": 
         """Return a user object from the Flask session."""
         try:
             return User(
@@ -19,34 +36,6 @@ class User(UserInterface):
             )
         except ValueError:
             User.logout()
-
-    @staticmethod
-    def from_token(token: str) -> "User":
-        """Return a user object from a token.
-        
-        Parameters
-        ----------
-        token : str
-            Token.
-        
-        Raises
-        ------
-        NotLoggedIn
-            If the token is not valid.
-        """
-        # To execute this operation, the user must not be already logged in.
-        if User.is_authenticated():
-            raise APIException("User is already logged in.")
-        user_id = TokensTable.get_user_id_from_token(token)
-        if user_id is None:
-            raise Unauthorized()
-        
-        # We add the user ID to the Flask session.
-        session["user_id"] = user_id
-
-        return User(
-            user_id=user_id
-        )
     
     @staticmethod
     def from_orcid(orcid: str) -> "User":

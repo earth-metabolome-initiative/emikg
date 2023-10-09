@@ -2,11 +2,11 @@
 from .sample import Sample
 from .taxon import Taxon
 from .user import User
-from .specter import Specter
+from .spectrum import Spectrum
 
 __all__ = [
     "Sample",
     "Taxon",
     "User",
-    "Specter"
+    "Spectrum"
 ]
