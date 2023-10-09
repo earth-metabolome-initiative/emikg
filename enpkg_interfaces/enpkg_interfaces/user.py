@@ -3,9 +3,10 @@ from typing import Type
 
 from enpkg_interfaces.from_identifier import FromIdentifier
 from enpkg_interfaces.authored import Authored
+from enpkg_interfaces.deletable import Deletable
 
 
-class User(FromIdentifier):
+class User(FromIdentifier, Deletable):
     """Abstract class to represent a user."""
 
     def is_administrator(self) -> bool:

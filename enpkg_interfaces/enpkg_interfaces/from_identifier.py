@@ -27,3 +27,8 @@ class FromIdentifier(object):
             If the package corresponding to the given identifier is not found.
         """
         raise NotImplementedError("Class does not implement method from_id")
+
+
+# We also define a child exception class for the case where the object is not found
+class IdentifierNotFound(Exception):
+    """Exception raised when an object is not found."""

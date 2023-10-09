@@ -2,8 +2,9 @@
 from typing import List, Type
 from enpkg_interfaces.from_identifier import FromIdentifier
 from enpkg_interfaces.authored import Authored
+from enpkg_interfaces.deletable import Deletable
 
-class Sample(FromIdentifier, Authored):
+class Sample(FromIdentifier, Authored, Deletable):
     """Abstract class to represent a sample."""
 
     def is_derived_sample(self) -> bool:
