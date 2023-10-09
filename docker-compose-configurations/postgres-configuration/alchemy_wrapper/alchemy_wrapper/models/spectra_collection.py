@@ -66,6 +66,6 @@ class SpectraCollection(Base, SpectraCollectionInterface):
         """Return recorded object name."""
         return self.name
 
-    def get_url(self) -> str:
-        """Return recorded object URL."""
-        return f"/spectra_collections/{self.id}"
+    def get_root(self) -> str:
+        """Return recorded object root."""
+        return "spectra_collections"

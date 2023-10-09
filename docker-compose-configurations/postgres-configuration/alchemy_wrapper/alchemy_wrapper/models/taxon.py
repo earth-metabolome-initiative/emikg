@@ -65,6 +65,6 @@ class Taxon(Base, TaxonInterface):
         """Return recorded object name."""
         return self.name
     
-    def get_url(self) -> str:
-        """Return recorded object URL."""
-        return f"/taxons/{self.id}"
+    def get_root(self) -> str:
+        """Return recorded object root."""
+        return "taxons"

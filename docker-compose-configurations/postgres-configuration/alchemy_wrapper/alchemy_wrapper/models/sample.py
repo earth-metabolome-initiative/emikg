@@ -85,9 +85,9 @@ class Sample(Base, SampleInterface):
         """Return recorded object name."""
         return self.name
 
-    def get_url(self) -> str:
-        """Return recorded object URL."""
-        return f"/samples/{self.id}"
+    def get_root(self) -> str:
+        """Return recorded object root."""
+        return "samples"
 
     def get_spectra_collections(self) -> List[SpectraCollection]:
         """Return list of spectra collections."""
