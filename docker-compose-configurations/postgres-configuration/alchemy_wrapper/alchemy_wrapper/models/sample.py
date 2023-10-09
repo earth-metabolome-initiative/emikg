@@ -14,8 +14,8 @@ class Sample(Base, SampleInterface):
     taxon_id = Column(
         Integer, ForeignKey("taxons.id", ondelete="CASCADE"), nullable=False
     )
-    sample_name = Column(String(255), nullable=False)
-    sample_description = Column(String(512), nullable=False)
+    name = Column(String(255), nullable=False)
+    description = Column(String(512), nullable=False)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     altitude = Column(Float, nullable=True)
@@ -75,3 +75,15 @@ class Sample(Base, SampleInterface):
         session = Session()
         session.delete(self)
         session.commit()
+
+    def get_description(self) -> str:
+        """Return recorded object description."""
+        return self.description
+    
+    def get_name(self) -> str:
+        """Return recorded object name."""
+        return self.name
+    
+    def get_url(self) -> str:
+        """Return recorded object URL."""
+        return f"/samples/{self.id}"

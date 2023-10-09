@@ -16,6 +16,7 @@ class Taxon(Base, TaxonInterface):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
+    description = Column(String(255), nullable=False)
     author_id = Column(
         Integer, ForeignKey("users.id"), nullable=False, ondelete="CASCADE"
     )
@@ -55,3 +56,15 @@ class Taxon(Base, TaxonInterface):
     def get_author(self) -> User:
         """Return author."""
         return User.query.filter_by(id=self.author_id).first()
+    
+    def get_description(self) -> str:
+        """Return recorded object description."""
+        return self.description
+    
+    def get_name(self) -> str:
+        """Return recorded object name."""
+        return self.name
+    
+    def get_url(self) -> str:
+        """Return recorded object URL."""
+        return f"/taxons/{self.id}"

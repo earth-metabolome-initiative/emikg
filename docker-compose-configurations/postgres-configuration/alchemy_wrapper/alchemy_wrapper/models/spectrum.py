@@ -1,5 +1,5 @@
 """SQLAlchemy model for the spectrographic data."""
-from sqlalchemy import Column, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
 from alchemy_wrapper import Session
 from enpkg_interfaces import Spectrum as SpectrumInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
@@ -11,6 +11,8 @@ class Spectrum(Base, SpectrumInterface):
     """SQLAlchemy model for the spectrographic data."""
 
     id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    description = Column(String(512), nullable=False)
     sample_id = Column(
         Integer, ForeignKey("samples.id", ondelete="CASCADE"), nullable=False
     )
@@ -45,3 +47,15 @@ class Spectrum(Base, SpectrumInterface):
         session = Session()
         session.delete(self)
         session.commit()
+
+    def get_description(self) -> str:
+        """Return recorded object description."""
+        return self.description
+    
+    def get_name(self) -> str:
+        """Return recorded object name."""
+        return self.name
+    
+    def get_url(self) -> str:
+        """Return recorded object URL."""
+        return f"/spectra/{self.id}"
