@@ -1,7 +1,7 @@
 """Abstract interface for sample objects."""
 from typing import List, Optional, Type
 
-from enpkg_interfaces import Record
+from enpkg_interfaces import Record, SpectraCollection
 
 
 class Sample(Record):
@@ -26,5 +26,12 @@ class Sample(Record):
         """Return list of child samples."""
         raise NotImplementedError(
             "Abstract method 'get_child_samples' should be implemented in derived class. "
+            f"It was not implemented in class {self.__class__.__name__}."
+        )
+
+    def get_spectra_collections(self) -> List[Type[SpectraCollection]]:
+        """Return list of spectra collections."""
+        raise NotImplementedError(
+            "Abstract method 'get_spectra_collections' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )

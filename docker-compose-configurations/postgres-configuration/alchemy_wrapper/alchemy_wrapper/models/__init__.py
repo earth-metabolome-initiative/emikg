@@ -9,6 +9,7 @@ from .sample import Sample
 from .token import Token
 from .translation import Translation
 from .spectrum import Spectrum
+from .spectra_collection import SpectraCollection
 
 __all__ = [
     "Base",
@@ -21,4 +22,5 @@ __all__ = [
     "Token",
     "Translation",
     "Spectrum",
+    "SpectraCollection"
 ]

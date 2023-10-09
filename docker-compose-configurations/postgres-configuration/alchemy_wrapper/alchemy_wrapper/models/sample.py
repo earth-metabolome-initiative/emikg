@@ -3,6 +3,7 @@
 from typing import List, Optional
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime
 from alchemy_wrapper import Session
+from alchemy_wrapper.models import SpectraCollection
 from enpkg_interfaces import Sample as SampleInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
 from .base import Base
@@ -70,8 +71,8 @@ class Sample(Base, SampleInterface):
         return User.from_id(self.author_id)
 
     def delete(self):
-        """Delete the user."""
-        # We delete the user from the database
+        """Delete the sample."""
+        # We delete the sample from the database
         session = Session()
         session.delete(self)
         session.commit()
@@ -79,11 +80,15 @@ class Sample(Base, SampleInterface):
     def get_description(self) -> str:
         """Return recorded object description."""
         return self.description
-    
+
     def get_name(self) -> str:
         """Return recorded object name."""
         return self.name
-    
+
     def get_url(self) -> str:
         """Return recorded object URL."""
         return f"/samples/{self.id}"
+
+    def get_spectra_collections(self) -> List[SpectraCollection]:
+        """Return list of spectra collections."""
+        return SpectraCollection.query.filter_by(sample_id=self.id).all()

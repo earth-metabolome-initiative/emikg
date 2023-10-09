@@ -1,6 +1,7 @@
 """SQLAlchemy model for the spectrographic data."""
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
 from alchemy_wrapper import Session
+from alchemy_wrapper.models import SpectraCollection
 from enpkg_interfaces import Spectrum as SpectrumInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
 from .base import Base
@@ -13,15 +14,12 @@ class Spectrum(Base, SpectrumInterface):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
     description = Column(String(512), nullable=False)
-    sample_id = Column(
-        Integer, ForeignKey("samples.id", ondelete="CASCADE"), nullable=False
+    spectra_collection_id = Column(
+        Integer, ForeignKey("spectra_collection.id", ondelete="CASCADE"), nullable=False
     )
     created_at = Column(DateTime, nullable=False, default=DateTime.utcnow)
     updated_at = Column(
         DateTime, nullable=False, default=DateTime.utcnow, onupdate=DateTime.utcnow
-    )
-    author_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
 
     @staticmethod
@@ -37,13 +35,17 @@ class Spectrum(Base, SpectrumInterface):
         """Return Sample id."""
         return self.id
 
+    def get_spectra_collection(self) -> SpectraCollection:
+        """Return the spectra collection of the spectrum."""
+        return SpectraCollection.from_id(self.spectra_collection_id)
+
     def get_author(self) -> User:
         """Return the author of the spectrum."""
-        return User.from_id(self.author_id)
+        return self.get_spectra_collection().get_author()
 
     def delete(self):
-        """Delete the user."""
-        # We delete the user from the database
+        """Delete the spectrum."""
+        # We delete the spectrum from the database
         session = Session()
         session.delete(self)
         session.commit()
@@ -51,11 +53,11 @@ class Spectrum(Base, SpectrumInterface):
     def get_description(self) -> str:
         """Return recorded object description."""
         return self.description
-    
+
     def get_name(self) -> str:
         """Return recorded object name."""
         return self.name
-    
+
     def get_url(self) -> str:
         """Return recorded object URL."""
         return f"/spectra/{self.id}"

@@ -6,7 +6,6 @@ from ..application import app
 from .user import User
 from .taxon import Taxon
 from ..exceptions import APIException
-from ..tables import SamplesTable
 
 
 class Sample(SampleInterface):
