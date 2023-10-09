@@ -4,9 +4,12 @@ from alchemy_wrapper import Session
 from enpkg_interfaces import Spectrum as SpectrumInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
 from .base import Base
+from .user import User
 
 
 class Spectrum(Base, SpectrumInterface):
+    """SQLAlchemy model for the spectrographic data."""
+
     id = Column(Integer, primary_key=True)
     sample_id = Column(
         Integer, ForeignKey("samples.id", ondelete="CASCADE"), nullable=False
@@ -31,6 +34,10 @@ class Spectrum(Base, SpectrumInterface):
     def get_id(self) -> int:
         """Return Sample id."""
         return self.id
+
+    def get_author(self) -> User:
+        """Return the author of the spectrum."""
+        return User.from_id(self.author_id)
 
     def delete(self):
         """Delete the user."""

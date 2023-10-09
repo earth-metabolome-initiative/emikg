@@ -5,6 +5,7 @@ from alchemy_wrapper import Session
 from enpkg_interfaces import Sample as SampleInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
 from .base import Base
+from .user import User
 
 
 class Sample(Base, SampleInterface):
@@ -37,6 +38,10 @@ class Sample(Base, SampleInterface):
     def get_id(self) -> int:
         """Return Sample id."""
         return self.id
+
+    def get_author(self) -> User:
+        """Return the author of the sample."""
+        return User.from_id(self.author_id)
 
     def delete(self):
         """Delete the user."""
