@@ -3,10 +3,12 @@ from .sample import Sample
 from .taxon import Taxon
 from .user import User
 from .spectrum import Spectrum
+from .record import Record
 
 __all__ = [
     "Sample",
     "Taxon",
     "User",
-    "Spectrum"
+    "Spectrum",
+    "Record"
 ]

@@ -1,10 +1,10 @@
 """Abstract interface for sample objects."""
-from typing import List, Type, Optional
-from enpkg_interfaces.from_identifier import FromIdentifier
-from enpkg_interfaces.authored import Authored
-from enpkg_interfaces.deletable import Deletable
+from typing import List, Optional, Type
 
-class Sample(FromIdentifier, Authored, Deletable):
+from enpkg_interfaces import Record
+
+
+class Sample(Record):
     """Abstract class to represent a sample."""
 
     def is_derived_sample(self) -> bool:

@@ -1,12 +1,11 @@
 """Abstract interface for user objects."""
 from typing import Type
 
-from enpkg_interfaces.from_identifier import FromIdentifier
+from enpkg_interfaces import Record
 from enpkg_interfaces.authored import Authored
-from enpkg_interfaces.deletable import Deletable
 
 
-class User(FromIdentifier, Deletable):
+class User(Record):
     """Abstract class to represent a user."""
 
     def is_administrator(self) -> bool:
@@ -27,9 +26,24 @@ class User(FromIdentifier, Deletable):
         """Return True if the user is the author of the provided authored object."""
         return self.get_id() == authored.get_author().get_id()
 
-    def delete(self):
-        """Delete the user."""
+    def get_taxons(self):
+        """Return list of taxons created by the user."""
         raise NotImplementedError(
-            "Abstract method 'delete' must be implemented in subclass. "
+            "Abstract method 'get_taxons' must be implemented in subclass. "
             f"It was not implemented in {self.__class__.__name__}."
         )
+
+    def get_samples(self):
+        """Return list of samples created by the user."""
+        raise NotImplementedError(
+            "Abstract method 'get_samples' must be implemented in subclass. "
+            f"It was not implemented in {self.__class__.__name__}."
+        )
+
+    def get_spectra(self):
+        """Return list of spectra created by the user."""
+        raise NotImplementedError(
+            "Abstract method 'get_spectra' must be implemented in subclass. "
+            f"It was not implemented in {self.__class__.__name__}."
+        )
+    

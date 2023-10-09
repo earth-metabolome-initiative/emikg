@@ -1,9 +1,12 @@
 """SQLalchemy model for taxon table."""
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from typing import List
+
 from alchemy_wrapper import Session
+from alchemy_wrapper.models import Base, Sample, User
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+
 from enpkg_interfaces import Taxon as TaxonInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
-from .base import Base
 
 
 class Taxon(Base, TaxonInterface):
@@ -44,3 +47,11 @@ class Taxon(Base, TaxonInterface):
         session = Session()
         session.delete(self)
         session.commit()
+
+    def get_samples(self) -> List[Sample]:
+        """Return list of samples."""
+        return Sample.query.filter_by(taxon_id=self.id).all()
+
+    def get_author(self) -> User:
+        """Return author."""
+        return User.query.filter_by(id=self.author_id).first()
