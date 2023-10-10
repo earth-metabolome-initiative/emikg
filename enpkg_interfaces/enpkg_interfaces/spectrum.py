@@ -1,7 +1,9 @@
 """Abstract interface for spectrum objects."""
-from enpkg_interfaces import Record, SpectraCollection
+from enpkg_interfaces.record import Record
+from enpkg_interfaces.spectra_collection import SpectraCollection
+from enpkg_interfaces.authored import Authored
 
-class Spectrum(Record):
+class Spectrum(Record, Authored):
     """Abstract class to represent a spectrum."""
 
     def get_spectra_collection(self) -> SpectraCollection:

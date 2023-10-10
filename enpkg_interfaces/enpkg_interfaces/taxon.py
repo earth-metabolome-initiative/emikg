@@ -1,14 +1,16 @@
 """Abstract interface for taxon objects."""
 from typing import List, Type
-from enpkg_interfaces import Sample, Record
+from enpkg_interfaces.sample import Sample
+from enpkg_interfaces.record import Record
+from enpkg_interfaces.authored import Authored
 
 
-class Taxon(Record):
+class Taxon(Record, Authored):
     """Abstract class to represent a taxon."""
 
     def get_samples(self, number_of_records: int) -> List[Type[Sample]]:
         """Return list of samples.
-        
+
         Parameters
         ----------
         number_of_records : int

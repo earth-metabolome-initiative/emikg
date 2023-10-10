@@ -1,8 +1,10 @@
 """Abstract interface for user objects."""
 from typing import Type, List
 
-from enpkg_interfaces import Record, SpectraCollection, Sample, Taxon
-from enpkg_interfaces.authored import Authored
+from enpkg_interfaces.record import Record
+from enpkg_interfaces.spectra_collection import SpectraCollection
+from enpkg_interfaces.sample import Sample
+from enpkg_interfaces.taxon import Taxon
 
 
 class User(Record):
@@ -21,10 +23,6 @@ class User(Record):
             "Abstract method 'is_moderator' must be implemented in subclass. "
             f"It was not implemented in {self.__class__.__name__}."
         )
-
-    def is_author_of(self, authored: Type[Authored]) -> bool:
-        """Return True if the user is the author of the provided authored object."""
-        return self.get_id() == authored.get_author().get_id()
 
     def get_taxons(self, number_of_records: int) -> List[Type[Taxon]]:
         """Return list of taxons created by the user.

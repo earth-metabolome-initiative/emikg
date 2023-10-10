@@ -1,11 +1,10 @@
 """Abstract interface for an object that has been recorded."""
 
-from enpkg_interfaces.authored import Authored
 from enpkg_interfaces.deletable import Deletable
 from enpkg_interfaces.from_identifier import FromIdentifier
 
 
-class Record(FromIdentifier, Authored, Deletable):
+class Record(FromIdentifier, Deletable):
     """Abstract class to represent a recorded object."""
 
     def get_name(self) -> str:
