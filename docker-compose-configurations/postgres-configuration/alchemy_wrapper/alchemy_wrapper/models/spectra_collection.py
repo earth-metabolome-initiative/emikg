@@ -1,7 +1,7 @@
 """SQLAlchemy models for spectra_collection table."""
 
 from typing import List, Type
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from enpkg_interfaces import SpectraCollection as SpectraCollectionInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models import Base, Spectrum, User, Sample
@@ -20,6 +20,9 @@ class SpectraCollection(Base, SpectraCollectionInterface):
         Integer, ForeignKey("samples.id", ondelete="CASCADE"), nullable=False
     )
     author_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    updated_by_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=DateTime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=DateTime.utcnow)
 
     def get_spectra(self) -> List[Type[Spectrum]]:
         """Return a list of spectra."""
@@ -65,7 +68,3 @@ class SpectraCollection(Base, SpectraCollectionInterface):
     def get_name(self) -> str:
         """Return recorded object name."""
         return self.name
-
-    def get_root(self) -> str:
-        """Return recorded object root."""
-        return "spectra_collections"

@@ -20,3 +20,8 @@ class Taxon(Record, Authored):
             "Abstract method 'get_samples' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )
+
+    @staticmethod
+    def get_root() -> str:
+        """Return root for the taxon interface."""
+        return "taxons"

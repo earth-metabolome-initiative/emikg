@@ -65,6 +65,3 @@ class Taxon(Base, TaxonInterface):
         """Return recorded object name."""
         return self.name
     
-    def get_root(self) -> str:
-        """Return recorded object root."""
-        return "taxons"

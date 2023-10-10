@@ -19,3 +19,8 @@ class SpectraCollection(Record, Authored):
             "SpectraCollection.get_sample() not implemented "
             f" for {self.__class__.__name__}"
         )
+
+    @staticmethod
+    def get_root() -> str:
+        """Return root for the spectra_collection interface."""
+        return "spectra_collections"

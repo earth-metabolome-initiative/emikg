@@ -1,13 +1,17 @@
 """SQLAlchemy model for the user table."""
 
-from sqlalchemy import Column, Integer, String, DateTime
+from typing import List
+from alchemy_wrapper import Session
+from sqlalchemy import Column, DateTime, Integer, String
+
 from enpkg_interfaces import User as UserInterface
 from enpkg_interfaces.from_identifier import IdentifierNotFound
 
-from .base import Base
 from .administrator import Administrator
+from .base import Base
+from .spectra_collection import SpectraCollection
+from .sample import Sample
 from .moderator import Moderator
-from alchemy_wrapper import Session
 
 
 class User(Base, UserInterface):
@@ -18,6 +22,7 @@ class User(Base, UserInterface):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(80), nullable=False)
     last_name = Column(String(80), nullable=False)
+    description = Column(String(255), nullable=False)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
@@ -77,3 +82,37 @@ class User(Base, UserInterface):
         session = Session()
         session.delete(self)
         session.commit()
+
+    def get_spectra_collections(
+        self, number_of_records: int
+    ) -> List[SpectraCollection]:
+        """Return list of spectra collections created by the user.
+
+        Parameters
+        ----------
+        number_of_records : int
+            Maximum number of records to return.
+        """
+        # We return the most recent spectra collections created by the user
+        return (
+            SpectraCollection.query.filter_by(user_id=self.id)
+            .order_by(SpectraCollection.updated_at.desc())
+            .limit(number_of_records)
+            .all()
+        )
+
+    def get_samples(self, number_of_records: int) -> List[Sample]:
+        """Return list of samples created by the user.
+
+        Parameters
+        ----------
+        number_of_records : int
+            Maximum number of records to return.
+        """
+        # We return the most recent samples created by the user
+        return (
+            Sample.query.filter_by(user_id=self.id)
+            .order_by(Sample.updated_at.desc())
+            .limit(number_of_records)
+            .all()
+        )

@@ -20,12 +20,12 @@ class Record(FromIdentifier, Deletable):
             "Abstract method 'get_description' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )
-    
-    def get_root(self) -> str:
+
+    @staticmethod
+    def get_root() -> str:
         """Return recorded object root."""
         raise NotImplementedError(
             "Abstract method 'get_root' should be implemented in derived class. "
-            f"It was not implemented in class {self.__class__.__name__}."
         )
 
     def get_url(self) -> str:

@@ -5,6 +5,7 @@ from enpkg_interfaces.user import User
 from enpkg_interfaces.spectrum import Spectrum
 from enpkg_interfaces.record import Record
 from enpkg_interfaces.spectra_collection import SpectraCollection
+from enpkg_interfaces.from_identifier import FromIdentifier, IdentifierNotFound
 
 __all__ = [
     "Sample",
@@ -12,5 +13,7 @@ __all__ = [
     "User",
     "Spectrum",
     "Record",
-    "SpectraCollection"
+    "SpectraCollection",
+    "FromIdentifier",
+    "IdentifierNotFound"
 ]

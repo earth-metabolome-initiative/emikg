@@ -85,10 +85,4 @@ class Sample(Base, SampleInterface):
         """Return recorded object name."""
         return self.name
 
-    def get_root(self) -> str:
-        """Return recorded object root."""
-        return "samples"
-
-    def get_spectra_collections(self) -> List[SpectraCollection]:
-        """Return list of spectra collections."""
-        return SpectraCollection.query.filter_by(sample_id=self.id).all()
+    

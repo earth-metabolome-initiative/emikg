@@ -36,3 +36,8 @@ class Sample(Record, Authored):
             "Abstract method 'get_spectra_collections' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )
+
+    @staticmethod
+    def get_root() -> str:
+        """Return root for the sample interface."""
+        return "samples"

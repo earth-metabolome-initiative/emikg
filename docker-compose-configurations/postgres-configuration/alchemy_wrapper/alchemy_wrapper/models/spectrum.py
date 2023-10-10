@@ -57,7 +57,3 @@ class Spectrum(Base, SpectrumInterface):
     def get_name(self) -> str:
         """Return recorded object name."""
         return self.name
-
-    def get_root(self) -> str:
-        """Return recorded object root."""
-        return "spectra"

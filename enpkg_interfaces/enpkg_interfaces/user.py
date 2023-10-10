@@ -26,7 +26,7 @@ class User(Record):
 
     def get_taxons(self, number_of_records: int) -> List[Type[Taxon]]:
         """Return list of taxons created by the user.
-        
+
         Parameters
         ----------
         number_of_records : int
@@ -39,7 +39,7 @@ class User(Record):
 
     def get_samples(self, number_of_records: int) -> List[Type[Sample]]:
         """Return list of samples created by the user.
-        
+
         Parameters
         ----------
         number_of_records : int
@@ -50,9 +50,11 @@ class User(Record):
             f"It was not implemented in {self.__class__.__name__}."
         )
 
-    def get_spectra_collections(self, number_of_records: int) -> List[Type[SpectraCollection]]:
+    def get_spectra_collections(
+        self, number_of_records: int
+    ) -> List[Type[SpectraCollection]]:
         """Return list of spectra collections created by the user.
-        
+
         Parameters
         ----------
         number_of_records : int
@@ -62,3 +64,8 @@ class User(Record):
             "Abstract method 'get_spectra_collections' must be implemented in subclass. "
             f"It was not implemented in {self.__class__.__name__}."
         )
+
+    @staticmethod
+    def get_root() -> str:
+        """Return root for the user interface."""
+        return "users"
