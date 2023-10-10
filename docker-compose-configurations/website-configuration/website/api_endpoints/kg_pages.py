@@ -16,7 +16,7 @@ def kg_page(
     current_user = (User.from_flask_session() if User.is_authenticated() else None,)
     if identifier is None:
         return render_template(
-            f"{record_class.get_root()}.html",
+            "record.html",
             record=None,
             current_user=current_user,
             lang=lang,
@@ -27,7 +27,7 @@ def kg_page(
         abort(404)
 
     return render_template(
-        f"{record_class.get_root()}.html",
+        "record.html",
         record=record,
         current_user=current_user,
         lang=lang,
