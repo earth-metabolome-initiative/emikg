@@ -1,10 +1,10 @@
 """Abstract interface for user objects."""
 from typing import Type, List
 
-from enpkg_interfaces.record import Record
-from enpkg_interfaces.spectra_collection import SpectraCollection
-from enpkg_interfaces.sample import Sample
-from enpkg_interfaces.taxon import Taxon
+from emikg_interfaces.record import Record
+from emikg_interfaces.spectra_collection import SpectraCollection
+from emikg_interfaces.sample import Sample
+from emikg_interfaces.taxon import Taxon
 
 
 class User(Record):

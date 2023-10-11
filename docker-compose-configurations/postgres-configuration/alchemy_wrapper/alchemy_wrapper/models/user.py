@@ -4,8 +4,8 @@ from typing import List
 from alchemy_wrapper import Session
 from sqlalchemy import Column, DateTime, Integer, String
 
-from enpkg_interfaces import User as UserInterface
-from enpkg_interfaces.from_identifier import IdentifierNotFound
+from emikg_interfaces import User as UserInterface
+from emikg_interfaces.from_identifier import IdentifierNotFound
 
 from .administrator import Administrator
 from .base import Base

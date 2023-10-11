@@ -4,8 +4,8 @@ from typing import List, Optional
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime
 from alchemy_wrapper import Session
 from alchemy_wrapper.models import SpectraCollection
-from enpkg_interfaces import Sample as SampleInterface
-from enpkg_interfaces.from_identifier import IdentifierNotFound
+from emikg_interfaces import Sample as SampleInterface
+from emikg_interfaces.from_identifier import IdentifierNotFound
 from .base import Base
 from .user import User
 

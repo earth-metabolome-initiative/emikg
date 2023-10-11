@@ -1,11 +1,11 @@
-"""Module installing the ENPKG interfaces package."""
+"""Module installing the emikg interfaces package."""
 from setuptools import find_packages, setup
 
 setup(
-    name='enpkg_interfaces',
+    name='emikg_interfaces',
     version="0.0.5",
-    description='Module providing interfaces for the ENPKG project.',
-    url='https://github.com/enpkg/enpkg',
+    description='Module providing interfaces for the emikg project.',
+    url='https://github.com/emikg/emikg',
     author="Luca Cappelletti", # Other authors can be added here
     license='MIT',
     python_requires='>=3.8.0',

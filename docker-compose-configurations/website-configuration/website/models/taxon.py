@@ -1,7 +1,7 @@
 """Concrete implementation of Taxon for the website, integrating from alchemy the db and providing sectioned taxon."""
 
 from .sectioned import Sectioned, Section
-from enpkg_interfaces import Taxon as TaxonInterface
+from emikg_interfaces import Taxon as TaxonInterface
 from alchemy_wrapper.models import Taxon as TaxonTable
 from ..exceptions import Unauthorized
 from .user import User

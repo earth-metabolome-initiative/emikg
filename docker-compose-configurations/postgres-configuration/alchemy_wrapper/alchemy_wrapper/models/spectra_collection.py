@@ -2,8 +2,8 @@
 
 from typing import List, Type
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from enpkg_interfaces import SpectraCollection as SpectraCollectionInterface
-from enpkg_interfaces.from_identifier import IdentifierNotFound
+from emikg_interfaces import SpectraCollection as SpectraCollectionInterface
+from emikg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models import Base, Spectrum, User, Sample
 from alchemy_wrapper import Session
 

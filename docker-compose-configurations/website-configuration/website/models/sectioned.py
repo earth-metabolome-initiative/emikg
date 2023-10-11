@@ -1,7 +1,7 @@
 """Abstract interface describing an object whose page contains sections."""
 
 from typing import List
-from enpkg_interfaces.record import Record
+from emikg_interfaces.record import Record
 
 
 class Section:

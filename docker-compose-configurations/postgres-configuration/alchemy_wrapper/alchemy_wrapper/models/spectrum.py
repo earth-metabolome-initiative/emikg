@@ -2,8 +2,8 @@
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
 from alchemy_wrapper import Session
 from alchemy_wrapper.models import SpectraCollection
-from enpkg_interfaces import Spectrum as SpectrumInterface
-from enpkg_interfaces.from_identifier import IdentifierNotFound
+from emikg_interfaces import Spectrum as SpectrumInterface
+from emikg_interfaces.from_identifier import IdentifierNotFound
 from .base import Base
 from .user import User
 

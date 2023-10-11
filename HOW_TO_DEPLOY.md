@@ -30,11 +30,11 @@ sudo apt-get install git
 Once you have installed the required software, you can clone the repository by running the following command:
 
 ```bash
-git clone git@github.com:enpkg/enpkg.git
+git clone git@github.com:emikg/emikg.git
 ```
 
 ## Customizing the environemnt file
-In order to run the docker compose, you need to create a `.env` file in the root directory of the project. You can use the [`default_env`](https://github.com/enpkg/enpkg/blob/main/default_env) file as a template.
+In order to run the docker compose, you need to create a `.env` file in the root directory of the project. You can use the [`default_env`](https://github.com/emikg/emikg/blob/main/default_env) file as a template.
 
 Once you have fully customized the `.env` file, you can run the docker compose command to start the application.
 

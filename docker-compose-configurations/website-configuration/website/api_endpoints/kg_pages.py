@@ -1,7 +1,7 @@
 """API endpoints regardin the dashboard."""
 from typing import Optional, Type
 from flask import render_template, abort
-from enpkg_interfaces import Record, IdentifierNotFound
+from emikg_interfaces import Record, IdentifierNotFound
 from alchemy_wrapper.models import Taxon, Sample, Spectrum, SpectraCollection
 from ..models import User
 from ..application import app

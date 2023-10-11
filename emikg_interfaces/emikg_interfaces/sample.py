@@ -1,8 +1,8 @@
 """Abstract interface for sample objects."""
 from typing import List, Optional, Type
 
-from enpkg_interfaces.record import Record
-from enpkg_interfaces.authored import Authored
+from emikg_interfaces.record import Record
+from emikg_interfaces.authored import Authored
 
 
 class Sample(Record, Authored):

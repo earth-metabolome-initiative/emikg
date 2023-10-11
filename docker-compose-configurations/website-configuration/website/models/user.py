@@ -1,8 +1,8 @@
 """Concretely implements the proxy user interface using SQLAlchemy."""
 from flask import session
 
-from enpkg_interfaces import User as UserInterface
-from enpkg_interfaces.from_identifier import IdentifierNotFound
+from emikg_interfaces import User as UserInterface
+from emikg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models import User as UsersTable
 
 from ..exceptions import APIException, NotLoggedIn, Unauthorized

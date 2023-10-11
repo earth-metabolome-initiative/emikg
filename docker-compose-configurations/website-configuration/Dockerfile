@@ -9,14 +9,14 @@ COPY requirements.txt /app
 # Similarly, we copy the alchemy wrapper directory from the database.
 COPY ../../postgres-configuration/alchemy_wrapper /app/alchemy_wrapper
 
-# And the enpkg interfaces.
-COPY ../../enpkg_interfaces /app/enpkg_interfaces
+# And the emikg interfaces.
+COPY ../../emikg_interfaces /app/emikg_interfaces
 
 # We make sure that the pip version is up to date
 RUN pip install --upgrade pip
 
-# We install the enpkg interfaces as a package
-RUN pip install -e enpkg_interfaces
+# We install the emikg interfaces as a package
+RUN pip install -e emikg_interfaces
 
 # We install the alchemy wrapper as a package
 RUN pip install -e alchemy_wrapper

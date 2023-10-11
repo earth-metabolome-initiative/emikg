@@ -1,8 +1,8 @@
 """Abstract class describing a collection of spectra."""
 from typing import List, Type
-from enpkg_interfaces.record import Record
-from enpkg_interfaces.sample import Sample
-from enpkg_interfaces.authored import Authored
+from emikg_interfaces.record import Record
+from emikg_interfaces.sample import Sample
+from emikg_interfaces.authored import Authored
 
 
 class SpectraCollection(Record, Authored):

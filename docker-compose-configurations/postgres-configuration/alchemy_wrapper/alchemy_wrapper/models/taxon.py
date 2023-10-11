@@ -5,8 +5,8 @@ from alchemy_wrapper import Session
 from alchemy_wrapper.models import Base, Sample, User
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
-from enpkg_interfaces import Taxon as TaxonInterface
-from enpkg_interfaces.from_identifier import IdentifierNotFound
+from emikg_interfaces import Taxon as TaxonInterface
+from emikg_interfaces.from_identifier import IdentifierNotFound
 
 
 class Taxon(Base, TaxonInterface):
