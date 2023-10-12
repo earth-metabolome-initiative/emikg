@@ -1,7 +1,7 @@
 """SQLAlchemy table for the access tokens."""
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from .base import Base
+from alchemy_wrapper.models.base import Base
 
 class Token(Base):
     """Define the Token model."""

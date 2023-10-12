@@ -4,8 +4,12 @@ from typing import List, Type
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from emikg_interfaces import SpectraCollection as SpectraCollectionInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
-from alchemy_wrapper.models import Base, Spectrum, User, Sample
-from alchemy_wrapper import Session
+from alchemy_wrapper.database import Session
+from alchemy_wrapper.models.base import Base
+from alchemy_wrapper.models.sample import Sample
+from alchemy_wrapper.models.user import User
+from alchemy_wrapper.models.spectrum import Spectrum
+
 
 
 class SpectraCollection(Base, SpectraCollectionInterface):

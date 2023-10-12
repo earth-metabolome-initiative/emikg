@@ -1,17 +1,17 @@
 """SQLAlchemy model for the user table."""
 
 from typing import List
-from alchemy_wrapper import Session
+from alchemy_wrapper.database import Session
 from sqlalchemy import Column, DateTime, Integer, String
 
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
 
-from .administrator import Administrator
-from .base import Base
-from .spectra_collection import SpectraCollection
-from .sample import Sample
-from .moderator import Moderator
+from alchemy_wrapper.models.administrator import Administrator
+from alchemy_wrapper.models.base import Base
+from alchemy_wrapper.models.spectra_collection import SpectraCollection
+from alchemy_wrapper.models.sample import Sample
+from alchemy_wrapper.models.moderator import Moderator
 
 
 class User(Base, UserInterface):

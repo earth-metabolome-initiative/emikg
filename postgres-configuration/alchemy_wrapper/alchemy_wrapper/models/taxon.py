@@ -1,8 +1,10 @@
 """SQLalchemy model for taxon table."""
 from typing import List
 
-from alchemy_wrapper import Session
-from alchemy_wrapper.models import Base, Sample, User
+from alchemy_wrapper.database import Session
+from alchemy_wrapper.models.base import Base
+from alchemy_wrapper.models.sample import Sample
+from alchemy_wrapper.models.user import User
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from emikg_interfaces import Taxon as TaxonInterface

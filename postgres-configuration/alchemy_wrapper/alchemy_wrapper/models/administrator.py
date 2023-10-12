@@ -12,7 +12,7 @@ administrator entry is also deleted.
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from alchemy_wrapper.models.base import Base
 
 
 class Administrator(Base):

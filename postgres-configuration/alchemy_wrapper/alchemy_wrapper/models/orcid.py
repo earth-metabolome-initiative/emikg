@@ -1,6 +1,6 @@
 """SQLAlchemy model for ORCID data."""
 from sqlalchemy import Column, Integer, String, ForeignKey
-from .base import Base
+from alchemy_wrapper.models.base import Base
 
 class ORCID(Base):
     """Define the ORCID model."""

@@ -2,12 +2,11 @@
 
 from typing import List, Optional
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime
-from alchemy_wrapper import Session
-from alchemy_wrapper.models import SpectraCollection
+from alchemy_wrapper.database import Session
 from emikg_interfaces import Sample as SampleInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
-from .base import Base
-from .user import User
+from alchemy_wrapper.models.base import Base
+from alchemy_wrapper.models.user import User
 
 
 class Sample(Base, SampleInterface):

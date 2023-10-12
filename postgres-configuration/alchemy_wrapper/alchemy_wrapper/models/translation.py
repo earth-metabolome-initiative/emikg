@@ -1,6 +1,6 @@
 """SQLAlchemy model for translation table for handling multi-language version of textual messages."""
 from sqlalchemy import Column, Integer, String, DateTime
-from .base import Base
+from alchemy_wrapper.models.base import Base
 
 class Translation(Base):
     """Define the Translation model."""

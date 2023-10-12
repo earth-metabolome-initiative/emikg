@@ -4,8 +4,8 @@ from alchemy_wrapper import Session
 from alchemy_wrapper.models import SpectraCollection
 from emikg_interfaces import Spectrum as SpectrumInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
-from .base import Base
-from .user import User
+from alchemy_wrapper.models.base import Base
+from alchemy_wrapper.models.user import User
 
 
 class Spectrum(Base, SpectrumInterface):
