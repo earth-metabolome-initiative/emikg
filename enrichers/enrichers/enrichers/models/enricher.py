@@ -1,6 +1,7 @@
 """Submodule providing enrichers models."""
 from sqlalchemy import Column, Integer, String, DateTime
-from .base import Base
+from sqlalchemy.sql import func
+from alchemy_wrapper.models.base import Base
 
 
 class Enricher(Base):
@@ -10,7 +11,7 @@ class Enricher(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(80), unique=True, nullable=False)
-    last_ping_time = Column(DateTime, nullable=True, default=DateTime.utcnow)
+    last_ping_time = Column(DateTime, nullable=True, default=func.now())
 
     def __repr__(self):
         """Represent instance as a unique string."""
@@ -18,4 +19,4 @@ class Enricher(Base):
 
     def ping(self):
         """Ping the enricher."""
-        self.last_ping_time = DateTime.utcnow()
+        self.last_ping_time = func.now()

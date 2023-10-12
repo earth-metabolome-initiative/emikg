@@ -21,7 +21,7 @@ finished, the status is set to SUCCESS or FAILURE depending on whether the task 
 from typing import List, Any
 from time import sleep
 from alchemy_wrapper import Session
-from .models import EnrichmentTask, Enricher as EnricherModel
+from .models import EnrichmentTask, Enricher as EnricherTable
 
 
 class Enricher:
@@ -33,9 +33,9 @@ class Enricher:
         # Create the enricher entry in the enrichers table
         # if it does not already exist. An enricher is uniquely
         # identified by its name.
-        enricher = EnricherModel.query.filter_by(name=self.name()).first()
+        enricher = self._session.query(EnricherTable).filter_by(name=self.name()).first()
         if enricher is None:
-            enricher = EnricherModel(name=self.name())
+            enricher = EnricherTable(name=self.name())
             self._session.add(enricher)
             self._session.commit()
         self._enricher = enricher

@@ -12,10 +12,8 @@ class Moderator(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(
-        Integer, ForeignKey("users.id", unique=True, ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("users.id", ondelete="CASCADE"),unique=True, nullable=False
     )
-
-    user = relationship("User", back_populates="moderator")
 
     def __repr__(self):
         return f"<Moderator(id={self.id}, user_id={self.user_id})>"

@@ -1,7 +1,7 @@
 """Submodule providing the Enrichments task SQLAlchemy model."""
 from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey
-from .base import Base
-
+from sqlalchemy.sql import func
+from alchemy_wrapper.models.base import Base
 
 class EnrichmentTask(Base):
     """Define the EnrichmentTask model."""
@@ -10,15 +10,15 @@ class EnrichmentTask(Base):
 
     id = Column(Integer, primary_key=True)
     enricher_id = Column(
-        Integer, ForeignKey("enrichers.id"), nullable=False, ondelete="CASCADE"
+        Integer, ForeignKey("enrichers.id",  ondelete="CASCADE"), nullable=False,
     )
     status = Column(
         Enum("PENDING", "STARTED", "SUCCESS", "FAILURE", name="status"),
         nullable=False,
         default="PENDING",
     )
-    created_at = Column(DateTime, nullable=False, default=DateTime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=DateTime.utcnow, onupdate=DateTime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=func.now())
+    updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         """Represent instance as a unique string."""

@@ -1,6 +1,7 @@
 """SQLAlchemy table for the access tokens."""
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.sql import func
 from alchemy_wrapper.models.base import Base
 
 class Token(Base):
@@ -11,7 +12,7 @@ class Token(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     token = Column(String(512), nullable=False)
-    created_at = Column(DateTime, nullable=False, default=DateTime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=func.now())
     expires_at = Column(DateTime, nullable=False)
 
     def __repr__(self):

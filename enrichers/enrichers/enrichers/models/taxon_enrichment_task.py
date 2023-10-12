@@ -1,7 +1,7 @@
 """SQLAlchemy table for the tasks involving enrichemnt of taxons."""
 
 from sqlalchemy import Column, Integer, ForeignKey
-from .base import Base
+from alchemy_wrapper.models.base import Base
 
 
 class TaxonEnrichmentTask(Base):
@@ -14,10 +14,10 @@ class TaxonEnrichmentTask(Base):
     # We associate to the taxon id from the taxons table, which cascade upon deletion of the taxon
     # foreign key
     taxon_id = Column(
-        Integer, ForeignKey("taxons.id"), nullable=False, ondelete="CASCADE"
+        Integer, ForeignKey("taxons.id", ondelete="CASCADE"), nullable=False, 
     )
     task_id = Column(
-        Integer, ForeignKey("enrichers_tasks.id"), ondelete="CASCADE", nullable=False
+        Integer, ForeignKey("enrichment_tasks.id", ondelete="CASCADE"), nullable=False
     )
 
     def __repr__(self):

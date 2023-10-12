@@ -1,8 +1,7 @@
 """SQLAlchemy database proxy relative to the open tree of life table."""
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from sqlalchemy.sql import func
+from alchemy_wrapper.models.base import Base
 
 
 class OpenTreeOfLifeEntry(Base):
@@ -45,15 +44,14 @@ class OpenTreeOfLifeEntry(Base):
     is_synonym = Column(Boolean, nullable=False)
     is_approximated_match = Column(Boolean, nullable=False)
 
-
     taxon_id = Column(
         Integer,
         ForeignKey("taxons.id", ondelete="CASCADE"),
         unique=True,
         nullable=False,
     )
-    created_at = Column(DateTime, nullable=False, default=DateTime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=DateTime.utcnow, onupdate=DateTime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=func.now())
+    updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         """Represent instance as a unique string."""

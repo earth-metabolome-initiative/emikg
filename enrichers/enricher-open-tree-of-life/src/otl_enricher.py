@@ -3,7 +3,7 @@ from typing import Dict, List
 
 import numpy as np
 import pandas as pd
-from alchemy_wrapper import Session
+from alchemy_wrapper.database import Session
 from alchemy_wrapper.models import Taxon
 from enrichers import TaxonEnricher
 from enrichers.models import EnrichmentTask
@@ -59,7 +59,7 @@ class OTLEnricher(TaxonEnricher):
     def _get_new_elements_to_enrich(self) -> List[Taxon]:
         """Returns a list of new elements to enrich."""
         # Get all the taxons that are not already in the open_tree_of_life table.
-        return Taxon.query.filter(
+        return self._session.query(Taxon).filter(
             ~Taxon.id.in_(
                 self._session.query(OpenTreeOfLifeEntry.taxon_id).filter(
                     OpenTreeOfLifeEntry.taxon_id.isnot(None)
