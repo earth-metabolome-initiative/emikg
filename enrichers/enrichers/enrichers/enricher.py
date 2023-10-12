@@ -191,10 +191,12 @@ class Enricher:
         minimal_sleep_time = 1
         maximal_sleep_time = 60
         sleep_time_seconds = minimal_sleep_time
+        print(f"Starting the {self.name()} enricher service.")
         while True:
             self.ping()
             some_success = self.enrich_all()
             if some_success:
+                print("Completed a round of enrichment.")
                 sleep_time_seconds = max(minimal_sleep_time, sleep_time_seconds / 2)
             else:
                 sleep_time_seconds = min(2 * sleep_time_seconds, maximal_sleep_time)
