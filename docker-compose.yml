@@ -2,7 +2,8 @@ version: '3'
 services:
   web:
     build:
-      context: ./docker-compose-configurations/website-configuration
+      context: ./
+      dockerfile: ./website-configuration/Dockerfile
     environment:
       YOUR_ORCID_CLIENT_ID: ${YOUR_ORCID_CLIENT_ID}
       YOUR_ORCID_CLIENT_SECRET: ${YOUR_ORCID_CLIENT_SECRET}
@@ -14,7 +15,7 @@ services:
     depends_on:
       - postgres_database
     volumes:
-      - "./docker-compose-configurations/website-configuration:/app"
+      - "./website-configuration:/app"
     tmpfs:
       - /run
       - /run/lock
@@ -26,7 +27,8 @@ services:
       retries: 5
   postgres_database:
     build:
-      context: ./docker-compose-configurations/postgres-configuration
+      context: ./
+      dockerfile: ./postgres-configuration/Dockerfile
     volumes:
       - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
     environment:
@@ -44,7 +46,8 @@ services:
       retries: 5
   enricher_open_tree_of_life:
     build:
-      context: ./docker-compose-configurations/enrichers/enricher-open-tree-of-life
+      context: ./
+      dockerfile: ./enrichers/enricher-open-tree-of-life/Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -60,7 +63,7 @@ services:
       - backup
     build:
        # Path to the directory containing your Dockerfile and scripts
-      context: ./docker-compose-configurations/postgres-backup-configuration
+      context: ./postgres-backup-configuration
       args:
         - BACKUP_SERVER_USERNAME=${BACKUP_SERVER_USERNAME}
         - BACKUP_SERVER_NAME=${BACKUP_SERVER_NAME}
