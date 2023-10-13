@@ -1,0 +1,7 @@
+<!-- General badge template, which receives a RecordBadge object -->
+{% block content %}
+<div class="badge">
+    <h4>{{ badge.get_title() }}</h4>
+    <p>{{ badge.get_description() }}</p>
+</div>
+{% endblock %}

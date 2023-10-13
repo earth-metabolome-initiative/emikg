@@ -1,14 +1,20 @@
-"""Concretely implements the proxy user interface using SQLAlchemy."""
+"""Concretely implements the proxy user and taxon interface using SQLAlchemy."""
 from flask import session
-
+from typing import List
+from flask import render_template
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models import User as UsersTable
 
+from emikg_interfaces import Taxon as TaxonInterface
+from alchemy_wrapper.models import Taxon as TaxonTable
+from alchemy_wrapper.models import ORCID
+from .user import User
+from .section import RecordPage, Section, RecordBadge
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
 
 
-class User(UserInterface):
+class User(UserInterface, RecordPage, Section):
     """Concrete implementation of the user interface using SQLAlchemy."""
 
     def __init__(self, user: UsersTable):
@@ -56,23 +62,14 @@ class User(UserInterface):
             raise APIException("User is already logged in.")
 
         # We check whether the ORCID exists in the orcid table of the database.
-        if ORCIDTable.is_valid_orcid(orcid):
-            # We look up whether the ORCID exists in the orcid table of the database.
-            # If it does, we create a new user object from the user ID associated with
-            # the ORCID.
-            user_id = ORCIDTable.get_id_from_orcid(orcid)
-        else:
-            # Otherwise, we are currently creating a new user.
-            # We open a transaction, and insert a new user in the users table.
-            # We also insert the ORCID in the orcid table alongside the user ID.
-            user_id = UsersTable.create_user_from_orcid(orcid)
+        user = ORCID.get_or_insert_user_from_orcid(orcid)
 
         # We add the user ID to the Flask session.
-        session["user_id"] = user_id
+        session["user_id"] = user.id
 
         # Finally, we return a new user object from the user ID of the newly
         # inserted user.
-        return User(user_id=user_id)
+        return User.from_id(user.id)
 
     @staticmethod
     def logout() -> None:
@@ -120,7 +117,7 @@ class User(UserInterface):
     def get_description(self) -> str:
         """Return the user description."""
         return self._user.get_description()
-
+    
     def get_name(self) -> str:
         return self._user.get_name()
 
@@ -153,3 +150,60 @@ class User(UserInterface):
         # If the current user is the session user, or is an administrator,
         # then delete the user from the database
         self._user.delete()
+
+    def get_sections(self) -> List[Section]:
+        """Return sections."""
+        return [self]
+    
+    def get_title(self) -> str:
+        """Return the title of the user."""
+        return self.get_name()
+    
+    def get_description(self) -> str:
+        """Return the description of the user."""
+        return self._user.get_description()
+
+
+class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
+    def __init__(self, taxon: TaxonTable):
+        """Initialize the taxon object from a taxon ID."""
+        self._taxon = taxon
+
+    @staticmethod
+    def from_id(identifier: int) -> "Taxon":
+        """Return a taxon object from a taxon ID."""
+        return Taxon(TaxonTable.from_id(identifier))
+
+    def get_author(self) -> User:
+        """Return the author of the taxon."""
+        return User(self._taxon.get_author())
+
+    def get_description(self) -> str:
+        """Return the description of the taxon."""
+        return self._taxon.get_description()
+    
+    def get_section_header(self) -> str:
+        """Return the user section header."""
+        return "Taxons"
+
+    def get_name(self) -> str:
+        """Return the name of the taxon."""
+        return self._taxon.get_name()
+    
+    def get_title(self) -> str:
+        """Return the title of the taxon."""
+        return self.get_name()
+    
+    def get_record_badge(self) -> str:
+        """Return the taxon record badge."""
+        return render_template("badge.html", record=self)
+
+    def delete(self):
+        """Delete the taxon."""
+        user = User.from_flask_session()
+
+        # Either the user is the author of the taxon, or the user is an admin.
+        if not user.is_administrator() and not user.is_author_of(self):
+            raise Unauthorized()
+
+        self._taxon.delete()

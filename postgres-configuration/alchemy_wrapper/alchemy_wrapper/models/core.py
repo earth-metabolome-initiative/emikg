@@ -15,6 +15,9 @@ from emikg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models.administrator import Administrator
 from alchemy_wrapper.models.base import Base
 from alchemy_wrapper.models.moderator import Moderator
+from alchemy_wrapper.models.social import Social
+from alchemy_wrapper.models.social_profiles import SocialProfile
+
 
 
 class User(Base, UserInterface):
@@ -25,9 +28,10 @@ class User(Base, UserInterface):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(80), nullable=False)
     last_name = Column(String(80), nullable=False)
-    description = Column(String(255), nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    email = Column(String(255), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    created_at = Column(DateTime, nullable=False, default=func.now())
+    updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
 
     @staticmethod
     def from_id(identifier: int) -> "User":
@@ -101,6 +105,10 @@ class User(Base, UserInterface):
             .limit(number_of_records)
             .all()
         )
+    
+    def get_social_profiles(self) -> List[SocialProfile]:
+        """Return list of socials."""
+        return Session().query(SocialProfile).filter(SocialProfile.user_id == self.id).all()
     
 class Sample(Base, SampleInterface):
 
@@ -178,7 +186,7 @@ class Sample(Base, SampleInterface):
 
     def get_name(self) -> str:
         """Return recorded object name."""
-        return self.name
+        return f"{self.first_name} {self.second_name}"
 
 class Taxon(Base, TaxonInterface):
     """Define the Taxon model."""

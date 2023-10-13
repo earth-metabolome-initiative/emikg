@@ -1,0 +1,14 @@
+{% extends 'navigator.html' %}
+
+{% block content %}
+<div class="form-container">
+    <form action="/upload-sample/" method="POST">
+        <h2>Upload samples</h2>
+        <fieldset>
+            <label for="file" class="dropzone">Select or drop a sample
+                <input name="file" type="file">
+            </label>
+        </fieldset>
+    </form>
+</div>
+{% endblock %}

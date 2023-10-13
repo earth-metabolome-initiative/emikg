@@ -1,0 +1,18 @@
+<!-- 
+    Template to render the several entries in a sectioned record,
+    which receives a sectioned record object, displays its properties
+    and then renders all of the sections in the sectioned record.
+-->
+
+{% extends 'navigator.html' %}
+
+{% block content %}
+    <h1>{{ sectioned_record.get_title() }}</h1>
+    <p>{{ sectioned_record.get_description() }}</p>
+    <p>{{ sectioned_record.get_sectioned_record_content() }}</p>
+    {% for section in sectioned_record.get_sections() %}
+        {{section.get_section_content()}}
+    {% endfor %}
+
+{% endblock %}
+```

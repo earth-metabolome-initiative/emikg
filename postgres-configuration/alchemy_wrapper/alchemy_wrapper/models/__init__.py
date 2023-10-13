@@ -6,6 +6,8 @@ from alchemy_wrapper.models.administrator import Administrator
 from alchemy_wrapper.models.orcid import ORCID
 from alchemy_wrapper.models.token import Token
 from alchemy_wrapper.models.translation import Translation
+from alchemy_wrapper.models.social_profiles import SocialProfile
+from alchemy_wrapper.models.social import Social
 
 __all__ = [
     "Base",
@@ -18,5 +20,7 @@ __all__ = [
     "Token",
     "Translation",
     "Spectrum",
-    "SpectraCollection"
+    "SpectraCollection",
+    "SocialProfile",
+    "Social",
 ]

@@ -20,6 +20,7 @@ finished, the status is set to SUCCESS or FAILURE depending on whether the task 
 """
 from typing import List, Any
 from time import sleep
+import logging
 from alchemy_wrapper import Session
 from .models import EnrichmentTask, Enricher as EnricherTable
 
@@ -27,12 +28,14 @@ from .models import EnrichmentTask, Enricher as EnricherTable
 class Enricher:
     """Abstract Enricher class for extending the metadata of a enrichable class."""
 
-    def __init__(self) -> None:
+    def __init__(self, verbose: bool = True) -> None:
         """Initialize the enricher object."""
         self._session = Session()
         # Create the enricher entry in the enrichers table
         # if it does not already exist. An enricher is uniquely
         # identified by its name.
+        self._verbose = verbose
+        self._logger = logging.getLogger(self.name())
         enricher = self._session.query(EnricherTable).filter_by(name=self.name()).first()
         if enricher is None:
             enricher = EnricherTable(name=self.name())
@@ -191,12 +194,12 @@ class Enricher:
         minimal_sleep_time = 1
         maximal_sleep_time = 60
         sleep_time_seconds = minimal_sleep_time
-        print(f"Starting the {self.name()} enricher service.")
+        self._logger.info(f"Starting the {self.name()} enricher service.")
         while True:
             self.ping()
             some_success = self.enrich_all()
             if some_success:
-                print("Completed a round of enrichment.")
+                self._logger.info("Completed a round of enrichment.")
                 sleep_time_seconds = max(minimal_sleep_time, sleep_time_seconds / 2)
             else:
                 sleep_time_seconds = min(2 * sleep_time_seconds, maximal_sleep_time)

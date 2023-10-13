@@ -4,8 +4,7 @@ Implementative details
 ----------------------
 The API is implemented using authlib's OAuth 2.0 framework.
 """
-from flask import redirect, render_template, session
-
+from flask import redirect
 from ..application import app
 from ..models import User
 # from ..oauth import orcid  # Import your Authlib OAuth instance
@@ -26,13 +25,13 @@ def orcid_callback():
 
     _user = User.from_orcid(orcid_id)
 
-    return redirect("/")  # Redirect to the profile page or another page
+    return redirect("/upload")
 
 # Login route to initiate ORCID OAuth
 @app.route('/login/orcid', methods=['GET'])
 def orcid_login():
     """Login route to initiate ORCID OAuth."""
-    return redirect("/login/orcid/callback")  # Redirect to the profile page or another page
+    return redirect("/login/orcid/callback")
 
 # Logout route to clear the session
 @app.route('/logout')
@@ -40,22 +39,3 @@ def logout():
     """Logout route to clear the session."""
     User.logout()
     return redirect("/")
-
-
-# Landing page with language subdirectory
-@app.route('/')
-@app.route("/<lang>")
-def dashboard(lang: str = "en"):
-    """Render dashboard template."""
-    session['lang'] = lang
-    if User.is_authenticated():
-        return render_template(
-            'dashboard.html',
-            current_user=User.from_flask_session(),
-            lang=lang
-        )
-    return render_template(
-        "home.html",
-        current_user=None,
-        lang=lang
-    )
