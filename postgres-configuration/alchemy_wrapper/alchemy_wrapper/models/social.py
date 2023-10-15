@@ -4,7 +4,7 @@ This table will contain the names and metadata associated to various socials tha
 admins can make available, by adding new rows for new socials.
 """
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
 from alchemy_wrapper.models.base import Base
 from alchemy_wrapper.database import Session
@@ -19,8 +19,8 @@ class Social(Base, FromIdentifier):
     url = Column(String(255), nullable=False, unique=True)
     icon_path = Column(String(255), nullable=False, unique=True)
     description = Column(String(255), nullable=False)
-    created_at = Column(Integer, nullable=False, server_default=func.now())
-    updated_at = Column(Integer, nullable=False, server_default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 
     @staticmethod
     def from_id(identifier: int) -> "Social":

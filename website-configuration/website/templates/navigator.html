@@ -15,10 +15,7 @@
     {% if current_user %}
     <link rel="stylesheet" href="/static/css/lateral_bar.css">
     {% endif %}
-    <!-- If the user is logged in and is a moderator -->
-    <!-- we include the translations popup template -->
-    <link rel="stylesheet" href="/static/css/translations_popup.css">
-    <title>Your Website</title>
+    <title>Earth Metabolome KG</title>
 </head>
 
 <body>
@@ -62,10 +59,6 @@
         {% block content %}{% endblock %}
     </div>
 
-    <!-- If the user is logged in and is a moderator -->
-    <!-- we include the translations popup template -->
-    {% include 'translations_popup.html' %}
-
     <footer>
         <div class="footer-content">
             <p>&copy; <a href="/{{lang}}/">EMI</a></p>
@@ -80,9 +73,6 @@
     {% if current_user %}
     <script src="/static/js/lateral_bar.js"></script>
     {% endif %}
-    <!-- If the user is logged in and is a moderator -->
-    <!-- we include the translations popup script -->
-    <script src="/static/js/translation.js"></script>
     <script src="https://kit.fontawesome.com/a9d47abff9.js" crossorigin="anonymous"></script>
 </body>
 

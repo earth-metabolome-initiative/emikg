@@ -9,7 +9,6 @@ from alchemy_wrapper.models import User as UsersTable
 from emikg_interfaces import Taxon as TaxonInterface
 from alchemy_wrapper.models import Taxon as TaxonTable
 from alchemy_wrapper.models import ORCID
-from .user import User
 from .section import RecordPage, Section, RecordBadge
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
 
