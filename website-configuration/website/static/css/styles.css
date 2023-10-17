@@ -68,6 +68,12 @@ body {
     transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
 }
 
+.username-button {
+    position: absolute;
+    right: 1em;
+    color: #aa9639;
+}
+
 /* When we hover the button, a small animation happens. */
 .signup-button:hover {
     background-color: white;

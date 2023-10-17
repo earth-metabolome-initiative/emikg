@@ -34,17 +34,17 @@ function get_translation(label) {
     }
 
     // We retrieve the language from the html tag.
-    var lang = $('html').attr('lang');
+    // var lang = $('html').attr('lang');
 
-    // We compose the URL from the lang and the label.
-    var url = '/' + lang + '/translation/' + label;
+    // // We compose the URL from the lang and the label.
+    // var url = '/' + lang + '/translation/' + label;
 
-    // We retrieve the message from the backend.
-    var message = $.ajax({
-        url: url,
-        async: false
-    }).responseText;
-    return message;
+    // // We retrieve the message from the backend.
+    // var message = $.ajax({
+    //     url: url,
+    //     async: false
+    // }).responseText;
+    return label;
 }
 
 function form_is_valid(form) {
@@ -71,11 +71,9 @@ function show_error_message(input, message_label) {
     p.attr('for', input.attr('name'));
     p.text(message);
     // We find the parent p containing the input field.
-    var parent = input.parent('p');
+    var parent = input.parents('fieldset');
     // We append the p object after the parent.
     parent.after(p);
-    // We add the class "error" to the input field.
-    input.addClass('error');
     // We hide the error message after 10 seconds, or
     // after the user clicks on the error message.
     setTimeout(function () {
@@ -216,12 +214,44 @@ function check_not_in_group(input) {
     return true;
 }
 
+function check_mime_type(input) {
+    // If the input has the attribute "mime-type",
+    // which is only allowed on input fields of type
+    // file, we check whether the mime type of the file
+    // is equal to the value of the attribute.
+    // The mime type may be a comma-separated list of
+    // mime types.
+    if (input.attr('mime-type') != undefined) {
+        // We retrieve the value of the input field.
+        var files = input.prop('files');
+        // We retrieve the value of the attribute.
+        var mime_types = input.attr('mime-type').split(',');
+        // We iterate across the files.
+        for (var i = 0; i < files.length; i++) {
+            // We retrieve the file.
+            var file = files[i];
+            // We retrieve the mime type of the file.
+            var mime_type = file.type;
+            // We check whether the mime type is in the list
+            // of allowed mime types.
+            if (mime_types.indexOf(mime_type) == -1) {
+                show_error_message(
+                    input,
+                    "invalid_mime_type"
+                );
+                return false;
+            }
+        }
+    }
+    return true;
+}
+    
 
 function validation_callback(input) {
     // We check whether the input already has a last-valid-value
     // attribute. If it has, we check that it is not equal to the
     // current value, otherwise we return.
-    if (input.attr('last-valid-value') != undefined && input.attr('last-valid-value') != "" && input.attr('last-valid-value') == input.val()) {
+    if (input.attr('last-validated-value') != undefined && input.attr('last-validated-value') != "" && input.attr('last-validated-value') == input.val()) {
         return;
     }
     // We remove error messages associated
@@ -233,20 +263,30 @@ function validation_callback(input) {
 
     // We set the last-valid-value attribute to the
     // current value of the input field.
-    input.attr('last-valid-value', input.val());
+    input.attr('last-validated-value', input.val());
+
+    // We retrieve the label associated to the input field,
+    // that is the label with the attribute "for" equal to
+    // the name of the input field.
+    var label = $('label[for="' + input.attr('name') + '"]');
 
     // We check if the input is empty.
     if (
         check_not_empty(input) &&
         check_must_be_equal_to(input) &&
         check_in_group(input) &&
-        check_not_in_group(input)
+        check_not_in_group(input) &&
+        check_mime_type(input)
     ) {
         input.removeClass('error');
+        label.removeClass('error');
         input.addClass('valid');
+        label.addClass('valid');
     } else {
         input.removeClass('valid');
+        label.removeClass('valid');
         input.addClass('error');
+        label.addClass('error');
     }
     // If the parent form is now valid, we enable the submit button.
     input.parents('form').find('button[type="submit"]').prop('disabled', !form_is_valid(input.parents('form')));
@@ -278,7 +318,6 @@ $(document).ready(function () {
     $('.validate').keyup(function () {
         timed_validation_callback($(this));
     });
-
 
     // We iterate across all form objects and if any of them
     // contains an input field with class "validate" which does
@@ -359,7 +398,24 @@ $(document).ready(function () {
             input.prop('files', files);
             // We add the dropped property to the dropzone.
             label.addClass('dropped');
+            // If the associated input file has
+            // the class validate, we validate it.
+            if (input.hasClass('validate')) {
+                timed_validation_callback(input);
+            }
         });
+        // We also need to handle the event where the user
+        // clicks and then selects a file.
+        input.change(function () {
+            // We add the dropped property to the dropzone.
+            label.addClass('dropped');
+            // If the associated input file has
+            // the class validate, we validate it.
+            if (input.hasClass('validate')) {
+                timed_validation_callback(input);
+            }
+        });
+
         // We handle the dragover event.
         label.on('dragover', function (event) {
             event.preventDefault();

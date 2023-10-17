@@ -26,6 +26,7 @@
             <li><a href="/{{ lang }}/users/search">Search user</a></li>
         </ul>
     </li>
+    {% if user %}
     <li>
         <ul>
             <li><a href="/{{ lang }}/users/{userid}">Myself</a></li>
@@ -33,4 +34,5 @@
             <li><a href="/logout">Logout</a></li>
         </ul>
     </li>
+    {% endif %}
 </ul>

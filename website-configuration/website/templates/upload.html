@@ -6,9 +6,15 @@
         <h2>Upload samples</h2>
         <fieldset>
             <label for="file" class="dropzone">Select or drop a sample
-                <input name="file" type="file">
+                <input class="validate" name="file" type="file" mime-type="application/zip,application/gzip">
             </label>
+            <div class="progress">
+                <div class="progress-bar"></div>
+            </div>
         </fieldset>
+        <button type="submit" class="create">
+            <i class="fa-solid fa-upload"></i> Upload
+        </button>
     </form>
 </div>
 {% endblock %}

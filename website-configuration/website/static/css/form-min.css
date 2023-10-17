@@ -54,16 +54,27 @@
     text-align: center;
     cursor: pointer;
     flex: 1;
+    color: #aa9639;
     transition: all 0.1s ease-in-out;
 }
 
 .form-container form label.dropzone.dropped {
-    background-color: #aa9639;
     color: white;
 }
 
+.form-container form label.dropzone.valid {
+    border-color: rgb(68, 116, 5);
+    background-color:  rgba(68, 116, 5, 0.5);
+}
+
+.form-container form label.dropzone.error {
+    border: 1px solid red;
+    background-color: rgba(220, 0, 0, 0.5);
+}
+
 .form-container form label.dropzone:hover, .form-container form label.dropzone.dragover {
-    background-color: #aa9639;
+    background-color: rgba(170, 150, 57, 0.6);
+    border-color: #aa9639;
     color: white;
 }
 
@@ -81,8 +92,6 @@
     color: red;
     display: block;
     font-size: 12px;
-    min-width: 100%;
-    width: 100%;
     padding: 0.5em;
     text-align: right;
 }
@@ -206,4 +215,23 @@
 .danger_zone p, .admin_zone p {
     padding: 0.5em;
     color: #333;
+}
+
+.progress {
+    background-color: #ccc;
+    border-radius: 4px;
+    height: 1em;
+    margin-bottom: 0.5em;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.progress .progress-bar {
+    background-color: #aa9639;
+    border-radius: 4px;
+    height: 100%;
+    position: absolute;
+    transition: width 0.1s ease-in-out;
+    width: 0;
 }
