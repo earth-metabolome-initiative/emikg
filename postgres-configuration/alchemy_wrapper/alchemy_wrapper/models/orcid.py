@@ -10,7 +10,7 @@ class ORCID(Base):
     __tablename__ = "orcid"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     orcid = Column(String(255), nullable=False, unique=True)
 
     def __repr__(self):
@@ -69,12 +69,12 @@ class ORCID(Base):
         return User.from_id(orcid.user_id)
     
     @staticmethod
-    def get_or_insert_user_from_orcid(orcid: str) -> User:
+    def get_or_insert_user_from_orcid(orcid_code: str) -> User:
         """Get user ID associated with the ORCID.
 
         Parameters
         ----------
-        orcid : str
+        orcid_code : str
             ORCID.
 
         Returns
@@ -82,18 +82,19 @@ class ORCID(Base):
         int
             User ID associated with the ORCID.
         """
-        orcid = ORCID.from_orcid(orcid)
+        orcid = ORCID.from_orcid(orcid_code)
         if orcid is None:
-            session = Session()
-            user = User(
-                first_name="John",
-                last_name="Wick",
-                email="john@wick.com",
-            )
-            session.add(user)
-            orcid = ORCID(user_id=user.id, orcid=orcid)
-            session.add(orcid)
-            session.commit()
+            with Session() as session:
+                user = User(
+                    first_name="John",
+                    last_name="Wick",
+                    email="john@wick.com",
+                )
+                session.add(user)
+                session.flush()
+                orcid = ORCID(user_id=user.id, orcid=orcid_code)
+                session.add(orcid)
+                session.commit()
         else:
             user = User.from_id(orcid.user_id)
         return user

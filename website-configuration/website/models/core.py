@@ -24,6 +24,10 @@ class User(UserInterface, RecordPage, Section):
     def from_id(identifier: int) -> "User":
         """Return a user object from a user ID."""
         return User(UsersTable.from_id(identifier))
+    
+    def get_id(self) -> int:
+        """Return the user ID."""
+        return self._user.get_id()
 
     @staticmethod
     def from_flask_session() -> "User":
@@ -161,7 +165,6 @@ class User(UserInterface, RecordPage, Section):
     def get_description(self) -> str:
         """Return the description of the user."""
         return self._user.get_description()
-
 
 class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
     def __init__(self, taxon: TaxonTable):

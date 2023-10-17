@@ -4,6 +4,7 @@ from typing import List, Optional, Type
 from alchemy_wrapper.database import Session
 from sqlalchemy.sql import func
 from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Float
+from sqlalchemy.orm import relationship, Mapped
 
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Sample as SampleInterface
@@ -48,7 +49,7 @@ class User(Base, UserInterface):
             If the user corresponding to the given identifier is not found.
         """
         # We query the user table to get the user corresponding to the given identifier
-        user = User.query.filter_by(id=identifier).first()
+        user = Session().query(User).filter_by(id=identifier).first()
         if user is None:
             raise IdentifierNotFound(f"User with id {identifier} not found")
         return user
@@ -70,7 +71,7 @@ class User(Base, UserInterface):
         id appears in the moderators table.
         """
         # We query the moderators table to check if the user is a moderator
-        return Moderator.query.filter_by(user_id=self.id).first() is not None
+        return Session().query(Moderator).filter_by(user_id=self.id).first() is not None
 
     def is_administrator(self):
         """Check if user is an administrator.
@@ -81,7 +82,7 @@ class User(Base, UserInterface):
         id appears in the administrators table.
         """
         # We query the administrators table to check if the user is an administrator
-        return Administrator.query.filter_by(user_id=self.id).first() is not None
+        return Session().query(Administrator).filter_by(user_id=self.id).first() is not None
 
     def delete(self):
         """Delete the user."""
@@ -100,7 +101,7 @@ class User(Base, UserInterface):
         """
         # We return the most recent samples created by the user
         return (
-            Sample.query.filter_by(user_id=self.id)
+            Session().query(Sample).filter_by(user_id=self.id)
             .order_by(Sample.updated_at.desc())
             .limit(number_of_records)
             .all()
@@ -109,6 +110,10 @@ class User(Base, UserInterface):
     def get_social_profiles(self) -> List[SocialProfile]:
         """Return list of socials."""
         return Session().query(SocialProfile).filter(SocialProfile.user_id == self.id).all()
+    
+    def get_name(self) -> str:
+        """Return recorded object name."""
+        return f"{self.first_name} {self.last_name}"
     
 class Sample(Base, SampleInterface):
 
@@ -154,13 +159,13 @@ class Sample(Base, SampleInterface):
 
     def get_child_samples(self) -> List["Sample"]:
         """Return list of child samples."""
-        return Sample.query.filter_by(derived_from=self.id).all()
+        return Session().query(Sample).filter_by(derived_from=self.id).all()
 
     @staticmethod
     def from_id(identifier: int) -> "Sample":
         """Return Sample instance from Sample id."""
         # We query the user table to get the user corresponding to the given identifier
-        sample = Sample.query.filter_by(id=identifier).first()
+        sample = Session().query(Sample).filter_by(id=identifier).first()
         if sample is None:
             raise IdentifierNotFound(f"Sample with id {identifier} not found")
         return sample
@@ -184,9 +189,6 @@ class Sample(Base, SampleInterface):
         """Return recorded object description."""
         return self.description
 
-    def get_name(self) -> str:
-        """Return recorded object name."""
-        return f"{self.first_name} {self.second_name}"
 
 class Taxon(Base, TaxonInterface):
     """Define the Taxon model."""
@@ -212,7 +214,7 @@ class Taxon(Base, TaxonInterface):
     def from_id(identifier: int) -> "Taxon":
         """Return taxon instance from taxon id."""
         # We query the user table to get the user corresponding to the given identifier
-        taxon = Taxon.query.filter_by(id=identifier).first()
+        taxon = Session().query(Taxon).filter_by(id=identifier).first()
         if taxon is None:
             raise IdentifierNotFound(f"Taxon with id {identifier} not found")
         return taxon
@@ -230,11 +232,11 @@ class Taxon(Base, TaxonInterface):
 
     def get_samples(self) -> List[Sample]:
         """Return list of samples."""
-        return Sample.query.filter_by(taxon_id=self.id).all()
+        return Session().query(Sample).filter_by(taxon_id=self.id).all()
 
     def get_author(self) -> User:
         """Return author."""
-        return User.query.filter_by(id=self.author_id).first()
+        return Session().query(User).filter_by(id=self.author_id).first()
     
     def get_description(self) -> str:
         """Return recorded object description."""
@@ -265,7 +267,7 @@ class Spectrum(Base, SpectrumInterface):
     def from_id(identifier: int) -> "Spectrum":
         """Return Spectrum instance from Spectrum id."""
         # We query the user table to get the user corresponding to the given identifier
-        spectrum = Spectrum.query.filter_by(id=identifier).first()
+        spectrum = Session().query(Spectrum).filter_by(id=identifier).first()
         if spectrum is None:
             raise IdentifierNotFound(f"Spectrum with id {identifier} not found")
         return spectrum
@@ -328,7 +330,7 @@ class SpectraCollection(Base, SpectraCollectionInterface):
     def from_id(identifier: int) -> "SpectraCollection":
         """Return SpectraCollection instance from SpectraCollection id."""
         # We query the user table to get the user corresponding to the given identifier
-        spectra_collection = SpectraCollection.query.filter_by(id=identifier).first()
+        spectra_collection = Session().query(SpectraCollection).filter_by(id=identifier).first()
         if spectra_collection is None:
             raise IdentifierNotFound(
                 f"SpectraCollection with id {identifier} not found"

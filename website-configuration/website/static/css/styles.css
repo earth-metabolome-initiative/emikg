@@ -22,10 +22,7 @@ body {
     background-color: white;
     border-bottom: 1px solid #aa9639;
     z-index: 1000;
-}
-
-.navbar .user {
-    display: none;
+    box-sizing: border-box;
 }
 
 .navbar h1 img {
@@ -62,9 +59,12 @@ body {
     padding: 0.7em;
     width: auto;
     text-decoration: none;
-    margin-bottom: 0;
+    width: 150px;
+    right: 1em;
     display: inline-block;
+    position: absolute;
     font-size: inherit;
+    text-align: center;
     transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
 }
 
@@ -77,8 +77,9 @@ body {
 .content {
     width: 800px;
     max-width: 100%;
-    padding-top: 60px;
+    padding: 10px;
     margin: 0 auto;
+    margin-top: 60px;
 }
 
 .content h2 {

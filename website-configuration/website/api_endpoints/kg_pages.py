@@ -31,6 +31,7 @@ def upload_page(lang: str = "en"):
     return render_template(
         "upload.html",
         lang=lang,
+        user=User.from_flask_session(),
     )
 
 @app.route("/taxons")
