@@ -5,11 +5,12 @@
     <form action="/upload-sample/" method="POST">
         <h2>Upload samples</h2>
         <fieldset>
-            <label for="file" class="dropzone">Select or drop a sample
+            <label for="file" class="hide-before-send dropzone">Select or drop a sample
                 <input class="validate" name="file" type="file" mime-type="application/zip,application/gzip">
             </label>
-            <div class="progress">
+            <div class="progress show-before-send">
                 <div class="progress-bar"></div>
+                <p class="completion-percentage">0%</span>
             </div>
         </fieldset>
         <button type="submit" class="create">

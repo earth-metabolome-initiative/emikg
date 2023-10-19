@@ -48,6 +48,7 @@
 .form-container form label.dropzone {
     border: 1px dashed #aa9639;
     width: 100%;
+    min-width: 100%;
     position: relative;
     border-radius: 4px;
     padding: 2em;
@@ -65,10 +66,12 @@
 .form-container form label.dropzone.valid {
     border-color: rgb(68, 116, 5);
     background-color:  rgba(68, 116, 5, 0.5);
+    color: white;
 }
 
 .form-container form label.dropzone.error {
     border: 1px solid red;
+    color: white;
     background-color: rgba(220, 0, 0, 0.5);
 }
 
@@ -96,7 +99,7 @@
     text-align: right;
 }
 
-.form-container form i.fa-loader{
+.form-container form i.fa-loader {
     background-color: red;
     padding: 0.7em;
     color: #aa9639;
@@ -220,18 +223,49 @@
 .progress {
     background-color: #ccc;
     border-radius: 4px;
-    height: 1em;
+    height: 2em;
     margin-bottom: 0.5em;
     overflow: hidden;
     position: relative;
     width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #999;
+    text-align: center;
+}
+
+.progress p {
+    color: #333;
+    line-height: 2em;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-top: -1em;
+    margin-left: -1em;
+    text-align: center;
+    background-color: white;
+    height: 2em;
+    width: 2em;
+    font-size: 12px;
+    border-radius: 100%;
+    display: block;
+    position: absolute;
 }
 
 .progress .progress-bar {
-    background-color: #aa9639;
+    background-color:  rgba(68, 116, 5, 0.5);
     border-radius: 4px;
     height: 100%;
     position: absolute;
     transition: width 0.1s ease-in-out;
     width: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.show-before-send {
+    display: none;
 }

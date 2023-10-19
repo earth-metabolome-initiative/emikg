@@ -91,6 +91,22 @@ function check_not_empty(input) {
     if (input.attr('empty') != undefined) {
         return true;
     }
+    // If the input field is an input of type file, we check whether
+    // the input has a file.
+    if (input.attr('type') == 'file') {
+        // We retrieve the value of the input field.
+        var files = input.prop('files');
+        // If the input field has no file, we return the error message.
+        if (files.length == 0) {
+            show_error_message(
+                input,
+                "empty_input_field"
+            );
+            return false;
+        }
+        return true;
+    }
+
     // We retrieve the value of the input field.
     var value = input.val();
     // We strip the value of the input field.
@@ -292,7 +308,7 @@ function validation_callback(input) {
     input.parents('form').find('button[type="submit"]').prop('disabled', !form_is_valid(input.parents('form')));
 }
 
-// We set up a timeout to validate the input after 500 milliseconds.
+// We set up a timeout to validate the input after 300 milliseconds.
 var timeout = null;
 function timed_validation_callback(input) {
     // If there is a timeout, we clear it.
@@ -309,11 +325,14 @@ $(document).ready(function () {
     // When the user goes out of focus of the input with
     // class "validate", we validate the input.
     $('.validate').blur(function () {
+        if ($(this).attr('type') == 'file') {
+            return;
+        }
         timed_validation_callback($(this));
     });
 
     // When the user has a keyup event on the input with
-    // class "validate", and stops typing for 500 milliseconds,
+    // class "validate", and stops typing for 300 milliseconds,
     // we validate the input.
     $('.validate').keyup(function () {
         timed_validation_callback($(this));
@@ -345,15 +364,70 @@ $(document).ready(function () {
         var form = $(this);
         var url = form.attr('action');
         var method = form.attr('method');
-        var data = form.serialize();
+
         $.ajax({
             url: url,
             method: method,
-            data: data,
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            beforeSend: function () {
+                // We disable the submit button.
+                form.find('button[type="submit"]').prop('disabled', true);
+                // We display all objects with class show-before-send.
+                form.find('.show-before-send').show(300);
+                // We hide all objects with class hide-before-send.
+                form.find('.hide-before-send').hide(300);
+            },
+            complete: function () {
+                // We enable the submit button.
+                form.find('button[type="submit"]').prop('disabled', false);
+                // We wait for 3 seconds before hiding the elememts, so
+                // to allow the user to understand that the task was
+                // successfull.
+                setTimeout(function () {
+                    // We hide all objects with class show-before-send.
+                    form.find('.show-before-send').hide(300);
+                    // We show all objects with class hide-before-send.
+                    form.find('.hide-before-send').show(300);
+                }, 3 * 1000);
+            },
+            xhr: function() {
+                // If the form contains a progress bar, we
+                // update its content upon progress of the upload.
+                if (form.find('.progress-bar').length == 0) {
+                    return null;
+                }
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = ((evt.loaded / evt.total) * 100);
+                        $(".progress-bar").width(percentComplete + '%');
+                        // We format the completion percentage as an
+                        // integer.
+                        let percentage_text = Math.round(percentComplete);
+                        $(".completion-percentage").html(percentage_text+'%');
+                    }
+                }, false);
+                return xhr;
+            },
             success: function (data) {
                 // We clear out the form.
                 form.find('input').val('');
                 form.find('textarea').val('');
+
+                // We remove the "valid" class from
+                // all labels with class "validate" within
+                // the form.
+                form.find('input').removeClass('valid');
+                form.find('textarea').removeClass('valid');
+                form.find('label.validate').removeClass('valid');
+
+                // We remove the "dropped" class from
+                // all labels with class "dropzone" within
+                // the form.
+                form.find('label.dropzone').removeClass('dropped');
 
                 // On success, we redirect the user to the
                 // page defined by the url attribute of the
@@ -404,11 +478,18 @@ $(document).ready(function () {
                 timed_validation_callback(input);
             }
         });
+
         // We also need to handle the event where the user
         // clicks and then selects a file.
         input.change(function () {
             // We add the dropped property to the dropzone.
-            label.addClass('dropped');
+            // If there is a file, we add the dropped property
+            // to the dropzone.
+            if (input.prop('files').length > 0) {
+                label.addClass('dropped');
+            } else {
+                label.removeClass('dropped');
+            }
             // If the associated input file has
             // the class validate, we validate it.
             if (input.hasClass('validate')) {
@@ -423,6 +504,7 @@ $(document).ready(function () {
             // We add the class "dragover" to the label.
             label.addClass('dragover');
         });
+
         // We handle the dragout event.
         label.on('dragout', function (event) {
             event.preventDefault();
