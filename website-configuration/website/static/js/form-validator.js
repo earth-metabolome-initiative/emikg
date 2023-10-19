@@ -422,7 +422,7 @@ $(document).ready(function () {
                 // the form.
                 form.find('input').removeClass('valid');
                 form.find('textarea').removeClass('valid');
-                form.find('label.validate').removeClass('valid');
+                form.find('label.valid').removeClass('valid');
 
                 // We remove the "dropped" class from
                 // all labels with class "dropzone" within
