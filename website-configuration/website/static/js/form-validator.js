@@ -381,8 +381,6 @@ $(document).ready(function () {
                 form.find('.hide-before-send').hide(300);
             },
             complete: function () {
-                // We enable the submit button.
-                form.find('button[type="submit"]').prop('disabled', false);
                 // We wait for 3 seconds before hiding the elememts, so
                 // to allow the user to understand that the task was
                 // successfull.
@@ -428,6 +426,9 @@ $(document).ready(function () {
                 // all labels with class "dropzone" within
                 // the form.
                 form.find('label.dropzone').removeClass('dropped');
+
+                // Disable submit button.
+                form.find('button[type="submit"]').prop('disabled', true);
 
                 // On success, we redirect the user to the
                 // page defined by the url attribute of the
