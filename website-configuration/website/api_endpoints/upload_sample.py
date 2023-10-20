@@ -1,7 +1,7 @@
 """Endpoint to upload samples."""
 from flask import request, jsonify, session
 from alchemy_wrapper.models import DataPayload
-from ..application import app
+from ..application import app, db
 from ..models import User
 
 @app.route('/upload-sample/', methods=['POST'])
@@ -28,8 +28,8 @@ def upload_sample():
     # sample_file.save(path)
 
     # We create a data payload.
-    data_payload = DataPayload.new_data_payload(user)
-    task = data_payload.get_task()
+    data_payload = DataPayload.new_data_payload(user, session=db.session)
+    task = data_payload.get_task(session=db.session)
     url = task.get_url()
 
     lang = session.get('lang', "en")

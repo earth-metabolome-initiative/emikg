@@ -7,10 +7,10 @@
 {% extends 'navigator.html' %}
 
 {% block content %}
-    <h1>{{ sectioned_record.get_title() }}</h1>
-    <p>{{ sectioned_record.get_description() }}</p>
-    <p>{{ sectioned_record.get_sectioned_record_content() }}</p>
-    {% for section in sectioned_record.get_sections() %}
+    <h1>{{ record.get_title() }}</h1>
+    <p>{{ record.get_description() }}</p>
+    <p>{{ record.get_record_content() }}</p>
+    {% for section in record.get_sections() %}
         {{section.get_section_content()}}
     {% endfor %}
 

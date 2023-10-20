@@ -51,6 +51,6 @@ class RecordPage(Record):
             f"It was not implemented in class {self.__class__.__name__}."
         )
 
-    def get_sectioned_record_content(self) -> str:
+    def get_record_content(self) -> str:
         """Return sectioned record content."""
         return render_template("record.html", record=self)

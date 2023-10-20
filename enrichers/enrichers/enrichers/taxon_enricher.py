@@ -10,7 +10,7 @@ class TaxonEnricher(Enricher):
 
     def _create_new_task(self, enrichable: Taxon) -> Task:
         enrichment_task = super()._create_new_task(enrichable)
-        # Create a new entry in the taxon_enrichment_tasks table
+        # Create a new entry in the taxon_tasks table
         taxon_enrichment_task = TaxonEnrichmentTask(
             taxon_id=enrichable.id, enrichment_task_id=enrichment_task.id
         )

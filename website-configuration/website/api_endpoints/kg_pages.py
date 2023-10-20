@@ -20,17 +20,19 @@ def kg_page(
     except IdentifierNotFound:
         abort(404)
 
-    return record.get_sectioned_record_content()
+    return record.get_record_content()
 
 
 @app.route("/upload")
+@app.route("/upload/")
 @app.route("/<lang>/upload")
+@app.route("/<lang>/upload/")
 def upload_page(lang: str = "en"):
     """Load the taxons page."""
-    try:
-        user = User.from_flask_session()
-    except NotLoggedIn:
-        return redirect("/", code=302)
+    if not User.is_authenticated():
+        return redirect(f"/{lang}/", code=302)
+
+    user = User.from_flask_session()
 
     return render_template(
         "upload.html",
@@ -116,6 +118,7 @@ def tasks_page(lang: str = "en", identifier: Optional[int] = None):
 
 @app.route("/")
 @app.route("/<lang>")
+@app.route("/<lang>/")
 def home_page(lang: str = "en"):
     """Load the taxons page."""
     return render_template(

@@ -13,6 +13,8 @@ from ..models import User
 @app.route('/login/orcid/callback')
 def orcid_callback():
     """Internal route to handle the ORCID OAuth callback."""
+    if User.is_authenticated():
+        return redirect("/upload")
     # Exchange the authorization code for an access token
     # TODO! ADD SUPPORT FOR PROPER ORCID AUTHENTICATION
     # WHEN SWITCHING TO ONLINE VERSION.

@@ -1,6 +1,8 @@
 import os
 
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from alchemy_wrapper.database import DATABASE_URL
 
 # from flask_socketio import SocketIO, emit
 
@@ -8,6 +10,12 @@ app = Flask(__name__, static_folder=os.path.abspath('static'))
 
 # We set the session secret key for the application
 app.secret_key = "hytrito8ew78ftoegfpdl"
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+
+db = SQLAlchemy()
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
 # socketio = SocketIO(app)
 

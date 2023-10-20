@@ -191,10 +191,3 @@ class Task(Record, Authored):
         """Return root for the spectrum interface."""
         return "tasks"
     
-    @staticmethod
-    def get_task_type() -> Type[TaskType]:
-        """Return task type."""
-        raise NotImplementedError(
-            "Abstract method 'get_task_type' should be implemented in derived class. "
-        )
-    

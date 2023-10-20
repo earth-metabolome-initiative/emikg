@@ -25,18 +25,18 @@ class DataPayload(Base, TaskInterface):
     # The time when the payload was created.
     created_at = Column(DateTime, nullable=False, default=func.now())
 
-    def get_author(self) -> User:
+    def get_author(self, session: Type[Session]) -> User:
         """Return author user."""
-        return User.from_id(self.user_id)
+        return User.from_id(self.user_id, session=session)
     
-    def get_task(self) -> Task:
+    def get_task(self, session: Type[Session]) -> Task:
         """Return task."""
-        return Task.from_id(self.task_id)
+        return Task.from_id(self.task_id, session=session)
     
     @staticmethod
-    def from_id(id: int) -> "DataPayload":
+    def from_id(id: int, session: Type[Session]) -> "DataPayload":
         """Return data payload from id."""
-        data_payload = DataPayload.query.filter_by(id=id).first()
+        data_payload = session.query(DataPayload).filter_by(id=id).first()
         if data_payload is None:
             raise IdentifierNotFound(f"Data payload with id {id} not found.")
         return data_payload
@@ -50,36 +50,29 @@ class DataPayload(Base, TaskInterface):
         return f"/unsafe_data_payloads/{self.id}"
 
     @staticmethod
-    def get_task_type() -> str:
-        """Return task type."""
-        return "Data payload processing"
-
-    @staticmethod
-    def get_task_type() -> TaskType:
-        """Return task type id."""
-        session = Session()
-        task_type = session.query(TaskType).filter_by(name=DataPayload.get_task_type()).first()
+    def new_data_payload(
+        user: Type[UserInterface],
+        session: Type[Session],
+    ) -> "DataPayload":
+        """Create a new data payload."""
+        task_type_name = "Data payload processing"
+        task_type_description = "Task type for data payload processing."
+        task_type = session.query(TaskType).filter_by(name=task_type_name).first()
         if task_type is None:
             # If the task type does not exist, we create it.
-            task_type = TaskType(name=DataPayload.get_task_type())
+            task_type = TaskType(name=task_type_name, description=task_type_description)
             session.add(task_type)
-            session.commit()
-        return task_type
-
-    @staticmethod
-    def new_data_payload(user: Type[UserInterface]) -> "DataPayload":
-        """Create a new data payload."""
-        with Session() as session:
-            task = Task(
-                user_id=user.get_id(),
-                task_type_id=DataPayload.get_task_type().id,
-            )
-            session.add(task)
             session.flush()
-            data_payload = DataPayload(
-                user_id=user.get_id(),
-                task_id=task.id,
-            )
-            session.add(data_payload)
-            session.commit()
+        task = Task(
+            user_id=user.get_id(),
+            task_type_id=task_type.id,
+        )
+        session.add(task)
+        session.flush()
+        data_payload = DataPayload(
+            user_id=user.get_id(),
+            task_id=task.id,
+        )
+        session.add(data_payload)
+        session.commit()
         return data_payload

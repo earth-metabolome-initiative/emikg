@@ -6,12 +6,12 @@ The Enricher class is an abstract class that must be extended by a subclass to b
 Each child enricher class has a corresponding entry in the enrichers table of the database, which
 identifies it uniquely by its name.
 
-When a new task is started, the enricher object first creates an entry in the enrichment_tasks table
+When a new task is started, the enricher object first creates an entry in the tasks table
 and since each concrete enricher tasks will have some additional characteristics, such as the Taxon
 class will have the taxon_id, the enricher object will create a new entry in the corresponding table.
 
 For instance, for the taxon enrichers, the enricher object will create a new entry in the taxon enrichment tasks
-table, which will have a foreign key to the enrichment_tasks table and the taxons table.
+table, which will have a foreign key to the tasks table and the taxons table.
 
 Each task is initially set to the status of PENDING, as it may not be possible to start it immediately.
 Several tasks require us to query remote services, and it may be the case that we can only send a limited
@@ -101,13 +101,13 @@ class Enricher:
 
         Implementative details
         ----------------------
-        This method creates a new entry in the enrichment_tasks table and returns the corresponding
+        This method creates a new entry in the tasks table and returns the corresponding
         Task object. The status of the task is set to PENDING.
 
         In the child classes, this method may be extended so as to create a new entry in the
-        enricher-specific table that may contain foreign keys, such as the taxon_enrichment_tasks table.
+        enricher-specific table that may contain foreign keys, such as the taxon_tasks table.
         """
-        # Create a new entry in the enrichment_tasks table
+        # Create a new entry in the tasks table
         enrichment_task = Task(
             enricher_id=self.id,
         )

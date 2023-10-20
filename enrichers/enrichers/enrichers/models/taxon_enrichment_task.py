@@ -7,7 +7,7 @@ from alchemy_wrapper.models.base import Base
 class TaxonEnrichmentTask(Base):
     """Define the TaxonEnrichmentTask model."""
 
-    __tablename__ = "taxon_enrichment_tasks"
+    __tablename__ = "taxon_tasks"
 
     id = Column(Integer, primary_key=True)
 
@@ -17,7 +17,7 @@ class TaxonEnrichmentTask(Base):
         Integer, ForeignKey("taxons.id", ondelete="CASCADE"), nullable=False, 
     )
     task_id = Column(
-        Integer, ForeignKey("enrichment_tasks.id", ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
     )
 
     def __repr__(self):

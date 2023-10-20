@@ -35,7 +35,7 @@ class User(Base, UserInterface):
     updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
 
     @staticmethod
-    def from_id(identifier: int) -> "User":
+    def from_id(identifier: int, session: Type[Session]) -> "User":
         """Return the user corresponding to the given identifier.
 
         Parameters
@@ -49,7 +49,7 @@ class User(Base, UserInterface):
             If the user corresponding to the given identifier is not found.
         """
         # We query the user table to get the user corresponding to the given identifier
-        user = Session().query(User).filter_by(id=identifier).first()
+        user = session.query(User).filter_by(id=identifier).first()
         if user is None:
             raise IdentifierNotFound(f"User with id {identifier} not found")
         return user
@@ -62,7 +62,7 @@ class User(Base, UserInterface):
         """Represent instance as a unique string."""
         return f"<User({self.username!r})>"
 
-    def is_moderator(self):
+    def is_moderator(self, session: Type[Session]):
         """Check if user is a moderator.
 
         Implementation details
@@ -71,9 +71,9 @@ class User(Base, UserInterface):
         id appears in the moderators table.
         """
         # We query the moderators table to check if the user is a moderator
-        return Session().query(Moderator).filter_by(user_id=self.id).first() is not None
+        return session.query(Moderator).filter_by(user_id=self.id).first() is not None
 
-    def is_administrator(self):
+    def is_administrator(self, session: Type[Session]):
         """Check if user is an administrator.
 
         Implementation details
@@ -82,7 +82,7 @@ class User(Base, UserInterface):
         id appears in the administrators table.
         """
         # We query the administrators table to check if the user is an administrator
-        return Session().query(Administrator).filter_by(user_id=self.id).first() is not None
+        return session.query(Administrator).filter_by(user_id=self.id).first() is not None
 
     def delete(self):
         """Delete the user."""
@@ -91,7 +91,7 @@ class User(Base, UserInterface):
         session.delete(self)
         session.commit()
 
-    def get_samples(self, number_of_records: int) -> List["Sample"]:
+    def get_samples(self, number_of_records: int, sesion: Type[Session]) -> List["Sample"]:
         """Return list of samples created by the user.
 
         Parameters
@@ -101,15 +101,15 @@ class User(Base, UserInterface):
         """
         # We return the most recent samples created by the user
         return (
-            Session().query(Sample).filter_by(user_id=self.id)
+            sesion.query(Sample).filter_by(user_id=self.id)
             .order_by(Sample.updated_at.desc())
             .limit(number_of_records)
             .all()
         )
     
-    def get_social_profiles(self) -> List[SocialProfile]:
+    def get_social_profiles(self, sesion: Type[Session]) -> List[SocialProfile]:
         """Return list of socials."""
-        return Session().query(SocialProfile).filter(SocialProfile.user_id == self.id).all()
+        return sesion.query(SocialProfile).filter(SocialProfile.user_id == self.id).all()
     
     def get_name(self) -> str:
         """Return recorded object name."""
@@ -147,7 +147,7 @@ class Sample(Base, SampleInterface):
     updated_at = Column(
         DateTime, nullable=False, default=func.now(), onupdate=func.now()
     )
-    author_id = Column(
+    user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
 
@@ -174,9 +174,9 @@ class Sample(Base, SampleInterface):
         """Return Sample id."""
         return self.id
 
-    def get_author(self) -> User:
+    def get_author(self, session: Type[Session]) -> User:
         """Return the author of the sample."""
-        return User.from_id(self.author_id)
+        return User.from_id(self.user_id, session=session)
 
     def delete(self):
         """Delete the sample."""
@@ -198,7 +198,7 @@ class Taxon(Base, TaxonInterface):
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
     description = Column(String(255), nullable=False)
-    author_id = Column(
+    user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False,
     )
     created_at = Column(DateTime, nullable=False, default=func.now())
@@ -234,9 +234,9 @@ class Taxon(Base, TaxonInterface):
         """Return list of samples."""
         return Session().query(Sample).filter_by(taxon_id=self.id).all()
 
-    def get_author(self) -> User:
+    def get_author(self, session: Type[Session]) -> User:
         """Return author."""
-        return Session().query(User).filter_by(id=self.author_id).first()
+        return Session().query(User).filter_by(id=self.user_id).first()
     
     def get_description(self) -> str:
         """Return recorded object description."""
@@ -280,7 +280,7 @@ class Spectrum(Base, SpectrumInterface):
         """Return the spectra collection of the spectrum."""
         return SpectraCollection.from_id(self.spectra_collection_id)
 
-    def get_author(self) -> User:
+    def get_author(self, session: Type[Session]) -> User:
         """Return the author of the spectrum."""
         return self.get_spectra_collection().get_author()
 
@@ -310,7 +310,7 @@ class SpectraCollection(Base, SpectraCollectionInterface):
     sample_id = Column(
         Integer, ForeignKey("samples.id", ondelete="CASCADE"), nullable=False
     )
-    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     updated_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, nullable=False, default=func.now())
     updated_at = Column(DateTime, nullable=False, default=func.now())
@@ -348,9 +348,9 @@ class SpectraCollection(Base, SpectraCollectionInterface):
         session.delete(self)
         session.commit()
 
-    def get_author(self) -> User:
+    def get_author(self, session: Type[Session]) -> User:
         """Return the author of the spectrum."""
-        return User.from_id(self.author_id)
+        return User.from_id(self.user_id, session=session)
 
     def get_description(self) -> str:
         """Return recorded object description."""
@@ -370,10 +370,10 @@ class TaskType(Base, TaskTypeInterface):
     description = Column(String(512), nullable=False)
 
     @staticmethod
-    def from_id(identifier: int) -> "TaskType":
+    def from_id(identifier: int, session: Type[Session]) -> "TaskType":
         """Return TaskType instance from TaskType id."""
         # We query the user table to get the user corresponding to the given identifier
-        task_type = Session().query(TaskType).filter_by(id=identifier).first()
+        task_type = session.query(TaskType).filter_by(id=identifier).first()
         if task_type is None:
             raise IdentifierNotFound(f"TaskType with id {identifier} not found")
         return task_type
@@ -386,13 +386,13 @@ class TaskType(Base, TaskTypeInterface):
         """Represent instance as a unique string."""
         return f"<TaskType({self.name!r})>"
 
-    def get_description(self) -> str:
-        """Return recorded object description."""
-        return self.description
-
     def get_name(self) -> str:
         """Return recorded object name."""
         return self.name
+    
+    def get_description(self) -> str:
+        """Return recorded object description."""
+        return self.description
 
 class Task(Base, TaskInterface):
     """Define the Task model."""
@@ -400,7 +400,7 @@ class Task(Base, TaskInterface):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True)
-    author_id = Column(
+    user_id = Column(
         Integer, ForeignKey("users.id",  ondelete="CASCADE"), nullable=False,
     )
     status = Column(
@@ -430,26 +430,26 @@ class Task(Base, TaskInterface):
         """Finish the task with a failure."""
         self.status = "FAILURE"
 
-    def get_name(self) -> str:
+    def get_name(self, session: Type[Session]) -> str:
         """Return recorded object name, associated to the task type."""
-        return TaskType.from_id(self.task_type_id).name
+        return self.get_task_type(session=session).get_name()
     
-    def get_description(self) -> str:
+    def get_description(self, session: Type[Session]) -> str:
         """Return recorded object description, associated to the task type."""
-        return TaskType.from_id(self.task_type_id).description
+        return self.get_task_type(session=session).get_description()
     
-    def get_author(self) -> User:
+    def get_author(self, session: Type[Session]) -> User:
         """Return the author of the task."""
-        return User.from_id(self.author_id)
+        return User.from_id(self.user_id, session=session)
     
-    def get_task_type(self) -> TaskType:
+    def get_task_type(self, session: Type[Session]) -> TaskType:
         """Return the task type of the task."""
-        return TaskType.from_id(self.task_type_id)
+        return TaskType.from_id(self.task_type_id, session=session)
     
-    def from_id(identifier: int) -> "Task":
+    def from_id(identifier: int, session: Type[Session]) -> "Task":
         """Return Task instance from Task id."""
         # We query the user table to get the user corresponding to the given identifier
-        task = Session().query(Task).filter_by(id=identifier).first()
+        task = session.query(Task).filter_by(id=identifier).first()
         if task is None:
             raise IdentifierNotFound(f"Task with id {identifier} not found")
         return task

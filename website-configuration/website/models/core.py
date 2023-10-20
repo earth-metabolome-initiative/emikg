@@ -13,6 +13,7 @@ from alchemy_wrapper.models import Task as TaskTable
 from alchemy_wrapper.models import ORCID
 from .section import RecordPage, Section, RecordBadge
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
+from ..application import db
 
 
 class User(UserInterface, RecordPage, Section):
@@ -25,7 +26,7 @@ class User(UserInterface, RecordPage, Section):
     @staticmethod
     def from_id(identifier: int) -> "User":
         """Return a user object from a user ID."""
-        return User(UsersTable.from_id(identifier))
+        return User(UsersTable.from_id(identifier, session=db.session))
     
     def get_id(self) -> int:
         """Return the user ID."""
@@ -67,7 +68,7 @@ class User(UserInterface, RecordPage, Section):
             raise APIException("User is already logged in.")
 
         # We check whether the ORCID exists in the orcid table of the database.
-        user = ORCID.get_or_insert_user_from_orcid(orcid)
+        user = ORCID.get_or_insert_user_from_orcid(orcid, session=db.session)
 
         # We add the user ID to the Flask session.
         session["user_id"] = user.id
@@ -127,10 +128,10 @@ class User(UserInterface, RecordPage, Section):
         return self._user.get_name()
 
     def is_administrator(self) -> bool:
-        return self._user.is_administrator()
+        return self._user.is_administrator(session=db.session)
 
     def is_moderator(self) -> bool:
-        return self._user.is_moderator()
+        return self._user.is_moderator(session=db.session)
 
     def delete(self):
         """Delete the user.
@@ -176,7 +177,7 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
     @staticmethod
     def from_id(identifier: int) -> "Taxon":
         """Return a taxon object from a taxon ID."""
-        return Taxon(TaxonTable.from_id(identifier))
+        return Taxon(TaxonTable.from_id(identifier, session=db.session))
 
     def get_author(self) -> User:
         """Return the author of the taxon."""
@@ -221,7 +222,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     @staticmethod
     def from_id(identifier: int) -> "Task":
         """Return a task object from a task ID."""
-        return Task(TaskTable.from_id(identifier))
+        return Task(TaskTable.from_id(identifier, session=db.session))
 
     def get_author(self) -> User:
         """Return the author of the task."""
@@ -229,7 +230,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
     def get_description(self) -> str:
         """Return the description of the task."""
-        return self._task.get_description()
+        return self._task.get_description(session=db.session)
     
     def get_section_header(self) -> str:
         """Return the user section header."""
@@ -237,7 +238,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
     def get_name(self) -> str:
         """Return the name of the task."""
-        return self._task.get_name()
+        return self._task.get_name(session=db.session)
     
     def get_title(self) -> str:
         """Return the title of the task."""
