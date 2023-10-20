@@ -4,9 +4,8 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 from alchemy_wrapper.database import Session
-from alchemy_wrapper.models import Taxon
+from alchemy_wrapper.models import Taxon, Task
 from enrichers import TaxonEnricher
-from enrichers.models import EnrichmentTask
 from opentree import OT
 
 from .models import OpenTreeOfLifeEntry
@@ -44,7 +43,7 @@ class OTLEnricher(TaxonEnricher):
         """Returns the number of seconds to wait between two start attempts."""
         return 10
 
-    def _task_can_start(self, enrichable: Taxon, task: EnrichmentTask) -> bool:
+    def _task_can_start(self, enrichable: Taxon, task: Task) -> bool:
         """Returns whether the task can start.
 
         Parameters
@@ -67,7 +66,7 @@ class OTLEnricher(TaxonEnricher):
             )
         ).all()
 
-    def _enrich(self, enrichable: Taxon, task: EnrichmentTask):
+    def _enrich(self, enrichable: Taxon, task: Task):
         """Enrich the metadata of a enrichable class.
 
         Parameters

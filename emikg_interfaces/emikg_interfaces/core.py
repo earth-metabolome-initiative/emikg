@@ -167,6 +167,14 @@ class Spectrum(Record, Authored):
         """Return root for the spectrum interface."""
         return "spectra"
     
+class TaskType(Record, Authored):
+    """Abstract interface to describe a generic task type."""
+
+    @staticmethod
+    def get_root() -> str:
+        """Return root for the spectrum interface."""
+        return "task_types"
+
 class Task(Record, Authored):
     """Abstract interface to describe a generic task.
 
@@ -182,3 +190,11 @@ class Task(Record, Authored):
     def get_root() -> str:
         """Return root for the spectrum interface."""
         return "tasks"
+    
+    @staticmethod
+    def get_task_type() -> Type[TaskType]:
+        """Return task type."""
+        raise NotImplementedError(
+            "Abstract method 'get_task_type' should be implemented in derived class. "
+        )
+    

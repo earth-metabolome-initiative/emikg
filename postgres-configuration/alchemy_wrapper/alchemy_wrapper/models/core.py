@@ -3,20 +3,20 @@
 from typing import List, Optional, Type
 from alchemy_wrapper.database import Session
 from sqlalchemy.sql import func
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Float
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Float, Enum
 
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Sample as SampleInterface
 from emikg_interfaces import Taxon as TaxonInterface
 from emikg_interfaces import Spectrum as SpectrumInterface
 from emikg_interfaces import SpectraCollection as SpectraCollectionInterface
-from emikg_interfaces.from_identifier import IdentifierNotFound
+from emikg_interfaces import Task as TaskInterface
+from emikg_interfaces import TaskType as TaskTypeInterface
+from emikg_interfaces import IdentifierNotFound, FromIdentifier
 
 from alchemy_wrapper.models.administrator import Administrator
 from alchemy_wrapper.models.base import Base
 from alchemy_wrapper.models.moderator import Moderator
-from alchemy_wrapper.models.social import Social
 from alchemy_wrapper.models.social_profiles import SocialProfile
 
 
@@ -359,3 +359,102 @@ class SpectraCollection(Base, SpectraCollectionInterface):
     def get_name(self) -> str:
         """Return recorded object name."""
         return self.name
+
+class TaskType(Base, TaskTypeInterface):
+    """Define the TaskType model."""
+
+    __tablename__ = "task_types"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    description = Column(String(512), nullable=False)
+
+    @staticmethod
+    def from_id(identifier: int) -> "TaskType":
+        """Return TaskType instance from TaskType id."""
+        # We query the user table to get the user corresponding to the given identifier
+        task_type = Session().query(TaskType).filter_by(id=identifier).first()
+        if task_type is None:
+            raise IdentifierNotFound(f"TaskType with id {identifier} not found")
+        return task_type
+    
+    def get_id(self) -> int:
+        """Return Sample id."""
+        return self.id
+
+    def __repr__(self):
+        """Represent instance as a unique string."""
+        return f"<TaskType({self.name!r})>"
+
+    def get_description(self) -> str:
+        """Return recorded object description."""
+        return self.description
+
+    def get_name(self) -> str:
+        """Return recorded object name."""
+        return self.name
+
+class Task(Base, TaskInterface):
+    """Define the Task model."""
+
+    __tablename__ = "tasks"
+
+    id = Column(Integer, primary_key=True)
+    author_id = Column(
+        Integer, ForeignKey("users.id",  ondelete="CASCADE"), nullable=False,
+    )
+    status = Column(
+        Enum("PENDING", "STARTED", "SUCCESS", "FAILURE", name="status"),
+        nullable=False,
+        default="PENDING",
+    )
+    task_type_id = Column(
+        Integer, ForeignKey("task_types.id", ondelete="CASCADE"), nullable=False,
+    )
+    created_at = Column(DateTime, nullable=False, default=func.now())
+    updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
+
+    def __repr__(self):
+        """Represent instance as a unique string."""
+        return f"<Task({self.id!r})>"
+
+    def start(self):
+        """Start the task."""
+        self.status = "STARTED"
+
+    def success(self):
+        """Finish the task successfully."""
+        self.status = "SUCCESS"
+
+    def failure(self):
+        """Finish the task with a failure."""
+        self.status = "FAILURE"
+
+    def get_name(self) -> str:
+        """Return recorded object name, associated to the task type."""
+        return TaskType.from_id(self.task_type_id).name
+    
+    def get_description(self) -> str:
+        """Return recorded object description, associated to the task type."""
+        return TaskType.from_id(self.task_type_id).description
+    
+    def get_author(self) -> User:
+        """Return the author of the task."""
+        return User.from_id(self.author_id)
+    
+    def get_task_type(self) -> TaskType:
+        """Return the task type of the task."""
+        return TaskType.from_id(self.task_type_id)
+    
+    def from_id(identifier: int) -> "Task":
+        """Return Task instance from Task id."""
+        # We query the user table to get the user corresponding to the given identifier
+        task = Session().query(Task).filter_by(id=identifier).first()
+        if task is None:
+            raise IdentifierNotFound(f"Task with id {identifier} not found")
+        return task
+    
+    def get_id(self) -> int:
+        """Return Sample id."""
+        return self.id
+

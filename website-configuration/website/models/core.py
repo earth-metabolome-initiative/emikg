@@ -3,11 +3,13 @@ from flask import session
 from typing import List
 from flask import render_template
 from emikg_interfaces import User as UserInterface
+from emikg_interfaces import Task as TaskInterface
+from emikg_interfaces import Taxon as TaxonInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models import User as UsersTable
 
-from emikg_interfaces import Taxon as TaxonInterface
 from alchemy_wrapper.models import Taxon as TaxonTable
+from alchemy_wrapper.models import Task as TaskTable
 from alchemy_wrapper.models import ORCID
 from .section import RecordPage, Section, RecordBadge
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
@@ -209,3 +211,48 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
             raise Unauthorized()
 
         self._taxon.delete()
+
+class Task(TaskInterface, Section, RecordPage, RecordBadge):
+
+    def __init__(self, task: TaskTable):
+        """Initialize the task object from a task ID."""
+        self._task = task
+
+    @staticmethod
+    def from_id(identifier: int) -> "Task":
+        """Return a task object from a task ID."""
+        return Task(TaskTable.from_id(identifier))
+
+    def get_author(self) -> User:
+        """Return the author of the task."""
+        return User(self._task.get_author())
+
+    def get_description(self) -> str:
+        """Return the description of the task."""
+        return self._task.get_description()
+    
+    def get_section_header(self) -> str:
+        """Return the user section header."""
+        return "Tasks"
+
+    def get_name(self) -> str:
+        """Return the name of the task."""
+        return self._task.get_name()
+    
+    def get_title(self) -> str:
+        """Return the title of the task."""
+        return self.get_name()
+    
+    def get_record_badge(self) -> str:
+        """Return the task record badge."""
+        return render_template("badge.html", record=self)
+
+    def delete(self):
+        """Delete the task."""
+        user = User.from_flask_session()
+
+        # Either the user is the author of the task, or the user is an admin.
+        if not user.is_administrator() and not user.is_author_of(self):
+            raise Unauthorized()
+
+        self._task.delete()

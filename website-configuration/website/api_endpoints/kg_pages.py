@@ -1,11 +1,10 @@
 """API endpoints regardin the dashboard."""
 from typing import Optional, Type
-from flask import abort, session, render_template
+from flask import abort, session, render_template, redirect
 from emikg_interfaces import IdentifierNotFound
-from alchemy_wrapper.models import Taxon#, Sample, Spectrum, SpectraCollection
-from ..models import User, RecordPage
+from ..models import User, RecordPage, Taxon, Task
 from ..application import app
-
+from ..exceptions import NotLoggedIn
 
 def kg_page(
     lang: str,
@@ -28,10 +27,15 @@ def kg_page(
 @app.route("/<lang>/upload")
 def upload_page(lang: str = "en"):
     """Load the taxons page."""
+    try:
+        user = User.from_flask_session()
+    except NotLoggedIn:
+        return redirect("/", code=302)
+
     return render_template(
         "upload.html",
         lang=lang,
-        user=User.from_flask_session(),
+        user=user,
     )
 
 @app.route("/taxons")
@@ -43,6 +47,18 @@ def taxons_page(lang: str = "en", identifier: Optional[int] = None):
     return kg_page(
         lang=lang,
         record_class=Taxon,
+        identifier=identifier,
+    )
+
+@app.route("/tasks")
+@app.route("/<lang>/tasks")
+@app.route("/tasks/<int:identifier>")
+@app.route("/<lang>/tasks/<int:identifier>")
+def tasks_page(lang: str = "en", identifier: Optional[int] = None):
+    """Load the tasks page."""
+    return kg_page(
+        lang=lang,
+        record_class=Task,
         identifier=identifier,
     )
 
