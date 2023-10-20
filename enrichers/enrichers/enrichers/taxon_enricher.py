@@ -1,14 +1,14 @@
 """Abstract Enricher class for extending the metadata of a taxon class."""
 
-from alchemy_wrapper.models import Taxon
+from alchemy_wrapper.models import Taxon, Task
 from .enricher import Enricher
-from .models import TaxonEnrichmentTask, EnrichmentTask
+from .models import TaxonEnrichmentTask
 
 
 class TaxonEnricher(Enricher):
     """Abstract Enricher class for extending the metadata of a taxon class."""
 
-    def _create_new_task(self, enrichable: Taxon) -> EnrichmentTask:
+    def _create_new_task(self, enrichable: Taxon) -> Task:
         enrichment_task = super()._create_new_task(enrichable)
         # Create a new entry in the taxon_enrichment_tasks table
         taxon_enrichment_task = TaxonEnrichmentTask(

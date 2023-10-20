@@ -22,7 +22,8 @@ from typing import List, Any
 from time import sleep
 import logging
 from alchemy_wrapper import Session
-from .models import EnrichmentTask, Enricher as EnricherTable
+from alchemy_wrapper.models import Task
+from .models import Enricher as EnricherTable
 
 
 class Enricher:
@@ -77,7 +78,7 @@ class Enricher:
             f"This was not done for the {self.__class__.__name__} class."
         )
 
-    def _enrich(self, enrichable, task: EnrichmentTask) -> bool:
+    def _enrich(self, enrichable, task: Task) -> bool:
         """Enrich the metadata of a enrichable class.
 
         Parameters
@@ -95,26 +96,26 @@ class Enricher:
             f"This class should retrieve the metadata relative to the repository {self.repository()}."
         )
 
-    def _create_new_task(self, enrichable) -> EnrichmentTask:
+    def _create_new_task(self, enrichable) -> Task:
         """Create a new task for the enricher.
 
         Implementative details
         ----------------------
         This method creates a new entry in the enrichment_tasks table and returns the corresponding
-        EnrichmentTask object. The status of the task is set to PENDING.
+        Task object. The status of the task is set to PENDING.
 
         In the child classes, this method may be extended so as to create a new entry in the
         enricher-specific table that may contain foreign keys, such as the taxon_enrichment_tasks table.
         """
         # Create a new entry in the enrichment_tasks table
-        enrichment_task = EnrichmentTask(
+        enrichment_task = Task(
             enricher_id=self.id,
         )
         self._session.add(enrichment_task)
         self._session.commit()
         return enrichment_task
 
-    def _task_can_start(self, enrichable, task: EnrichmentTask) -> bool:
+    def _task_can_start(self, enrichable, task: Task) -> bool:
         """Returns whether the task can be started.
 
         Implementative details
