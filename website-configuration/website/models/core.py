@@ -159,7 +159,7 @@ class User(UserInterface, RecordPage, Section):
 
     def get_sections(self) -> List[Section]:
         """Return sections."""
-        return [self]
+        return []
     
     def get_title(self) -> str:
         """Return the title of the user."""
@@ -199,6 +199,10 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
         """Return the title of the taxon."""
         return self.get_name()
     
+    def get_sections(self) -> List[Section]:
+        """Return sections."""
+        return []
+    
     def get_record_badge(self) -> str:
         """Return the taxon record badge."""
         return render_template("badge.html", record=self)
@@ -235,6 +239,10 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def get_section_header(self) -> str:
         """Return the user section header."""
         return "Tasks"
+    
+    def get_sections(self) -> List[Section]:
+        """Return sections."""
+        return []
 
     def get_name(self) -> str:
         """Return the name of the task."""
