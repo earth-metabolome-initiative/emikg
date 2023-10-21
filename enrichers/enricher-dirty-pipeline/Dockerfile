@@ -14,6 +14,9 @@ RUN conda env create -f enpkg_full/environment.yml
 # We activate the dirty-pipeline environment
 RUN echo "source activate dirty-pipeline" > ~/.bashrc
 
+# We install jq
+RUN apt-get update && apt-get install -y jq unzip curl
+
 # We install Sirius using the bash script provided by the dirty-pipeline repository
 RUN bash enpkg_full/src/install_sirius.sh
 

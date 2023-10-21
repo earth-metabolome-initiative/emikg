@@ -10,6 +10,6 @@ setup(
     python_requires='>=3.8.0',
     packages=find_packages(
         exclude=['contrib', 'docs', 'tests*', 'notebooks*']),
-    install_requires=["sqlalchemy", "psycopg2"],
+    install_requires=["sqlalchemy", "psycopg2-binary"],
     include_package_data=True,
 )
