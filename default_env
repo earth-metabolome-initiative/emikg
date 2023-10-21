@@ -25,5 +25,5 @@ YOUR_ORCID_CLIENT_SECRET='orcid_client_secret'
 # We also need to set the login variables for the
 # sirius executable. These are the mail and password,
 # with the email being an academic email address.
-SIRIUS_EMAIL='email@email.com'
+SIRIUS_USERNAME='email@email.com'
 SIRIUS_PASSWORD='password'

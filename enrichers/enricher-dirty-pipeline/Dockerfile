@@ -14,6 +14,9 @@ RUN conda env create -f enpkg_full/environment.yml
 # We activate the dirty-pipeline environment
 RUN echo "source activate dirty-pipeline" > ~/.bashrc
 
+# We install Sirius using the bash script provided by the dirty-pipeline repository
+RUN bash enpkg_full/src/install_sirius.sh
+
 # We copy the content of the dirty-pipeline repository into the container
 COPY enrichers/enricher-dirty-pipeline /app
 
@@ -25,9 +28,6 @@ COPY postgres-configuration/alchemy_wrapper /app/alchemy_wrapper
 
 # And then we copy the emikg interfaces
 COPY emikg_interfaces /app/emikg_interfaces
-
-# We install sirius from conda
-RUN conda install -c conda-forge sirius-ms
 
 # We make sure that the pip version is up to date
 RUN pip install --upgrade pip

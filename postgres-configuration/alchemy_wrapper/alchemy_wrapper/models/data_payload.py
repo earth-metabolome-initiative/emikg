@@ -48,7 +48,7 @@ class DataPayload(Base, TaskInterface):
     
     def get_payload_path(self) -> str:
         """Return payload path."""
-        return f"/unsafe_data_payloads/{self.id}"
+        return f"/app/unsafe/{self.id}"
 
     @staticmethod
     def new_data_payload(

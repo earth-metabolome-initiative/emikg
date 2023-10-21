@@ -16,6 +16,8 @@ services:
       - postgres_database
     volumes:
       - "./website-configuration:/app"
+      - shared-unsafe-volume:/app/unsafe
+      - shared-safe-volume:/app/safe
     tmpfs:
       - /run
       - /run/lock
@@ -70,6 +72,9 @@ services:
       SIRIUS_PASSWORD: ${SIRIUS_PASSWORD}
     depends_on:
       - postgres_database
+    volumes:
+      - shared-unsafe-volume:/app/unsafe
+      - shared-safe-volume:/app/safe
     tmpfs:
       - /run
       - /run/lock
@@ -93,6 +98,11 @@ services:
       - source: postgres_database_backup_ssh_private_key
         target: postgres_database_backup_ssh_private_key
         mode: 0600
+
+volumes:
+  shared-unsafe-volume:
+  shared-safe-volume:
+
 secrets:
   postgres_database_backup_ssh_private_key:
     file: ${BACKUP_SERVER_PRIVATE_KEY_PATH}
