@@ -66,6 +66,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SIRIUS_EMAIL: ${SIRIUS_EMAIL}
+      SIRIUS_PASSWORD: ${SIRIUS_PASSWORD}
     depends_on:
       - postgres_database
     tmpfs:

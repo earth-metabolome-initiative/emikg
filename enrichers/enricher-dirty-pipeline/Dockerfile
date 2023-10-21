@@ -1,9 +1,20 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8
+# Use an official Miniconda runtime as a parent image
+FROM continuumio/miniconda3
 
 # Set the working directory to /app
 WORKDIR /app
 
+# We clone the dirty-pipeline repository
+RUN git clone https://github.com/enpkg/enpkg_full.git
+
+# We install all requirements specified in the dirty-pipeline repository
+# environment.yml file.
+RUN conda env create -f enpkg_full/environment.yml
+
+# We activate the dirty-pipeline environment
+RUN echo "source activate dirty-pipeline" > ~/.bashrc
+
+# We copy the content of the dirty-pipeline repository into the container
 COPY enrichers/enricher-dirty-pipeline /app
 
 # We copy the enrichers folder into the container at /app
@@ -14,6 +25,9 @@ COPY postgres-configuration/alchemy_wrapper /app/alchemy_wrapper
 
 # And then we copy the emikg interfaces
 COPY emikg_interfaces /app/emikg_interfaces
+
+# We install sirius from conda
+RUN conda install -c conda-forge sirius-ms
 
 # We make sure that the pip version is up to date
 RUN pip install --upgrade pip

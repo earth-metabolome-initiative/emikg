@@ -345,8 +345,8 @@ class Sample(SampleInterface, Section, RecordPage, RecordBadge):
             f"It was not implemented in main page {page.__class__.__name__}."
         )
 
-    
 class Task(TaskInterface, Section, RecordPage, RecordBadge):
+    """Concrete implementation of Task class for flask."""
 
     def __init__(self, task: TaskTable):
         """Initialize the task object from a task ID."""
@@ -426,9 +426,6 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         """Return whether the section has records."""
         if isinstance(page, User):
             return page.has_tasks()
-        
-        # if isinstance(page, Taxon):
-        #     return page.has_tasks()
         
         raise NotImplementedError(
             "Abstract method 'has_records' should be implemented in derived class Task. "
