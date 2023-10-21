@@ -91,6 +91,26 @@ class User(Base, UserInterface):
         session.delete(self)
         session.commit()
 
+    def has_taxons(self, session: Type[Session]) -> bool:
+        """Return whether the user has taxons."""
+        return session.query(Taxon).filter_by(user_id=self.id).first() is not None
+    
+    def get_taxons(self, number_of_records: int, session: Type[Session]) -> List["Taxon"]:
+        """Return list of taxons created by the user.
+
+        Parameters
+        ----------
+        number_of_records : int
+            Maximum number of records to return.
+        """
+        # We return the most recent taxons created by the user
+        return (
+            session.query(Taxon).filter_by(user_id=self.id)
+            .order_by(Taxon.updated_at.desc())
+            .limit(number_of_records)
+            .all()
+        )
+
     def has_samples(self, session: Type[Session]) -> bool:
         """Return whether the user has samples."""
         return session.query(Sample).filter_by(user_id=self.id).first() is not None

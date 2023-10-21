@@ -58,6 +58,20 @@ services:
       - /run
       - /run/lock
       - /tmp
+  enricher_dirty_pipeline:
+    build:
+      context: ./
+      dockerfile: ./enrichers/enricher-dirty-pipeline/Dockerfile
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres_database
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
   postgres_database_backup:
     profiles:
       - backup

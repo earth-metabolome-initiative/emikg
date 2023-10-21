@@ -7,5 +7,7 @@
             {{ record.get_record_badge()|safe }}
             {% endfor %}
         </ul>
+    {% else %}
+        <p>No records found.</p>
     {% endif %}
 {% endblock %}

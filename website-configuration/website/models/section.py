@@ -5,22 +5,24 @@ from emikg_interfaces import Authored, Record
 from flask import render_template
 
 class RecordBadge:
+    """Abstract interface describing a record badge."""
 
     def get_record_badge(self) -> Optional[str]:
         """Return section record badge."""
         return render_template("badge.html", record=self)
 
 class Section:
+    """Abstract interface describing a section of a record page in the website."""
 
     @staticmethod
-    def get_section_title(main_class: Type["RecordPage"]) -> str:
+    def get_section_title(page: Type["RecordPage"]) -> str:
         """Return section title."""
         raise NotImplementedError(
             "Abstract method 'get_section_title' should be implemented in derived class. "
         )
 
     @staticmethod
-    def get_section_header() -> str:
+    def get_section_header(page: Type["RecordPage"]) -> str:
         """Return section header."""
         raise NotImplementedError(
             "Abstract method 'get_section_header' should be implemented in derived class. "
@@ -54,6 +56,8 @@ class Section:
         )
 
 class RecordPage(Record):
+    """Abstract interface describing an object whose page contains sections."""
+
     def get_sections(self) -> List[Section]:
         """Return sections."""
         raise NotImplementedError(

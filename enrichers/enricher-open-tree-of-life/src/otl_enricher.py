@@ -36,7 +36,10 @@ class OTLEnricher(TaxonEnricher):
         # A Taxon is enrichable if there is not already an entry in the
         # open_tree_of_life table with the same taxon_id.
         return (
-            OpenTreeOfLifeEntry.query.filter_by(taxon_id=enrichable.id).first() is None
+            self._session.query(OpenTreeOfLifeEntry)
+            .filter_by(taxon_id=enrichable.id)
+            .first()
+            is None
         )
 
     def _get_sleep_time_between_start_attempts(self) -> int:
@@ -58,13 +61,17 @@ class OTLEnricher(TaxonEnricher):
     def _get_new_elements_to_enrich(self) -> List[Taxon]:
         """Returns a list of new elements to enrich."""
         # Get all the taxons that are not already in the open_tree_of_life table.
-        return self._session.query(Taxon).filter(
-            ~Taxon.id.in_(
-                self._session.query(OpenTreeOfLifeEntry.taxon_id).filter(
-                    OpenTreeOfLifeEntry.taxon_id.isnot(None)
+        return (
+            self._session.query(Taxon)
+            .filter(
+                ~Taxon.id.in_(
+                    self._session.query(OpenTreeOfLifeEntry.taxon_id).filter(
+                        OpenTreeOfLifeEntry.taxon_id.isnot(None)
+                    )
                 )
             )
-        ).all()
+            .all()
+        )
 
     def _enrich(self, enrichable: Taxon, task: Task):
         """Enrich the metadata of a enrichable class.

@@ -5,9 +5,10 @@ from flask import render_template
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Task as TaskInterface
 from emikg_interfaces import Taxon as TaxonInterface
+from emikg_interfaces import Sample as SampleInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models import User as UsersTable
-
+from alchemy_wrapper.models import Sample as SampleTable
 from alchemy_wrapper.models import Taxon as TaxonTable
 from alchemy_wrapper.models import Task as TaskTable
 from alchemy_wrapper.models import ORCID
@@ -127,9 +128,6 @@ class User(UserInterface, RecordPage, Section):
     def get_name(self) -> str:
         return self._user.get_name()
     
-    def get_description(self) -> str:
-        return self._user.get_description()
-
     def is_administrator(self) -> bool:
         return self._user.is_administrator(session=db.session)
 
@@ -162,15 +160,11 @@ class User(UserInterface, RecordPage, Section):
 
     def get_sections(self) -> List[Section]:
         """Return sections."""
-        return [Task]
+        return [Task, Taxon]
     
     def get_title(self) -> str:
         """Return the title of the user."""
         return self.get_name()
-    
-    def get_description(self) -> str:
-        """Return the description of the user."""
-        return self._user.get_description()
     
     def has_tasks(self) -> bool:
         """Return whether the user has tasks."""
@@ -183,6 +177,28 @@ class User(UserInterface, RecordPage, Section):
             for task in self._user.get_tasks(session=db.session, number_of_records=number_of_records)
         ]
     
+    def has_taxons(self) -> bool:
+        """Return whether the user has taxons."""
+        return self._user.has_taxons(session=db.session)
+    
+    def get_taxons(self, number_of_records: int = 10) -> List[TaxonInterface]:
+        """Return the taxons of the user."""
+        return [
+            Taxon(taxon)
+            for taxon in self._user.get_taxons(session=db.session, number_of_records=number_of_records)
+        ]
+    
+    def has_samples(self) -> bool:
+        """Return whether the user has samples."""
+        return self._user.has_samples(session=db.session)
+
+    def get_samples(self, number_of_records: int = 10) -> List[SampleInterface]:
+        """Return the samples of the user."""
+        return [
+            Sample(sample)
+            for sample in self._user.get_samples(session=db.session, number_of_records=number_of_records)
+        ]
+
 class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
     """Concrete implementation of Taxon class."""
 
@@ -203,7 +219,8 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
         """Return the description of the taxon."""
         return self._taxon.get_description()
     
-    def get_section_header(self) -> str:
+    @staticmethod
+    def get_section_header(page: Type[RecordPage]) -> str:
         """Return the user section header."""
         return "Taxons"
 
@@ -237,10 +254,10 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
     def get_section_title(main_class: Type["RecordPage"]) -> str:
         """Return section title."""
 
-        if main_class == User:
+        if isinstance(main_class, User):
             return "Taxons created by this user"
         
-        if main_class == Task:
+        if isinstance(main_class, Task):
             return "Taxons associated with this task"
         
         raise NotImplementedError(
@@ -248,6 +265,44 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
             "implemented in derived class.  It was not implemented in "
             f"class Taxon for main class {main_class}"
         )
+    
+    @staticmethod
+    def has_records(page: Type["RecordPage"]) -> bool:
+        """Return whether the section has records."""
+        if isinstance(page, User):
+            return page.has_taxons()
+        
+        if isinstance(page, Task):
+            return page.has_taxons()
+        
+        raise NotImplementedError(
+            "Abstract method 'has_records' should be implemented in derived class. "
+            f"It was not implemented in main page {page.__class__.__name__}."
+        )
+    
+class Sample(SampleInterface, Section, RecordPage, RecordBadge):
+    """Concrete implementation of Sample class for flask."""
+
+    def __init__(self, sample: SampleTable):
+        """Initialize the sample object from a sample ID."""
+        self._sample = sample
+
+    @staticmethod
+    def from_id(identifier: int) -> "Sample":
+        """Return a sample object from a sample ID."""
+        return Sample(SampleTable.from_id(identifier, session=db.session))
+    
+    def get_id(self) -> int:
+        """Return the sample ID."""
+        return self._sample.get_id()
+    
+    def get_author(self) -> User:
+        """Return the author of the sample."""
+        return User(self._sample.get_author(session=db.session))
+    
+    def get_description(self) -> str:
+        """Return the description of the sample."""
+        return self._sample.get_description(session=db.session)
     
 class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
@@ -272,7 +327,8 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         """Return the description of the task."""
         return self._task.get_description(session=db.session)
     
-    def get_section_header(self) -> str:
+    @staticmethod
+    def get_section_header(page: Type[RecordPage]) -> str:
         """Return the user section header."""
         return "Tasks"
     
