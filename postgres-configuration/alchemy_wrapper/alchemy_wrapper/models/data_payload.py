@@ -14,7 +14,7 @@ from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Task as TaskInterface
 
 class DataPayload(Base, TaskInterface):
-    """SQLAlchemy class for data_payload table.
+    """SQLAlchemy class for data_payload table."""
 
     __tablename__ = "data_payloads"
 

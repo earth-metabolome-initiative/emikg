@@ -67,7 +67,7 @@ class ORCID(Base):
         orcid = ORCID.from_orcid(orcid, session=session)
         if orcid is None:
             raise ValueError(f"ORCID {orcid} does not exist.")
-        return User.from_id(orcid.user_id)
+        return User.from_id(orcid.user_id, session=session)
     
     @staticmethod
     def get_or_insert_user_from_orcid(orcid_code: str, session: Type[Session]) -> User:

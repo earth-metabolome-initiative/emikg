@@ -17,6 +17,7 @@ from emikg_interfaces import IdentifierNotFound, FromIdentifier
 from alchemy_wrapper.models.administrator import Administrator
 from alchemy_wrapper.models.base import Base
 from alchemy_wrapper.models.moderator import Moderator
+from alchemy_wrapper.models.bot import Bot
 from alchemy_wrapper.models.social_profiles import SocialProfile
 
 
@@ -29,7 +30,7 @@ class User(Base, UserInterface):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(80), nullable=False)
     last_name = Column(String(80), nullable=False)
-    email = Column(String(255), nullable=False, unique=True)
+    email = Column(String(255), nullable=True, unique=True)
     description = Column(String(255), nullable=True)
     created_at = Column(DateTime, nullable=False, default=func.now())
     updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
@@ -83,6 +84,17 @@ class User(Base, UserInterface):
         """
         # We query the administrators table to check if the user is an administrator
         return session.query(Administrator).filter_by(user_id=self.id).first() is not None
+    
+    def is_bot(self, session: Type[Session]):
+        """Check if user is a bot.
+
+        Implementation details
+        ----------------------
+        This method checks if the user is a bot by checking if the user
+        id appears in the bots table.
+        """
+        # We query the bots table to check if the user is a bot
+        return session.query(Bot).filter_by(user_id=self.id).first() is not None
 
     def delete(self):
         """Delete the user."""
@@ -162,8 +174,9 @@ class User(Base, UserInterface):
     def get_description(self) -> str:
         """Return recorded object description."""
         return self.description
-
+    
 class Sample(Base, SampleInterface):
+    """Define the Sample model."""
 
     __tablename__ = "samples"
 
@@ -278,13 +291,13 @@ class Taxon(Base, TaxonInterface):
         session.delete(self)
         session.commit()
 
-    def get_samples(self) -> List[Sample]:
+    def get_samples(self, session: Type[Session]) -> List[Sample]:
         """Return list of samples."""
-        return Session().query(Sample).filter_by(taxon_id=self.id).all()
+        return session.query(Sample).filter_by(taxon_id=self.id).all()
 
     def get_author(self, session: Type[Session]) -> User:
         """Return author."""
-        return Session().query(User).filter_by(id=self.user_id).first()
+        return session.query(User).filter_by(id=self.user_id).first()
     
     def get_description(self) -> str:
         """Return recorded object description."""
@@ -312,10 +325,10 @@ class Spectrum(Base, SpectrumInterface):
     )
 
     @staticmethod
-    def from_id(identifier: int) -> "Spectrum":
+    def from_id(identifier: int, session: Type[Session]) -> "Spectrum":
         """Return Spectrum instance from Spectrum id."""
         # We query the user table to get the user corresponding to the given identifier
-        spectrum = Session().query(Spectrum).filter_by(id=identifier).first()
+        spectrum = session.query(Spectrum).filter_by(id=identifier).first()
         if spectrum is None:
             raise IdentifierNotFound(f"Spectrum with id {identifier} not found")
         return spectrum
@@ -324,13 +337,13 @@ class Spectrum(Base, SpectrumInterface):
         """Return Sample id."""
         return self.id
 
-    def get_spectra_collection(self) -> "SpectraCollection":
+    def get_spectra_collection(self, session: Type[Session]) -> "SpectraCollection":
         """Return the spectra collection of the spectrum."""
-        return SpectraCollection.from_id(self.spectra_collection_id)
+        return SpectraCollection.from_id(self.spectra_collection_id, session=session)
 
     def get_author(self, session: Type[Session]) -> User:
         """Return the author of the spectrum."""
-        return self.get_spectra_collection().get_author()
+        return self.get_spectra_collection(session).get_author(session)
 
     def delete(self):
         """Delete the spectrum."""
@@ -494,6 +507,7 @@ class Task(Base, TaskInterface):
         """Return the task type of the task."""
         return TaskType.from_id(self.task_type_id, session=session)
     
+    @staticmethod
     def from_id(identifier: int, session: Type[Session]) -> "Task":
         """Return Task instance from Task id."""
         # We query the user table to get the user corresponding to the given identifier

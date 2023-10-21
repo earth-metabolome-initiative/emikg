@@ -22,8 +22,7 @@ from typing import List, Any
 from time import sleep
 import logging
 from alchemy_wrapper import Session
-from alchemy_wrapper.models import Task
-from .models import Enricher as EnricherTable
+from alchemy_wrapper.models import Task, User, Bot, TaskType
 
 
 class Enricher:
@@ -37,11 +36,32 @@ class Enricher:
         # identified by its name.
         self._verbose = verbose
         self._logger = logging.getLogger(self.name())
-        enricher = self._session.query(EnricherTable).filter_by(name=self.name()).first()
+        enricher = self._session.query(User).filter_by(first_name=self.name()).first()
         if enricher is None:
-            enricher = EnricherTable(name=self.name())
+            enricher = User(
+                first_name=self.name(),
+                last_name="McBotFace",
+                description="",
+            )
             self._session.add(enricher)
+            self._session.flush()
+            bot = Bot(user_id=enricher.id)
+            self._session.add(bot)
             self._session.commit()
+
+        # Create the task type entry in the task_types table
+        # if it does not already exist. A task type is uniquely
+        # identified by its name.
+        task_type = self._session.query(TaskType).filter_by(name=self.name()).first()
+        if task_type is None:
+            task_type = TaskType(
+                name=self.name(),
+                description="",
+            )
+            self._session.add(task_type)
+            self._session.commit()
+
+        self._task_type = task_type
         self._enricher = enricher
 
     @property
@@ -109,7 +129,8 @@ class Enricher:
         """
         # Create a new entry in the tasks table
         enrichment_task = Task(
-            enricher_id=self.id,
+            user_id=self.id,
+            task_type_id=self._task_type.id,
         )
         self._session.add(enrichment_task)
         self._session.commit()
@@ -141,11 +162,6 @@ class Enricher:
             "The _get_new_elements_to_enrich method of the Enricher class must be implemented by a subclass. "
             f"This was not done for the {self.__class__.__name__} class."
         )
-
-    def ping(self) -> None:
-        """Ping the enricher."""
-        self._enricher.ping()
-        self._session.commit()
 
     def enrich(self, enrichable) -> bool:
         """Enrich the metadata of a enrichable class.
@@ -197,7 +213,6 @@ class Enricher:
         sleep_time_seconds = minimal_sleep_time
         self._logger.info(f"Starting the {self.name()} enricher service.")
         while True:
-            self.ping()
             some_success = self.enrich_all()
             if some_success:
                 self._logger.info("Completed a round of enrichment.")
