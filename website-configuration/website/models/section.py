@@ -1,7 +1,7 @@
 """Abstract interface describing an object whose page contains sections."""
 
 from typing import List, Optional, Type
-from emikg_interfaces.record import Record
+from emikg_interfaces import Authored, Record
 from flask import render_template
 
 class RecordBadge:
@@ -11,25 +11,36 @@ class RecordBadge:
         return render_template("badge.html", record=self)
 
 class Section:
-    def get_title(self) -> str:
+
+    @staticmethod
+    def get_section_title(main_class: Type["RecordPage"]) -> str:
         """Return section title."""
         raise NotImplementedError(
-            "Abstract method 'get_title' should be implemented in derived class. "
-            f"It was not implemented in class {self.__class__.__name__}."
+            "Abstract method 'get_section_title' should be implemented in derived class. "
         )
-    
-    def get_section_header(self) -> str:
+
+    @staticmethod
+    def get_section_header() -> str:
         """Return section header."""
         raise NotImplementedError(
             "Abstract method 'get_section_header' should be implemented in derived class. "
-            f"It was not implemented in class {self.__class__.__name__}."
         )
 
-    def get_section_content(self) -> str:
+    @staticmethod
+    def get_section_content(page: Type["RecordPage"], section_type: Type["Section"]) -> str:
         """Return section content."""
-        return render_template("section.html", section=self)
+        return render_template("section.html", page=page, section=section_type)
     
-    def get_records(self, number_of_records: int) -> List[Type[RecordBadge]]:
+    @staticmethod
+    def has_records(page: Type["RecordPage"]) -> bool:
+        """Return whether the section has records."""
+        raise NotImplementedError(
+            "Abstract method 'has_records' should be implemented in derived class. "
+            f"It was not implemented in main page {page.__class__.__name__}."
+        )
+
+    @staticmethod
+    def get_records(page: Type["RecordPage"], number_of_records: int) -> List[Type[RecordBadge]]:
         """Return section records.
         
         Parameters
@@ -39,9 +50,8 @@ class Section:
         """
         raise NotImplementedError(
             "Abstract method 'get_records' should be implemented in derived class. "
-            f"It was not implemented in class {self.__class__.__name__}."
+            f"It was not implemented in main page {page.__class__.__name__}."
         )
-
 
 class RecordPage(Record):
     def get_sections(self) -> List[Section]:
@@ -50,7 +60,7 @@ class RecordPage(Record):
             "Abstract method 'get_sections' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )
-
-    def get_record_content(self) -> str:
-        """Return sectioned record content."""
-        return render_template("record.html", record=self)
+    
+    def is_authored(self) -> bool:
+        """Return whether the record is authored."""
+        return issubclass(self.__class__, Authored)

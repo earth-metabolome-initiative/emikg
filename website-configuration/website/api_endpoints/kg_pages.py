@@ -20,7 +20,17 @@ def kg_page(
     except IdentifierNotFound:
         abort(404)
 
-    return record.get_record_content()
+    if User.is_authenticated():
+        user = User.from_flask_session()
+    else:
+        user = None
+
+    return render_template(
+        "record.html",
+        record=record,
+        lang=lang,
+        user=user,
+    )
 
 
 @app.route("/upload")
@@ -91,17 +101,21 @@ def tasks_page(lang: str = "en", identifier: Optional[int] = None):
 #     )
 
 
-# @app.route("/users")
-# @app.route("/<lang>/users")
-# @app.route("/users/<int:identifier>")
-# @app.route("/<lang>/users/<int:identifier>")
-# def users_page(lang: str = "en", identifier: Optional[int] = None):
-#     """Load the users page."""
-#     return kg_page(
-#         lang=lang,
-#         record_class=User,
-#         identifier=identifier,
-#     )
+@app.route("/users")
+@app.route("/users/")
+@app.route("/<lang>/users")
+@app.route("/<lang>/users/")
+@app.route("/users/<int:identifier>")
+@app.route("/users/<int:identifier>/")
+@app.route("/<lang>/users/<int:identifier>")
+@app.route("/<lang>/users/<int:identifier>/")
+def users_page(lang: str = "en", identifier: Optional[int] = None):
+    """Load the users page."""
+    return kg_page(
+        lang=lang,
+        record_class=User,
+        identifier=identifier,
+    )
 
 
 # @app.route("/spectra")

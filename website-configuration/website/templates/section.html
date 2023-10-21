@@ -1,13 +1,11 @@
-<!--
-    Template for rendering a section in flask.
-    This template receives a section object and renders it.
--->
-
 {% block content %}
-    <h3>{{ section.get_title() }}</h3>
-    <p>{{ section.get_section_header() }}</p>
-    <!-- If the session has at least a record, we render it. -->
-    {% for record in section.get_records() %}
-        <p>{{ record.get_record_badge() }}</p>
+    <h3>{{ section.get_section_title(page) }}</h3>
+    <p>{{ section.get_section_header(page) }}</p>
+    {% if section.has_records(page) %}
+        <ul class="search-results">
+            {% for record in section.get_records(page, 10) %}
+            {{ record.get_record_badge()|safe }}
+            {% endfor %}
+        </ul>
     {% endif %}
 {% endblock %}

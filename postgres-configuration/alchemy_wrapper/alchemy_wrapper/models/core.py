@@ -91,7 +91,11 @@ class User(Base, UserInterface):
         session.delete(self)
         session.commit()
 
-    def get_samples(self, number_of_records: int, sesion: Type[Session]) -> List["Sample"]:
+    def has_samples(self, session: Type[Session]) -> bool:
+        """Return whether the user has samples."""
+        return session.query(Sample).filter_by(user_id=self.id).first() is not None
+
+    def get_samples(self, number_of_records: int, session: Type[Session]) -> List["Sample"]:
         """Return list of samples created by the user.
 
         Parameters
@@ -101,20 +105,44 @@ class User(Base, UserInterface):
         """
         # We return the most recent samples created by the user
         return (
-            sesion.query(Sample).filter_by(user_id=self.id)
+            session.query(Sample).filter_by(user_id=self.id)
             .order_by(Sample.updated_at.desc())
             .limit(number_of_records)
             .all()
         )
     
-    def get_social_profiles(self, sesion: Type[Session]) -> List[SocialProfile]:
+    def has_tasks(self, session: Type[Session]) -> bool:
+        """Return whether the user has tasks."""
+        return session.query(Task).filter_by(user_id=self.id).first() is not None
+    
+    def get_tasks(self, number_of_records: int, session: Type[Session]) -> List["Task"]:
+        """Return list of tasks created by the user.
+
+        Parameters
+        ----------
+        number_of_records : int
+            Maximum number of records to return.
+        """
+        # We return the most recent tasks created by the user
+        return (
+            session.query(Task).filter_by(user_id=self.id)
+            .order_by(Task.updated_at.desc())
+            .limit(number_of_records)
+            .all()
+        )
+    
+    def get_social_profiles(self, session: Type[Session]) -> List[SocialProfile]:
         """Return list of socials."""
-        return sesion.query(SocialProfile).filter(SocialProfile.user_id == self.id).all()
+        return session.query(SocialProfile).filter(SocialProfile.user_id == self.id).all()
     
     def get_name(self) -> str:
         """Return recorded object name."""
         return f"{self.first_name} {self.last_name}"
-    
+
+    def get_description(self) -> str:
+        """Return recorded object description."""
+        return self.description
+
 class Sample(Base, SampleInterface):
 
     __tablename__ = "samples"

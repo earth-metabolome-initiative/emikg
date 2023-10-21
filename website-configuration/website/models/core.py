@@ -1,6 +1,6 @@
 """Concretely implements the proxy user and taxon interface using SQLAlchemy."""
 from flask import session
-from typing import List
+from typing import List, Type
 from flask import render_template
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Task as TaskInterface
@@ -17,7 +17,7 @@ from ..application import db
 
 
 class User(UserInterface, RecordPage, Section):
-    """Concrete implementation of the user interface using SQLAlchemy."""
+    """Concrete implementation of the user interface for Flask."""
 
     def __init__(self, user: UsersTable):
         """Initialize the user object from a user ID."""
@@ -126,6 +126,9 @@ class User(UserInterface, RecordPage, Section):
     
     def get_name(self) -> str:
         return self._user.get_name()
+    
+    def get_description(self) -> str:
+        return self._user.get_description()
 
     def is_administrator(self) -> bool:
         return self._user.is_administrator(session=db.session)
@@ -159,7 +162,7 @@ class User(UserInterface, RecordPage, Section):
 
     def get_sections(self) -> List[Section]:
         """Return sections."""
-        return []
+        return [Task]
     
     def get_title(self) -> str:
         """Return the title of the user."""
@@ -168,8 +171,21 @@ class User(UserInterface, RecordPage, Section):
     def get_description(self) -> str:
         """Return the description of the user."""
         return self._user.get_description()
+    
+    def has_tasks(self) -> bool:
+        """Return whether the user has tasks."""
+        return self._user.has_tasks(session=db.session)
 
+    def get_tasks(self, number_of_records: int = 10) -> List[TaskInterface]:
+        """Return the tasks of the user."""
+        return [
+            Task(task)
+            for task in self._user.get_tasks(session=db.session, number_of_records=number_of_records)
+        ]
+    
 class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
+    """Concrete implementation of Taxon class."""
+
     def __init__(self, taxon: TaxonTable):
         """Initialize the taxon object from a taxon ID."""
         self._taxon = taxon
@@ -217,6 +233,22 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
 
         self._taxon.delete()
 
+    @staticmethod
+    def get_section_title(main_class: Type["RecordPage"]) -> str:
+        """Return section title."""
+
+        if main_class == User:
+            return "Taxons created by this user"
+        
+        if main_class == Task:
+            return "Taxons associated with this task"
+        
+        raise NotImplementedError(
+            "Abstract method 'get_section_title' should be "
+            "implemented in derived class.  It was not implemented in "
+            f"class Taxon for main class {main_class}"
+        )
+    
 class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
     def __init__(self, task: TaskTable):
@@ -227,10 +259,14 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def from_id(identifier: int) -> "Task":
         """Return a task object from a task ID."""
         return Task(TaskTable.from_id(identifier, session=db.session))
+    
+    def get_id(self) -> int:
+        """Return the task ID."""
+        return self._task.get_id()
 
     def get_author(self) -> User:
         """Return the author of the task."""
-        return User(self._task.get_author())
+        return User(self._task.get_author(session=db.session))
 
     def get_description(self) -> str:
         """Return the description of the task."""
@@ -255,6 +291,11 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def get_record_badge(self) -> str:
         """Return the task record badge."""
         return render_template("badge.html", record=self)
+    
+    def get_url(self) -> str:
+        """Return the URL of the task."""
+        lang = session.get("lang", "en")
+        return f"/{lang}/{super().get_url()}"
 
     def delete(self):
         """Delete the task."""
@@ -265,3 +306,53 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
             raise Unauthorized()
 
         self._task.delete()
+
+    @staticmethod
+    def get_section_title(main_class: Type["RecordPage"]) -> str:
+        """Return section title."""
+
+        if isinstance(main_class, User):
+            return "Tasks created by this user"
+        
+        if isinstance(main_class, Taxon):
+            return "Tasks associated with this taxon"
+        
+        raise NotImplementedError(
+            "Abstract method 'get_section_title' should be "
+            "implemented in derived class. It was not implemented in "
+            f"class Task for main class {main_class}"
+        )
+    
+    @staticmethod
+    def has_records(page: Type["RecordPage"]) -> bool:
+        """Return whether the section has records."""
+        if isinstance(page, User):
+            return page.has_tasks()
+        
+        # if isinstance(page, Taxon):
+        #     return page.has_tasks()
+        
+        raise NotImplementedError(
+            "Abstract method 'has_records' should be implemented in derived class. "
+            f"It was not implemented in main page {page.__class__.__name__}."
+        )
+
+    @staticmethod
+    def get_records(page: Type["RecordPage"], number_of_records: int) -> List[Type[RecordBadge]]:
+        """Return section records.
+        
+        Parameters
+        ----------
+        number_of_records : int
+            Number of records to return.
+        """
+        if isinstance(page, User):
+            return page.get_tasks(number_of_records)
+        
+        # if isinstance(page, Taxon):
+        #     return page.get_tasks(number_of_records)
+        
+        raise NotImplementedError(
+            "Abstract method 'get_records' should be implemented in derived class. "
+            f"It was not implemented in main page {page.__class__.__name__}."
+        )

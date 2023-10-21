@@ -7,9 +7,15 @@
 {% extends 'navigator.html' %}
 
 {% block content %}
-    <h1>{{ record.get_title() }}</h1>
+    <h2><a href="{{record.get_url()}}">{{ record.get_title() }}</a></h2>
     <p>{{ record.get_description() }}</p>
     {% for section in record.get_sections() %}
-        {{section.get_section_content()}}
+        {{section.get_section_content(page=record, section_type=section)|safe}}
     {% endfor %}
+    {% if record.is_authored() %}
+        <!-- We assign the author of the record to a variable. -->
+        {% set author = record.get_author() %}
+        <h3>Authorship</h3>
+        <p>This entry was created by <a href="{{author.get_url()}}">{{ author.get_name() }}{{ ' (You)' if user and record.is_author(user) else '' }}.</p>
+    {% endif %}
 {% endblock %}

@@ -1,1 +1,0 @@
-const userDropdown=document.getElementById("userDropdown");window.addEventListener("click",(e=>{e.target.matches(".username-button")||userDropdown.classList.contains("show")&&userDropdown.classList.remove("show")}));

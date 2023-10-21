@@ -63,6 +63,7 @@ class User(Record):
     def get_root() -> str:
         """Return root for the user interface."""
         return "users"
+    
 
 class Authored:
     """Abstract interface describing the methods associated to an object with an author."""
@@ -73,6 +74,10 @@ class Authored:
             "Abstract method 'get_author' should be implemented in derived class. "
             f"It was not implemented in class {self.__class__.__name__}."
         )
+    
+    def is_author(self, user: Type[User]) -> bool:
+        """Return True if user is author."""
+        return self.get_author().get_id() == user.get_id()
     
 class Taxon(Record, Authored):
     """Abstract class to represent a taxon."""
