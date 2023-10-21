@@ -160,7 +160,7 @@ class User(UserInterface, RecordPage, Section):
 
     def get_sections(self) -> List[Section]:
         """Return sections."""
-        return [Task, Taxon]
+        return [Task, Taxon, Sample]
     
     def get_title(self) -> str:
         """Return the title of the user."""
@@ -251,19 +251,19 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
         self._taxon.delete()
 
     @staticmethod
-    def get_section_title(main_class: Type["RecordPage"]) -> str:
+    def get_section_title(page: Type["RecordPage"]) -> str:
         """Return section title."""
 
-        if isinstance(main_class, User):
+        if isinstance(page, User):
             return "Taxons created by this user"
         
-        if isinstance(main_class, Task):
+        if isinstance(page, Task):
             return "Taxons associated with this task"
         
         raise NotImplementedError(
             "Abstract method 'get_section_title' should be "
             "implemented in derived class.  It was not implemented in "
-            f"class Taxon for main class {main_class}"
+            f"class Taxon for main class {page}"
         )
     
     @staticmethod
@@ -276,7 +276,7 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
             return page.has_taxons()
         
         raise NotImplementedError(
-            "Abstract method 'has_records' should be implemented in derived class. "
+            "Abstract method 'has_records' should be implemented in derived class Taxon. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
     
@@ -302,7 +302,49 @@ class Sample(SampleInterface, Section, RecordPage, RecordBadge):
     
     def get_description(self) -> str:
         """Return the description of the sample."""
-        return self._sample.get_description(session=db.session)
+        return self._sample.get_description()
+    
+    @staticmethod
+    def get_section_header(page: Type[RecordPage]) -> str:
+        """Return the user section header."""
+        return "Samples"
+    
+    def get_sections(self) -> List[Section]:
+        """Return sections."""
+        return []
+    
+    def get_name(self) -> str:
+        """Return the name of the sample."""
+        return self._sample.get_name()
+    
+    def get_title(self) -> str:
+        """Return the title of the sample."""
+        return self.get_name()
+    
+    @staticmethod
+    def get_section_title(page: Type["RecordPage"]) -> str:
+        """Return section title."""
+
+        if isinstance(page, User):
+            return "Samples created by this user"
+        
+        raise NotImplementedError(
+            "Abstract method 'get_section_title' should be "
+            "implemented in derived class Sample. It was not implemented in "
+            f"class Sample for main class {page}"
+        )
+    
+    @staticmethod
+    def has_records(page: Type["RecordPage"]) -> bool:
+        """Return whether the section has records."""
+        if isinstance(page, User):
+            return page.has_samples()
+        
+        raise NotImplementedError(
+            "Abstract method 'has_records' should be implemented in derived class Sample. "
+            f"It was not implemented in main page {page.__class__.__name__}."
+        )
+
     
 class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
@@ -364,19 +406,19 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         self._task.delete()
 
     @staticmethod
-    def get_section_title(main_class: Type["RecordPage"]) -> str:
+    def get_section_title(page: Type["RecordPage"]) -> str:
         """Return section title."""
 
-        if isinstance(main_class, User):
+        if isinstance(page, User):
             return "Tasks created by this user"
         
-        if isinstance(main_class, Taxon):
+        if isinstance(page, Taxon):
             return "Tasks associated with this taxon"
         
         raise NotImplementedError(
             "Abstract method 'get_section_title' should be "
             "implemented in derived class. It was not implemented in "
-            f"class Task for main class {main_class}"
+            f"class Task for main class {page}"
         )
     
     @staticmethod
@@ -389,7 +431,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         #     return page.has_tasks()
         
         raise NotImplementedError(
-            "Abstract method 'has_records' should be implemented in derived class. "
+            "Abstract method 'has_records' should be implemented in derived class Task. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
 

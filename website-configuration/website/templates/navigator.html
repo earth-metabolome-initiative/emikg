@@ -34,7 +34,7 @@
         {% if user %}
         <!-- If the user is logged in, we show the user-related options. -->
         <div class="user-dropdown" id="userDropdown">
-            <button class="username-button" id="usernameBtn">{{ user.get_name() }}</button>
+            <button class="username-button" id="usernameBtn"><a href="{{user.get_url()}}">{{ user.get_name() }}</a></button>
         </div>
         {% else %}
         <!-- Otherwise, we show the login button. -->

@@ -74,6 +74,11 @@ body {
     color: #aa9639;
 }
 
+.username-button a {
+    color: inherit;
+    text-decoration: none;
+}
+
 /* When we hover the button, a small animation happens. */
 .signup-button:hover {
     background-color: white;
