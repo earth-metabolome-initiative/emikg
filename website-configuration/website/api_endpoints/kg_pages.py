@@ -18,7 +18,7 @@ def kg_page(
     try:
         record = record_class.from_id(identifier)
     except IdentifierNotFound:
-        abort(404)
+        return redirect(f"/{lang}/", code=302)
 
     if User.is_authenticated():
         user = User.from_flask_session()

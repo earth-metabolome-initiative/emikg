@@ -79,5 +79,6 @@ class DirtyPipelineEnricher(Enricher):
         enrichable
             enrichable class to enrich.
         """
+        path = enrichable.get_path()
         raise NotImplementedError("This method should be implemented in derived classes.")
 

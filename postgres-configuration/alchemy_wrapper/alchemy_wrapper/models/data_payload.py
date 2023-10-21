@@ -25,6 +25,8 @@ class DataPayload(Base, TaskInterface):
     task_id = Column(Integer, ForeignKey(Task.id), nullable=False)
     # The time when the payload was created.
     created_at = Column(DateTime, nullable=False, default=func.now())
+    # The extension of the file.
+    extension = Column(String, nullable=False)
 
     def get_author(self, session: Type[Session]) -> User:
         """Return author user."""
@@ -46,13 +48,14 @@ class DataPayload(Base, TaskInterface):
         """Return id."""
         return self.id
     
-    def get_payload_path(self) -> str:
+    def get_path(self) -> str:
         """Return payload path."""
-        return f"/app/unsafe/{self.id}"
+        return f"/app/unsafe/{self.id}.{self.extension}"
 
     @staticmethod
     def new_data_payload(
         user: Type[UserInterface],
+        extension: str,
         session: Type[Session],
     ) -> "DataPayload":
         """Create a new data payload."""
@@ -72,6 +75,7 @@ class DataPayload(Base, TaskInterface):
         session.flush()
         data_payload = DataPayload(
             user_id=user.get_id(),
+            extension=extension,
             task_id=task.id,
         )
         session.add(data_payload)
