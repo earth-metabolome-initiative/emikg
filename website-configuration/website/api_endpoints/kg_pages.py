@@ -1,10 +1,10 @@
 """API endpoints regardin the dashboard."""
 from typing import Optional, Type
-from flask import abort, session, render_template, redirect
+from flask import abort, session, render_template, redirect, send_from_directory
 from emikg_interfaces import IdentifierNotFound
+from alchemy_wrapper.models import Document
 from ..models import User, RecordPage, Taxon, Task
-from ..application import app
-from ..exceptions import NotLoggedIn
+from ..application import app, db
 
 def kg_page(
     lang: str,
@@ -72,6 +72,19 @@ def tasks_page(lang: str = "en", identifier: Optional[int] = None):
         lang=lang,
         record_class=Task,
         identifier=identifier,
+    )
+
+@app.route("/documents/<int:identifier>")
+def download_document(identifier: int):
+    """Load the tasks page."""
+    try:
+        document = Document.from_id(identifier, session=db.session)
+    except IdentifierNotFound:
+        return abort(404)
+    return send_from_directory(
+        "/app/safe/",
+        document.path.split("/")[-1],
+        as_attachment=True,
     )
 
 

@@ -196,3 +196,16 @@ class Task(Record, Authored):
         """Return root for the spectrum interface."""
         return "tasks"
     
+class Document(Record, Authored):
+    """Abstract interface to describe a generic document.
+
+    Examples
+    --------
+    A document may be a publication, a report, a thesis, etc.
+    Can also be a dataset.
+    """
+
+    @staticmethod
+    def get_root() -> str:
+        """Return root for the spectrum interface."""
+        return "documents"

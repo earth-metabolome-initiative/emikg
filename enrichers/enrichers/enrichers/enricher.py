@@ -219,4 +219,4 @@ class Enricher:
                 sleep_time_seconds = max(minimal_sleep_time, sleep_time_seconds / 2)
             else:
                 sleep_time_seconds = min(2 * sleep_time_seconds, maximal_sleep_time)
-            sleep(sleep_time_seconds * 1000)
+            sleep(sleep_time_seconds)

@@ -6,11 +6,13 @@ from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Task as TaskInterface
 from emikg_interfaces import Taxon as TaxonInterface
 from emikg_interfaces import Sample as SampleInterface
+from emikg_interfaces import Document as DocumentInterface
 from emikg_interfaces.from_identifier import IdentifierNotFound
 from alchemy_wrapper.models import User as UsersTable
 from alchemy_wrapper.models import Sample as SampleTable
 from alchemy_wrapper.models import Taxon as TaxonTable
 from alchemy_wrapper.models import Task as TaskTable
+from alchemy_wrapper.models import Document as DocumentTable
 from alchemy_wrapper.models import ORCID
 from .section import RecordPage, Section, RecordBadge
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
@@ -367,7 +369,21 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
     def get_description(self) -> str:
         """Return the description of the task."""
-        return self._task.get_description(session=db.session)
+        return (
+            f"{self._task.get_description(session=db.session)}, "
+            f"status: {self._task.get_status()}"
+        )
+    
+    def has_documents(self) -> bool:
+        """Return whether the task has documents."""
+        return self._task.has_documents(session=db.session)
+    
+    def get_documents(self, number_of_records: int = 10) -> List[DocumentInterface]:
+        """Return the documents of the task."""
+        return [
+            Document(document)
+            for document in self._task.get_documents(session=db.session, number_of_records=number_of_records)
+        ]
     
     @staticmethod
     def get_section_header(page: Type[RecordPage]) -> str:
@@ -376,7 +392,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     
     def get_sections(self) -> List[Section]:
         """Return sections."""
-        return []
+        return [Document]
 
     def get_name(self) -> str:
         """Return the name of the task."""
@@ -449,5 +465,124 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         
         raise NotImplementedError(
             "Abstract method 'get_records' should be implemented in derived class. "
+            f"It was not implemented in main page {page.__class__.__name__}."
+        )
+    
+class Document(DocumentInterface, RecordBadge, Section):
+    """Concrete implementation of Document class for flask."""
+
+    def __init__(self, document: DocumentTable):
+        """Initialize the document object from a document ID."""
+        self._document = document
+
+    @staticmethod
+    def from_id(identifier: int) -> "Document":
+        """Return a document object from a document ID."""
+        return Document(DocumentTable.from_id(identifier, session=db.session))
+
+    def get_id(self) -> int:
+        """Return the document ID."""
+        return self._document.get_id()
+
+    def get_author(self) -> User:
+        """Return the author of the document."""
+        return User(self._document.get_author(session=db.session))
+
+    def get_description(self) -> str:
+        """Return the description of the document."""
+        return self._document.get_description()
+
+    def get_name(self) -> str:
+        """Return the name of the document."""
+        return self._document.get_name()
+
+    def get_title(self) -> str:
+        """Return the title of the document."""
+        return self.get_name()
+
+    def get_record_badge(self) -> str:
+        """Return the document record badge."""
+        return render_template("badge.html", record=self)
+
+    def delete(self):
+        """Delete the document."""
+        user = User.from_flask_session()
+
+        # Either the user is the author of the document, or the user is an admin.
+        if not user.is_administrator() and not user.is_author_of(self):
+            raise Unauthorized()
+
+        self._document.delete()
+
+    @staticmethod
+    def get_section_header(page: Type[RecordPage]) -> str:
+        """Return the user section header."""
+        return "Documents"
+
+    @staticmethod
+    def get_section_title(page: Type["RecordPage"]) -> str:
+        """Return section title."""
+
+        if isinstance(page, User):
+            return "Documents created by this user"
+        
+        if isinstance(page, Taxon):
+            return "Documents associated with this taxon"
+        
+        if isinstance(page, Task):
+            return "Documents associated with this task"
+        
+        if isinstance(page, Sample):
+            return "Documents associated with this sample"
+
+        raise NotImplementedError(
+            "Abstract method 'get_section_title' should be "
+            "implemented in derived class. It was not implemented in "
+            f"class Document for main class {page}"
+        )
+
+    @staticmethod
+    def has_records(page: Type["RecordPage"]) -> bool:
+        """Return whether the section has records."""
+        if isinstance(page, User):
+            return page.has_documents()
+        
+        if isinstance(page, Taxon):
+            return page.has_documents()
+        
+        if isinstance(page, Task):
+            return page.has_documents()
+        
+        if isinstance(page, Sample):
+            return page.has_documents()
+
+        raise NotImplementedError(
+            "Abstract method 'has_records' should be implemented in derived class Document. "
+            f"It was not implemented in main page {page.__class__.__name__}."
+        )
+    
+    @staticmethod
+    def get_records(page: Type["RecordPage"], number_of_records: int) -> List[Type[RecordBadge]]:
+        """Return section records.
+        
+        Parameters
+        ----------
+        number_of_records : int
+            Number of records to return.
+        """
+        if isinstance(page, User):
+            return page.get_documents(number_of_records)
+        
+        if isinstance(page, Taxon):
+            return page.get_documents(number_of_records)
+        
+        if isinstance(page, Task):
+            return page.get_documents(number_of_records)
+        
+        if isinstance(page, Sample):
+            return page.get_documents(number_of_records)
+
+        raise NotImplementedError(
+            "Abstract method 'get_records' should be implemented in derived class Document. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )

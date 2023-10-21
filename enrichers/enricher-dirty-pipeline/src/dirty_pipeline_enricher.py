@@ -12,10 +12,9 @@ is more like a pipebomb.
 """
 from typing import List
 
-from alchemy_wrapper.models import DataPayload, Task
+from alchemy_wrapper.models import DataPayload, Task, Document, TaskRelatedDocuments
 from enrichers import Enricher
-
-from .models import DirtyPipelineEntry
+import shutil
 
 
 class DirtyPipelineEnricher(Enricher):
@@ -38,13 +37,18 @@ class DirtyPipelineEnricher(Enricher):
         ----------
         enrichable
             enrichable class to enrich.
+
+        Implementation details
+        ----------------------
+        The payloads that can be enriched by the dirty pipeline are the ones
+        associated to tasks that are still PENDING.
         """
         if not isinstance(enrichable, DataPayload):
             return False
         
-        return (
-            self._session.query(DirtyPipelineEntry).filter_by(payload_id=enrichable.get_id()).first() is None
-        )
+        return self._session.query(Task).filter_by(
+            id=enrichable.task_id
+        ).first().status == "PENDING"
 
     def _get_sleep_time_between_start_attempts(self) -> int:
         """Returns the number of seconds to wait between two start attempts."""
@@ -63,15 +67,26 @@ class DirtyPipelineEnricher(Enricher):
         return self._can_enrich(enrichable)
 
     def _get_new_elements_to_enrich(self) -> List[DataPayload]:
-        """Returns a list of new elements to enrich."""
-        # Get all the DataPayloads that are not already in the dirty_pipeline_entries table.
-        return self._session.query(DataPayload).filter(
-            ~DataPayload.id.in_(
-                self._session.query(DirtyPipelineEntry.payload_id)
-            )
+        """Returns a list of new elements to enrich.
+        
+        Implementation details
+        ----------------------
+        The new elements to enrich are the ones that are associated to a task with
+        status PENDING.
+        """
+        return self._session.query(DataPayload).join(Task, Task.id==DataPayload.task_id).filter(
+            Task.status == "PENDING"
         ).all()
+    
+    def _create_new_task(self, enrichable: DataPayload) -> Task:
+        # In the case of the data payload, there is no need
+        # to create a new entry in the task table, as there is
+        # already one associated to the data payload.
+        return self._session.query(Task).filter_by(
+            id=enrichable.task_id
+        ).first()
 
-    def _enrich(self, enrichable: DataPayload, task: Task):
+    def _enrich(self, enrichable: DataPayload, task: Task) -> bool:
         """Enrich the metadata of a enrichable class.
 
         Parameters
@@ -79,6 +94,40 @@ class DirtyPipelineEnricher(Enricher):
         enrichable
             enrichable class to enrich.
         """
-        path = enrichable.get_path()
-        raise NotImplementedError("This method should be implemented in derived classes.")
+        # We set the status of the task associated to the enrichable to STARTED.
+        path = enrichable.get_unsafe_path()
 
+        # TODO: Implement the enrichment here.
+
+        # TEMPORARELY we copy the original payload directly to the safe folder
+        # to monkeypatch the execution of the pipeline.
+
+        shutil.copy(path, enrichable.get_safe_path())
+
+        # We create a new document entry in the database.
+        document = Document(
+            name=f"Dirty Pipeline enrichment for task {task.id}",
+            description=f"Dirty Pipeline enrichment for task {task.id}",
+            path=enrichable.get_safe_path(),
+            user_id=self._enricher.id,
+        )
+
+        self._session.add(document)
+        self._session.flush()
+
+        # We insert a new entry for relationship between the task and the document.
+        task_document = TaskRelatedDocuments(
+            task_id=task.id,
+            document_id=document.id,
+        )
+
+        self._session.add(task_document)
+
+        # We set the task associated to the enrichable to SUCCESS.
+        task.success()
+
+        # We commit the changes.
+        self._session.commit()
+
+        # raise NotImplementedError("This method should be implemented in derived classes.")
+        return True

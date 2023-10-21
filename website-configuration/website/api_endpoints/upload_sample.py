@@ -35,7 +35,7 @@ def upload_sample():
     url = task.get_url()
 
     # We save the file to the unsafe subdirectory.
-    sample_file.save(data_payload.get_path())
+    sample_file.save(data_payload.get_unsafe_path())
 
     lang = session.get("lang", "en")
 

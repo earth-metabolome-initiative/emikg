@@ -3,7 +3,7 @@
 from typing import List, Optional, Type
 from alchemy_wrapper.database import Session
 from sqlalchemy.sql import func
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Float, Enum
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Float, Enum, UniqueConstraint
 
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Sample as SampleInterface
@@ -12,6 +12,7 @@ from emikg_interfaces import Spectrum as SpectrumInterface
 from emikg_interfaces import SpectraCollection as SpectraCollectionInterface
 from emikg_interfaces import Task as TaskInterface
 from emikg_interfaces import TaskType as TaskTypeInterface
+from emikg_interfaces import Document as DocumentInterface
 from emikg_interfaces import IdentifierNotFound, FromIdentifier
 
 from alchemy_wrapper.models.administrator import Administrator
@@ -491,6 +492,10 @@ class Task(Base, TaskInterface):
         """Finish the task with a failure."""
         self.status = "FAILURE"
 
+    def get_status(self) -> str:
+        """Return task status."""
+        return self.status
+
     def get_name(self, session: Type[Session]) -> str:
         """Return recorded object name, associated to the task type."""
         return self.get_task_type(session=session).get_name()
@@ -520,3 +525,64 @@ class Task(Base, TaskInterface):
         """Return Sample id."""
         return self.id
 
+    def has_documents(self, session: Type[Session]) -> bool:
+        """Return whether the task has documents."""
+        return session.query(TaskRelatedDocuments).filter_by(task_id=self.id).first() is not None
+    
+    def get_documents(self, session: Type[Session], number_of_records: int) -> List["Document"]:
+        """Return list of documents."""
+        return (
+            session.query(Document)
+            .join(TaskRelatedDocuments, TaskRelatedDocuments.task_id == self.id)
+            .order_by(Document.updated_at.desc())
+            .limit(number_of_records)
+            .all()
+        )
+
+class Document(Base, DocumentInterface):
+    """Define the Document model."""
+
+    __tablename__ = "documents"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    description = Column(String(512), nullable=False)
+    path = Column(String(255), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False,
+    )
+    created_at = Column(DateTime, nullable=False, default=func.now())
+    updated_at = Column(DateTime, nullable=False, default=func.now(), onupdate=func.now())
+
+    def get_name(self) -> str:
+        """Return recorded object name."""
+        return self.name
+    
+    def get_description(self) -> str:
+        """Return recorded object description."""
+        return self.description
+    
+    @staticmethod
+    def from_id(identifier: int, session: Type[Session]) -> "Document":
+        """Return Document instance from Document id."""
+        # We query the user table to get the user corresponding to the given identifier
+        document = session.query(Document).filter_by(id=identifier).first()
+        if document is None:
+            raise IdentifierNotFound(f"Document with id {identifier} not found")
+        return document
+    
+    def get_id(self) -> int:
+        """Return Sample id."""
+        return self.id
+    
+class TaskRelatedDocuments(Base):
+    """Define relationship between tasks and documents."""
+
+    __tablename__ = "task_related_documents"
+
+    id = Column(Integer, primary_key=True)
+    document_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
+    task_id = Column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False)
+
+    # The combination of document id and task id have to be unique.
+    __table_args__ = (UniqueConstraint("document_id", "task_id"),)
