@@ -1,5 +1,6 @@
 """API endpoints regardin the dashboard."""
 from typing import Optional, Type
+import os
 from flask import abort, session, render_template, redirect, send_from_directory
 from emikg_interfaces import IdentifierNotFound
 from alchemy_wrapper.models import Document
@@ -83,7 +84,7 @@ def download_document(identifier: int):
         return abort(404)
     return send_from_directory(
         "/app/safe/",
-        document.path.split("/")[-1],
+        os.sep.join(document.path.split(os.sep)[3:]),
         as_attachment=True,
     )
 

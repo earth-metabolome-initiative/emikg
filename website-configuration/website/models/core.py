@@ -392,7 +392,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     
     def get_sections(self) -> List[Section]:
         """Return sections."""
-        return [Document]
+        return [Document, Task]
 
     def get_name(self) -> str:
         """Return the name of the task."""
@@ -431,22 +431,47 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         if isinstance(page, Taxon):
             return "Tasks associated with this taxon"
         
+        if isinstance(page, Task):
+            return "Derived tasks"
+
         raise NotImplementedError(
             "Abstract method 'get_section_title' should be "
             "implemented in derived class. It was not implemented in "
             f"class Task for main class {page}"
         )
     
+    def has_derived_tasks(self) -> bool:
+        """Return whether the task has derived tasks."""
+        return self._task.has_derived_tasks(session=db.session)
+    
+    def has_parent_task(self) -> bool:
+        """Return whether the task has a parent task."""
+        return self._task.has_parent_task(session=db.session)
+    
+    def get_parent_task(self) -> "Task":
+        """Return the parent task."""
+        return Task(self._task.get_parent_task(session=db.session))
+    
     @staticmethod
     def has_records(page: Type["RecordPage"]) -> bool:
         """Return whether the section has records."""
         if isinstance(page, User):
             return page.has_tasks()
-        
+
+        if isinstance(page, Task):
+            return page.has_derived_tasks()
+
         raise NotImplementedError(
             "Abstract method 'has_records' should be implemented in derived class Task. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
+    
+    def get_derived_tasks(self, number_of_records: int) -> List["Task"]:
+        """Return derived tasks."""
+        return [
+            Task(task)
+            for task in self._task.get_derived_tasks(session=db.session, number_of_records=number_of_records)
+        ]
 
     @staticmethod
     def get_records(page: Type["RecordPage"], number_of_records: int) -> List[Type[RecordBadge]]:
@@ -459,6 +484,9 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         """
         if isinstance(page, User):
             return page.get_tasks(number_of_records)
+        
+        if isinstance(page, Task):
+            return page.get_derived_tasks(number_of_records)
         
         # if isinstance(page, Taxon):
         #     return page.get_tasks(number_of_records)

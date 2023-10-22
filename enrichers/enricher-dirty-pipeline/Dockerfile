@@ -7,6 +7,11 @@ WORKDIR /app
 # We clone the dirty-pipeline repository
 RUN git clone https://github.com/enpkg/enpkg_full.git
 
+# We need to checkout the correct branch of the dirty-pipeline repository
+# to make sure that the enricher works as expected, namely the branch
+# called "emikg-adapt".
+RUN cd enpkg_full && git checkout emikg-adapt
+
 # We install all requirements specified in the dirty-pipeline repository
 # environment.yml file.
 RUN conda env create -f enpkg_full/environment.yml

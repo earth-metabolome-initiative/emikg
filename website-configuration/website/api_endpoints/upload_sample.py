@@ -21,9 +21,8 @@ def upload_sample():
     # We check if the extension is valid.
     if extension not in ("zip", "gz"):
         return jsonify({"success": False, "error": "Invalid extension."})
-    # Save the sample file.
-    # path = f"samples/{user.get_id()}.{extension}"
-    # We check if the directory exists and create it if it doesn't.
+    
+    # TODO! CHECK THE INTERNAL STRUCTURE OF THE GZIP.
 
     # We create a data payload.
     data_payload = DataPayload.new_data_payload(

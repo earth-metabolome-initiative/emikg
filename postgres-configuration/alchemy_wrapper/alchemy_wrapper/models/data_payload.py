@@ -54,7 +54,7 @@ class DataPayload(Base, TaskInterface):
     
     def get_safe_path(self) -> str:
         """Return payload path."""
-        return f"/app/safe/{self.id}.{self.extension}"
+        return f"/app/safe/{self.id}.tar.gz"
 
     @staticmethod
     def new_data_payload(

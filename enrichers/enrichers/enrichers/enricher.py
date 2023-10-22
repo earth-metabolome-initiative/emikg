@@ -182,20 +182,13 @@ class Enricher:
         while not self._task_can_start(enrichable, task):
             sleep(self._get_sleep_time_between_start_attempts())
 
-        task.start()
-        self._session.commit()
-
+        task.start(session=self._session)
         try:
             success = self._enrich(enrichable, task)
-        except Exception:
+            task.success(session=self._session)
+        except Exception as reason_for_failure:
             success = False
-
-        if success:
-            task.success()
-        else:
-            task.failure()
-
-        self._session.commit()
+            task.failure(session=self._session, reason=reason_for_failure)
 
         return success
 
