@@ -132,11 +132,7 @@ class DirtyPipelineEnricher(Enricher):
             {
                 "name": "Graph builder step 10",
                 "description": "Tenth step of the graph builder.",
-            },
-            {
-                "name": "Graph builder step 11",
-                "description": "Eleventh step of the graph builder.",
-            },
+            }
         ]
 
         for step in steps:
@@ -261,6 +257,8 @@ class DirtyPipelineEnricher(Enricher):
         )
 
         if derived_task is not None:
+            if derived_task.has_failed():
+                derived_task.restart(session=self._session)
             return derived_task
 
         derived_task = Task(
@@ -476,28 +474,28 @@ class DirtyPipelineEnricher(Enricher):
 
             derived_task.success(session=self._session)
 
+        # derived_task = self._create_new_derived_task(
+        #     task.id,
+        #     task_number=8,
+        # )
+
+        # if derived_task.has_started():
+        #     try:
+        #         subprocess.run(
+        #             f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/01_b_rdf_enpkgmodule_metadata_indi.py"',
+        #             shell=True,
+        #             check=True,
+        #             capture_output=True,
+        #         )
+        #     except subprocess.CalledProcessError as process_exception:
+        #         derived_task.failure(session=self._session, reason=process_exception)
+        #         raise process_exception
+
+        #     derived_task.success(session=self._session)
+
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=8,
-        )
-
-        if derived_task.has_started():
-            try:
-                subprocess.run(
-                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/01_b_rdf_enpkgmodule_metadata_indi.py"',
-                    shell=True,
-                    check=True,
-                    capture_output=True,
-                )
-            except subprocess.CalledProcessError as process_exception:
-                derived_task.failure(session=self._session, reason=process_exception)
-                raise process_exception
-
-            derived_task.success(session=self._session)
-
-        derived_task = self._create_new_derived_task(
-            task.id,
-            task_number=9,
         )
 
         if derived_task.has_started():
@@ -516,7 +514,7 @@ class DirtyPipelineEnricher(Enricher):
 
         derived_task = self._create_new_derived_task(
             task.id,
-            task_number=10,
+            task_number=9,
         )
 
         if derived_task.has_started():
@@ -535,7 +533,7 @@ class DirtyPipelineEnricher(Enricher):
 
         derived_task = self._create_new_derived_task(
             task.id,
-            task_number=11,
+            task_number=10,
         )
 
         if derived_task.has_started():
@@ -554,7 +552,7 @@ class DirtyPipelineEnricher(Enricher):
 
         derived_task = self._create_new_derived_task(
             task.id,
-            task_number=12,
+            task_number=11,
         )
 
         if derived_task.has_started():
@@ -570,6 +568,11 @@ class DirtyPipelineEnricher(Enricher):
                 raise process_exception
 
             derived_task.success(session=self._session)
+
+        derived_task = self._create_new_derived_task(
+            task.id,
+            task_number=12,
+        )
 
         if derived_task.has_started():
             try:
@@ -645,25 +648,6 @@ class DirtyPipelineEnricher(Enricher):
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=16,
-        )
-
-        if derived_task.has_started():
-            try:
-                subprocess.run(
-                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/09_rdf_exporter.py"',
-                    shell=True,
-                    check=True,
-                    capture_output=True,
-                )
-            except subprocess.CalledProcessError as process_exception:
-                derived_task.failure(session=self._session, reason=process_exception)
-                raise process_exception
-
-            derived_task.success(session=self._session)
-
-        derived_task = self._create_new_derived_task(
-            task.id,
-            task_number=17,
         )
 
         if derived_task.has_started():
