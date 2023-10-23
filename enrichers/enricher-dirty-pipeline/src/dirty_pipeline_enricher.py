@@ -36,10 +36,10 @@ class DirtyPipelineEnricher(Enricher):
         super().__init__()
         self._extractor = AutoExtractor()
         self._downloader = BaseDownloader(auto_extract=False)
-        self._root = "enpkg_full/"
-        self._output_path = "temporary_output/"
+        self._root = "/app/enpkg_full/"
+        self._output_path = "/app/temporary_output/"
 
-        self._frozen_metadata = f"./{self._root}03_enpkg_mn_isdb_isdb_taxo/db_metadata/230106_frozen_metadata.csv.gz"
+        self._frozen_metadata = "/app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_metadata/230106_frozen_metadata.csv.gz"
         self._downloader.download(
             "https://drive.switch.ch/index.php/s/T09ictsnhv59UOy/download",
             # "https://zenodo.org/record/7534071/files/230106_frozen_metadata.csv.gz",
@@ -49,17 +49,18 @@ class DirtyPipelineEnricher(Enricher):
         subprocess.run(
             [
                 "python",
-                f"./{self._root}03_enpkg_mn_isdb_isdb_taxo/src/adducts_formatter.py",
+                f"{self._root}03_enpkg_mn_isdb_isdb_taxo/src/adducts_formatter.py",
                 "-p",
                 "./db_metadata/230106_frozen_metadata.csv.gz",
             ],
             check=True,
+            capture_output=True,
         )
 
         self._downloader.download(
             "https://drive.switch.ch/index.php/s/FqZHW4Qmo1bx2mz/download",
             # "https://zenodo.org/records/8287341/files/isdb_pos_cleaned.pkl",
-            "./db_spectra/isdb_pos_cleaned.pkl",
+            "/app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_spectra/isdb_pos_cleaned.pkl",
         )
 
         # We create the TaskType entries for the steps of the dirty pipeline.
@@ -237,6 +238,31 @@ class DirtyPipelineEnricher(Enricher):
             derived task.
 
         """
+        # First we check whether this subtask has already been created
+        # for this parent task.
+        # 
+        # We want to join the Derived Task table and the Task table on the
+        # keys derived_task_id and id respectively. Then we want to filter
+        # by the parent_task_id and the task_type_id, with the first being
+        # a column of the Derived Task table and the second being a column
+        # of the Task table.
+        #
+        # We order the results by the created_at column of the Task table
+        # in descending order, so that the most recent one is the first one.
+        #
+
+        derived_task = (
+            self._session.query(Task)
+            .join(DerivedTask, DerivedTask.derived_task_id == Task.id)
+            .filter(DerivedTask.parent_task_id == task_id)
+            .filter(Task.task_type_id == self._task_type_ids[task_number])
+            .order_by(Task.created_at.desc())
+            .first()
+        )
+
+        if derived_task is not None:
+            return derived_task
+
         derived_task = Task(
             task_type_id=self._task_type_ids[task_number],
             user_id=self._enricher.id,
@@ -274,12 +300,11 @@ class DirtyPipelineEnricher(Enricher):
 
         extraction_path = results["destination"]
 
-        directory = os.path.dirname(extraction_path)
-
         # We execute the dirty pipeline, which is composed
         # by a sequence of python scripts with parameters.
 
-        shutil.rmtree(self._output_path, ignore_errors=True)
+        if not task.has_derived_tasks(session=self._session):
+           shutil.rmtree(self._output_path, ignore_errors=True)
 
         os.makedirs(self._output_path, exist_ok=True)
 
@@ -290,388 +315,370 @@ class DirtyPipelineEnricher(Enricher):
             task_number=0,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}01_enpkg_data_organization/src/create_architecture.py",
-                    "--source_path",
-                    f"{directory}/ms_data/processed",
-                    "--target_path",
-                    self._output_path,
-                    "--source_metadata_path",
-                    f"{directory}/metadata",
-                    "--sample_metadata_filename",
-                    "dbgi_tropical_toydataset_metadata.tsv",
-                    "--lcms_method_params_filename",
-                    "dbgi_tropical_toydataset_lcms_params.txt",
-                    "--lcms_processing_params_filename",
-                    "dbgi_tropical_toydataset_mzmine_params.xml",
-                    "--polarity",
-                    "pos",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    (
+                        f'bash -c "source activate enpkg_full; python {self._root}01_enpkg_data_organization/src/create_architecture.py '
+                        f"--source_path {extraction_path}/msdata/processed "
+                        f"--target_path {self._output_path} --source_metadata_path {extraction_path}/metadata "
+                        f"--sample_metadata_filename dbgi_tropical_toydataset_metadata.tsv --lcms_method_params_filename "
+                        "dbgi_tropical_toydataset_lcms_params.txt --lcms_processing_params_filename "
+                        'dbgi_tropical_toydataset_mzmine_params.xml --polarity pos"',
+                    ),
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=1,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}01_enpkg_data_processing/src/add_massive_id.py",
-                    "--massive_id",
-                    "MSV000092400",
-                    "-p",
-                    self._output_path,
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    (
+                        f'bash -c "source activate enpkg_full; python {self._root}01_enpkg_data_organization/src/add_massive_id.py '
+                        f'--massive_id MSV000092400 -p {self._output_path}"',
+                    ),
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=2,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}02_enpkg_taxo_enhancer/src/taxo_info_fetcher.py",
-                    "-p",
-                    self._output_path,
-                    "-f",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    (
+                        f'bash -c "source activate enpkg_full; python {self._root}02_enpkg_taxo_enhancer/src/taxo_info_fetcher.py '
+                        f'-p {self._output_path} -f"'
+                    ),
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=3,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}03_enpkg_mn_isdb_isdb_taxo/src/nb_indifile.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}03_enpkg_mn_isdb_isdb_taxo/src/nb_indifile.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=4,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}04_enpkg_sirius_canopus/src/sirius_canopus_by_file.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}04_enpkg_sirius_canopus/src/sirius_canopus_by_file.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=5,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}05_enpkg_meta_analysis/src/chemo_info_fetcher.py",
-                    "-p",
-                    self._output_path,
-                    "--sql_name",
-                    # THIS IS HARDCODED IN THE STEP SIX!!!
-                    "structures_metadata.db",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}05_enpkg_meta_analysis/src/chemo_info_fetcher.py -p {self._output_path} --sql_name structures_metadata.db"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=6,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}05_enpkg_meta_analysis/src/memo_unaligned_repo.py",
-                    "-p",
-                    self._output_path,
-                    "--ionization",
-                    "pos",
-                    "--output",
-                    "memo_matrix",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
 
-        derived_task.success(session=self._session)
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}05_enpkg_meta_analysis/src/memo_unaligned_repo.py -p {self._output_path} --ionization pos --output memo_matrix"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
+
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=7,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/01_a_rdf_enpkg_metadata_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/01_a_rdf_enpkg_metadata_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=8,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/01_b_rdf_enpkgmodule_metadata_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/01_b_rdf_enpkgmodule_metadata_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=9,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/02_a_rdf_features_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/02_a_rdf_features_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=10,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/02_b_rdf_features_spec2vec_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/02_b_rdf_features_spec2vec_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=11,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/03_rdf_csi_annotations_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/03_rdf_csi_annotations_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=12,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/04_rdf_canopus_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/04_rdf_canopus_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/05_rdf_isdb_annotations_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/05_rdf_isdb_annotations_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=13,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/06_rdf_individual_mn_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/06_rdf_individual_mn_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=14,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/07_rdf_structures_metadata_indi.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/07_rdf_structures_metadata_indi.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=15,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/08_rdf_merger.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/08_rdf_merger.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=16,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/09_rdf_exporter.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/09_rdf_exporter.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         derived_task = self._create_new_derived_task(
             task.id,
             task_number=17,
         )
 
-        try:
-            subprocess.run(
-                [
-                    "python",
-                    f"./{self._root}06_enpkg_graph_builder/src/individual_processing/09_rdf_exporter.py",
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as process_exception:
-            derived_task.failure(session=self._session, reason=process_exception)
-            raise process_exception
+        if derived_task.has_started():
+            try:
+                subprocess.run(
+                    f'bash -c "source activate enpkg_full; python {self._root}06_enpkg_graph_builder/src/individual_processing/09_rdf_exporter.py"',
+                    shell=True,
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as process_exception:
+                derived_task.failure(session=self._session, reason=process_exception)
+                raise process_exception
 
-        derived_task.success(session=self._session)
+            derived_task.success(session=self._session)
 
         # We zip the output directory as a tar.gz file and we move it to the safe subdirectory.
 
@@ -683,6 +690,7 @@ class DirtyPipelineEnricher(Enricher):
                 self._output_path,
             ],
             check=True,
+            capture_output=True,
         )
 
         # We create a new document entry in the database.
@@ -703,11 +711,7 @@ class DirtyPipelineEnricher(Enricher):
         )
 
         self._session.add(task_document)
-
-        # We set the task associated to the enrichable to SUCCESS.
-        task.success()
-
-        # We commit the changes.
+        self._session.commit()
 
         # raise NotImplementedError("This method should be implemented in derived classes.")
         return True

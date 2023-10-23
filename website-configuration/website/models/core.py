@@ -369,10 +369,23 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
     def get_description(self) -> str:
         """Return the description of the task."""
+        restart_text = (
+            f"You can restart this task by clicking <a href='/tasks/restart/{self.get_id()}'>here</a>."
+            if self.has_failed() else ""
+        )
         return (
             f"{self._task.get_description(session=db.session)}, "
-            f"status: {self._task.get_status()}"
+            f"status: {self._task.get_status()}, "
+            f"{restart_text}"
         )
+    
+    def get_status(self) -> str:
+        """Return the status of the task."""
+        return self._task.get_status()
+    
+    def has_failed(self) -> bool:
+        """Return whether the task has failed."""
+        return self._task.has_failed()
     
     def has_documents(self) -> bool:
         """Return whether the task has documents."""
@@ -410,6 +423,10 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         """Return the URL of the task."""
         lang = session.get("lang", "en")
         return f"/{lang}/{super().get_url()}"
+    
+    def restart(self):
+        """Return whether the task restart."""
+        self._task.restart(session=db.session)
 
     def delete(self):
         """Delete the task."""

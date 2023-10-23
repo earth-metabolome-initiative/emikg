@@ -8,7 +8,7 @@
 
 {% block content %}
     <h2><a href="{{record.get_url()}}">{{ record.get_title() }}</a></h2>
-    <p>{{ record.get_description() }}</p>
+    <p>{{ record.get_description()|safe }}</p>
     {% for section in record.get_sections() %}
         {{section.get_section_content(page=record, section_type=section)|safe}}
     {% endfor %}

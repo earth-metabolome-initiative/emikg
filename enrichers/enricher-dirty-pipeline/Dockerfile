@@ -16,14 +16,21 @@ RUN cd enpkg_full && git checkout emikg-adapt
 # environment.yml file.
 RUN conda env create -f enpkg_full/environment.yml
 
-# We activate the dirty-pipeline environment
-RUN echo "source activate dirty-pipeline" > ~/.bashrc
+# We run the conda init command
+RUN conda init bash
+
+# We activate the enpkg_full environment
+RUN echo "source activate enpkg_full" > ~/.bashrc
 
 # We install jq
 RUN apt-get update && apt-get install -y jq unzip curl
 
 # We install Sirius using the bash script provided by the dirty-pipeline repository
 RUN bash enpkg_full/src/install_sirius.sh
+
+# Set the permission to allow the execution of the files under
+# the /app/sirius/bin directory
+RUN chmod +x /app/sirius/bin
 
 # We copy the content of the dirty-pipeline repository into the container
 COPY enrichers/enricher-dirty-pipeline /app
@@ -36,6 +43,10 @@ COPY postgres-configuration/alchemy_wrapper /app/alchemy_wrapper
 
 # And then we copy the emikg interfaces
 COPY emikg_interfaces /app/emikg_interfaces
+
+# TEMPORARY STEP, TO BE REMOVED AND IMPROVED!!!
+COPY enrichers/enricher-dirty-pipeline/230106_frozen_metadata.csv.gz /app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_metadata/230106_frozen_metadata.csv.gz
+COPY enrichers/enricher-dirty-pipeline/isdb_pos_cleaned.pkl /app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_spectra/isdb_pos_cleaned.pkl
 
 # We make sure that the pip version is up to date
 RUN pip install --upgrade pip

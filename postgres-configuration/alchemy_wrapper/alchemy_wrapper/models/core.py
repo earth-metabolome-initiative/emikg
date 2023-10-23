@@ -25,6 +25,7 @@ from emikg_interfaces import Document as DocumentInterface
 from emikg_interfaces import IdentifierNotFound, FromIdentifier
 
 import traceback
+import subprocess
 from alchemy_wrapper.models.administrator import Administrator
 from alchemy_wrapper.models.base import Base
 from alchemy_wrapper.models.moderator import Moderator
@@ -516,6 +517,11 @@ class Task(Base, TaskInterface):
     def __repr__(self):
         """Represent instance as a unique string."""
         return f"<Task({self.id!r})>"
+    
+    def restart(self, session: Type[Session]):
+        """Restart the task."""
+        self.status = "PENDING"
+        session.commit()
 
     def start(self, session: Type[Session]):
         """Start the task."""
@@ -535,6 +541,13 @@ class Task(Base, TaskInterface):
         session.commit()
         if reason is None:
             return
+
+        if isinstance(reason, subprocess.CalledProcessError):
+            reason = (
+                f"Command {reason.cmd} returned non-zero exit status {reason.returncode}. "
+                f"Output: {reason.output}, {reason.stderr}."
+            )
+
         if isinstance(reason, Exception):
             reason = traceback.format_exc()
 
@@ -572,6 +585,14 @@ class Task(Base, TaskInterface):
     def get_status(self) -> str:
         """Return task status."""
         return self.status
+
+    def has_failed(self) -> bool:
+        """Return whether the task has failed."""
+        return self.status == "FAILURE"
+    
+    def has_started(self) -> bool:
+        """Return whether the task has started."""
+        return self.status == "STARTED"
 
     def has_parent_task(self, session: Type[Session]) -> bool:
         """Return whether the task has a parent task."""
