@@ -12,9 +12,5 @@
         {% endfor %}
     </ul>
     {% endif %}
-    {% if record.is_authored() %}
-    {% set author = record.get_author() %}
-    <p>This entry was created by <a href="{{author.get_url()}}">{{ author.get_name() }}{{ ' (You)' if user and record.is_author(user) else '' }}.</p>
-    {% endif %}
 </li>
 {% endblock %}
