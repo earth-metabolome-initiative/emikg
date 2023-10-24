@@ -20,7 +20,7 @@ ul.autocomplete-search {
     display: none;
 }
 
-ul.search-results li{
+ul.search-results > li{
     padding: 0.5em;
     border-radius: 0.5em;
     margin-top: 0.1em;
@@ -30,15 +30,15 @@ ul.search-results li{
     transition: background-color 0.1s ease-in-out;
 }
 
-ul.search-results li h4 a{
+ul.search-results > li h4 a{
     color: #aa9639;
     text-decoration: underline;
 }
 
-ul.search-results li:hover{
+ul.search-results > li:hover{
     background-color: #eee;
 }
 
-ul.search-results li{
+ul.search-results > li{
     background-color: #fff;
 }

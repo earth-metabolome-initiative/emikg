@@ -1,0 +1,7 @@
+{% if pin.has_action() %}
+<a href="{{pin.get_action()}}">
+{% endif %}
+<i class="pin {{pin.get_class()}}" style="color:{{pin.get_color()}};" title="{{pin.get_name()}}"></i>
+{% if pin.has_action() %}
+</a>
+{% endif %}

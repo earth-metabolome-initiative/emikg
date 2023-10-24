@@ -533,6 +533,12 @@ class Task(Base, TaskInterface):
         self.status = "SUCCESS"
         session.commit()
 
+    def delete(self, session: Type[Session]):
+        """Delete the task."""
+        # We delete the task from the database
+        session.delete(self)
+        session.commit()
+
     def failure(self, session: Type[Session], reason: Optional[Union[str, Exception]] = None):
         """Finish the task with a failure."""
         if self.status == "FAILURE":
@@ -589,10 +595,18 @@ class Task(Base, TaskInterface):
     def has_failed(self) -> bool:
         """Return whether the task has failed."""
         return self.status == "FAILURE"
-    
+
+    def has_succeeded(self) -> bool:
+        """Return whether the task has succeeded."""
+        return self.status == "SUCCESS"
+
     def has_started(self) -> bool:
         """Return whether the task has started."""
         return self.status == "STARTED"
+    
+    def is_pending(self) -> bool:
+        """Return whether the task is pending."""
+        return self.status == "PENDING"
 
     def has_parent_task(self, session: Type[Session]) -> bool:
         """Return whether the task has a parent task."""
@@ -706,6 +720,10 @@ class Document(Base, DocumentInterface):
     def get_description(self) -> str:
         """Return recorded object description."""
         return self.description
+    
+    def get_author(self, session: Type[Session]) -> User:
+        """Return the author of the document."""
+        return User.from_id(self.user_id, session=session)
 
     @staticmethod
     def from_id(identifier: int, session: Type[Session]) -> "Document":
@@ -715,6 +733,12 @@ class Document(Base, DocumentInterface):
         if document is None:
             raise IdentifierNotFound(f"Document with id {identifier} not found")
         return document
+    
+    def delete(self, session: Type[Session]):
+        """Delete the document."""
+        # We delete the document from the database
+        session.delete(self)
+        session.commit()
 
     def get_id(self) -> int:
         """Return Sample id."""

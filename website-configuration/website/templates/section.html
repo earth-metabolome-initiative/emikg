@@ -3,10 +3,12 @@
     <p>{{ section.get_section_header(page) }}</p>
     {% if section.has_records(page) %}
         <div class="search-results-wrapper">
+            {% set records = section.get_records(page, 10) %}
             <ul class="search-results">
-                {% for record in section.get_records(page, 10) %}
+                {% for record in records %}
                 {{ record.get_record_badge()|safe }}
                 {% endfor %}
+                <li class="load_more_results">Load more results</li>
             </ul>
         </div>
     {% else %}

@@ -14,7 +14,17 @@ from alchemy_wrapper.models import Taxon as TaxonTable
 from alchemy_wrapper.models import Task as TaskTable
 from alchemy_wrapper.models import Document as DocumentTable
 from alchemy_wrapper.models import ORCID
-from .section import RecordPage, Section, RecordBadge
+from .section import (
+    RecordPage,
+    Section,
+    RecordBadge,
+    Pin,
+    FailurePin,
+    SuccessPin,
+    RunningPin,
+    PendingPin,
+    DeletePin,
+)
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
 from ..application import db
 
@@ -30,7 +40,7 @@ class User(UserInterface, RecordPage, Section):
     def from_id(identifier: int) -> "User":
         """Return a user object from a user ID."""
         return User(UsersTable.from_id(identifier, session=db.session))
-    
+
     def get_id(self) -> int:
         """Return the user ID."""
         return self._user.get_id()
@@ -126,15 +136,19 @@ class User(UserInterface, RecordPage, Section):
     def get_description(self) -> str:
         """Return the user description."""
         return self._user.get_description()
-    
+
     def get_name(self) -> str:
         return self._user.get_name()
-    
+
     def is_administrator(self) -> bool:
         return self._user.is_administrator(session=db.session)
 
     def is_moderator(self) -> bool:
         return self._user.is_moderator(session=db.session)
+    
+    def has_pins(self) -> bool:
+        """Return whether the user has pins."""
+        return False
 
     def delete(self):
         """Delete the user.
@@ -163,11 +177,11 @@ class User(UserInterface, RecordPage, Section):
     def get_sections(self) -> List[Section]:
         """Return sections."""
         return [Task, Taxon, Sample]
-    
+
     def get_title(self) -> str:
         """Return the title of the user."""
         return self.get_name()
-    
+
     def has_tasks(self) -> bool:
         """Return whether the user has tasks."""
         return self._user.has_tasks(session=db.session)
@@ -176,20 +190,24 @@ class User(UserInterface, RecordPage, Section):
         """Return the tasks of the user."""
         return [
             Task(task)
-            for task in self._user.get_tasks(session=db.session, number_of_records=number_of_records)
+            for task in self._user.get_tasks(
+                session=db.session, number_of_records=number_of_records
+            )
         ]
-    
+
     def has_taxons(self) -> bool:
         """Return whether the user has taxons."""
         return self._user.has_taxons(session=db.session)
-    
+
     def get_taxons(self, number_of_records: int = 10) -> List[TaxonInterface]:
         """Return the taxons of the user."""
         return [
             Taxon(taxon)
-            for taxon in self._user.get_taxons(session=db.session, number_of_records=number_of_records)
+            for taxon in self._user.get_taxons(
+                session=db.session, number_of_records=number_of_records
+            )
         ]
-    
+
     def has_samples(self) -> bool:
         """Return whether the user has samples."""
         return self._user.has_samples(session=db.session)
@@ -198,8 +216,11 @@ class User(UserInterface, RecordPage, Section):
         """Return the samples of the user."""
         return [
             Sample(sample)
-            for sample in self._user.get_samples(session=db.session, number_of_records=number_of_records)
+            for sample in self._user.get_samples(
+                session=db.session, number_of_records=number_of_records
+            )
         ]
+
 
 class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
     """Concrete implementation of Taxon class."""
@@ -220,7 +241,7 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
     def get_description(self) -> str:
         """Return the description of the taxon."""
         return self._taxon.get_description()
-    
+
     @staticmethod
     def get_section_header(page: Type[RecordPage]) -> str:
         """Return the user section header."""
@@ -229,15 +250,15 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
     def get_name(self) -> str:
         """Return the name of the taxon."""
         return self._taxon.get_name()
-    
+
     def get_title(self) -> str:
         """Return the title of the taxon."""
         return self.get_name()
-    
+
     def get_sections(self) -> List[Section]:
         """Return sections."""
         return []
-    
+
     def get_record_badge(self) -> str:
         """Return the taxon record badge."""
         return render_template("badge.html", record=self)
@@ -247,7 +268,7 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
         user = User.from_flask_session()
 
         # Either the user is the author of the taxon, or the user is an admin.
-        if not user.is_administrator() and not user.is_author_of(self):
+        if not user.is_administrator() and not self.is_author(user):
             raise Unauthorized()
 
         self._taxon.delete()
@@ -258,30 +279,31 @@ class Taxon(Section, RecordPage, TaxonInterface, RecordBadge):
 
         if isinstance(page, User):
             return "Taxons created by this user"
-        
+
         if isinstance(page, Task):
             return "Taxons associated with this task"
-        
+
         raise NotImplementedError(
             "Abstract method 'get_section_title' should be "
             "implemented in derived class.  It was not implemented in "
             f"class Taxon for main class {page}"
         )
-    
+
     @staticmethod
     def has_records(page: Type["RecordPage"]) -> bool:
         """Return whether the section has records."""
         if isinstance(page, User):
             return page.has_taxons()
-        
+
         if isinstance(page, Task):
             return page.has_taxons()
-        
+
         raise NotImplementedError(
             "Abstract method 'has_records' should be implemented in derived class Taxon. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
-    
+
+
 class Sample(SampleInterface, Section, RecordPage, RecordBadge):
     """Concrete implementation of Sample class for flask."""
 
@@ -293,59 +315,60 @@ class Sample(SampleInterface, Section, RecordPage, RecordBadge):
     def from_id(identifier: int) -> "Sample":
         """Return a sample object from a sample ID."""
         return Sample(SampleTable.from_id(identifier, session=db.session))
-    
+
     def get_id(self) -> int:
         """Return the sample ID."""
         return self._sample.get_id()
-    
+
     def get_author(self) -> User:
         """Return the author of the sample."""
         return User(self._sample.get_author(session=db.session))
-    
+
     def get_description(self) -> str:
         """Return the description of the sample."""
         return self._sample.get_description()
-    
+
     @staticmethod
     def get_section_header(page: Type[RecordPage]) -> str:
         """Return the user section header."""
         return "Samples"
-    
+
     def get_sections(self) -> List[Section]:
         """Return sections."""
         return []
-    
+
     def get_name(self) -> str:
         """Return the name of the sample."""
         return self._sample.get_name()
-    
+
     def get_title(self) -> str:
         """Return the title of the sample."""
         return self.get_name()
-    
+
     @staticmethod
     def get_section_title(page: Type["RecordPage"]) -> str:
         """Return section title."""
 
         if isinstance(page, User):
             return "Samples created by this user"
-        
+
         raise NotImplementedError(
             "Abstract method 'get_section_title' should be "
             "implemented in derived class Sample. It was not implemented in "
             f"class Sample for main class {page}"
         )
-    
+
     @staticmethod
     def has_records(page: Type["RecordPage"]) -> bool:
         """Return whether the section has records."""
         if isinstance(page, User):
             return page.has_samples()
-        
+
         raise NotImplementedError(
             "Abstract method 'has_records' should be implemented in derived class Sample. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
+
 
 class Task(TaskInterface, Section, RecordPage, RecordBadge):
     """Concrete implementation of Task class for flask."""
@@ -358,7 +381,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def from_id(identifier: int) -> "Task":
         """Return a task object from a task ID."""
         return Task(TaskTable.from_id(identifier, session=db.session))
-    
+
     def get_id(self) -> int:
         """Return the task ID."""
         return self._task.get_id()
@@ -371,38 +394,77 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         """Return the description of the task."""
         restart_text = (
             f"You can restart this task by clicking <a href='/tasks/restart/{self.get_id()}'>here</a>."
-            if self.has_failed() else ""
+            if self.has_failed()
+            else ""
         )
-        return (
-            f"{self._task.get_description(session=db.session)}, "
-            f"status: {self._task.get_status()}, "
-            f"{restart_text}"
-        )
-    
+        return f"{self._task.get_description(session=db.session)}, " f"{restart_text}"
+
     def get_status(self) -> str:
         """Return the status of the task."""
         return self._task.get_status()
-    
+
     def has_failed(self) -> bool:
         """Return whether the task has failed."""
         return self._task.has_failed()
-    
+
+    def has_succeeded(self) -> bool:
+        """Return whether the task has succeeded."""
+        return self._task.has_succeeded()
+
+    def has_started(self) -> bool:
+        """Return whether the task is running."""
+        return self._task.has_started()
+
+    def is_pending(self) -> bool:
+        """Return whether the task is pending."""
+        return self._task.is_pending()
+
+    def has_pins(self) -> bool:
+        """Return whether the task has pins."""
+        return True
+
+    def _dispatch_status_pin(self) -> Type[Pin]:
+        """Return the status pin."""
+        if self.has_failed():
+            return FailurePin()
+        if self.has_succeeded():
+            return SuccessPin()
+        if self.has_started():
+            return RunningPin()
+        if self.is_pending():
+            return PendingPin()
+        raise NotImplementedError(
+            "Abstract method '_dispatch_status_pin' should be implemented in derived class. "
+            f"It was not implemented in main class {self.__class__.__name__}."
+        )
+
+    def get_pins(self) -> List[Type[Pin]]:
+        return [
+            self._dispatch_status_pin(),
+            *((DeletePin(
+                root=self.get_root(),
+                identifier=self.get_id(),
+            ),) if self.can_delete() else ())
+        ]
+
     def has_documents(self) -> bool:
         """Return whether the task has documents."""
         return self._task.has_documents(session=db.session)
-    
+
     def get_documents(self, number_of_records: int = 10) -> List[DocumentInterface]:
         """Return the documents of the task."""
         return [
             Document(document)
-            for document in self._task.get_documents(session=db.session, number_of_records=number_of_records)
+            for document in self._task.get_documents(
+                session=db.session, number_of_records=number_of_records
+            )
         ]
-    
+
     @staticmethod
     def get_section_header(page: Type[RecordPage]) -> str:
         """Return the user section header."""
         return "Tasks"
-    
+
     def get_sections(self) -> List[Section]:
         """Return sections."""
         return [Document, Task]
@@ -410,33 +472,36 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def get_name(self) -> str:
         """Return the name of the task."""
         return self._task.get_name(session=db.session)
-    
+
     def get_title(self) -> str:
         """Return the title of the task."""
         return self.get_name()
-    
+
     def get_record_badge(self) -> str:
         """Return the task record badge."""
         return render_template("badge.html", record=self)
-    
+
     def get_url(self) -> str:
         """Return the URL of the task."""
         lang = session.get("lang", "en")
         return f"/{lang}/{super().get_url()}"
-    
+
     def restart(self):
         """Return whether the task restart."""
         self._task.restart(session=db.session)
 
+    def can_delete(self) -> bool:
+        """Return whether the task can be deleted."""
+        if not User.is_authenticated():
+            return False
+        user = User.from_flask_session()
+        return user.is_administrator() or self.is_author(user)
+    
     def delete(self):
         """Delete the task."""
-        user = User.from_flask_session()
-
-        # Either the user is the author of the task, or the user is an admin.
-        if not user.is_administrator() and not user.is_author_of(self):
+        if not self.can_delete():
             raise Unauthorized()
-
-        self._task.delete()
+        self._task.delete(session=db.session)
 
     @staticmethod
     def get_section_title(page: Type["RecordPage"]) -> str:
@@ -444,10 +509,10 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
         if isinstance(page, User):
             return "Tasks created by this user"
-        
+
         if isinstance(page, Taxon):
             return "Tasks associated with this taxon"
-        
+
         if isinstance(page, Task):
             return "Derived tasks"
 
@@ -456,19 +521,19 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
             "implemented in derived class. It was not implemented in "
             f"class Task for main class {page}"
         )
-    
+
     def has_derived_tasks(self) -> bool:
         """Return whether the task has derived tasks."""
         return self._task.has_derived_tasks(session=db.session)
-    
+
     def has_parent_task(self) -> bool:
         """Return whether the task has a parent task."""
         return self._task.has_parent_task(session=db.session)
-    
+
     def get_parent_task(self) -> "Task":
         """Return the parent task."""
         return Task(self._task.get_parent_task(session=db.session))
-    
+
     @staticmethod
     def has_records(page: Type["RecordPage"]) -> bool:
         """Return whether the section has records."""
@@ -482,18 +547,22 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
             "Abstract method 'has_records' should be implemented in derived class Task. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
-    
+
     def get_derived_tasks(self, number_of_records: int) -> List["Task"]:
         """Return derived tasks."""
         return [
             Task(task)
-            for task in self._task.get_derived_tasks(session=db.session, number_of_records=number_of_records)
+            for task in self._task.get_derived_tasks(
+                session=db.session, number_of_records=number_of_records
+            )
         ]
 
     @staticmethod
-    def get_records(page: Type["RecordPage"], number_of_records: int) -> List[Type[RecordBadge]]:
+    def get_records(
+        page: Type["RecordPage"], number_of_records: int
+    ) -> List[Type[RecordBadge]]:
         """Return section records.
-        
+
         Parameters
         ----------
         number_of_records : int
@@ -501,19 +570,20 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
         """
         if isinstance(page, User):
             return page.get_tasks(number_of_records)
-        
+
         if isinstance(page, Task):
             return page.get_derived_tasks(number_of_records)
-        
+
         # if isinstance(page, Taxon):
         #     return page.get_tasks(number_of_records)
-        
+
         raise NotImplementedError(
             "Abstract method 'get_records' should be implemented in derived class. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
-    
-class Document(DocumentInterface, RecordBadge, Section):
+
+
+class Document(DocumentInterface, RecordPage, RecordBadge, Section):
     """Concrete implementation of Document class for flask."""
 
     def __init__(self, document: DocumentTable):
@@ -549,15 +619,33 @@ class Document(DocumentInterface, RecordBadge, Section):
         """Return the document record badge."""
         return render_template("badge.html", record=self)
 
+    def can_delete(self) -> bool:
+        """Return whether the document can be deleted."""
+        if not User.is_authenticated():
+            return False
+        user = User.from_flask_session()
+        return user.is_administrator() or self.is_author(user)
+
     def delete(self):
         """Delete the document."""
-        user = User.from_flask_session()
-
-        # Either the user is the author of the document, or the user is an admin.
-        if not user.is_administrator() and not user.is_author_of(self):
+        if not self.can_delete():
             raise Unauthorized()
+        self._document.delete(session=db.session)
 
-        self._document.delete()
+    def has_pins(self) -> bool:
+        """Return whether the document has pins."""
+        return self.can_delete()
+
+    def get_pins(self) -> List[Type[Pin]]:
+        """Return pins."""
+        return [
+            DeletePin(
+                root=self.get_root(),
+                identifier=self.get_id(),
+            )
+            if self.can_delete()
+            else None
+        ]
 
     @staticmethod
     def get_section_header(page: Type[RecordPage]) -> str:
@@ -570,13 +658,13 @@ class Document(DocumentInterface, RecordBadge, Section):
 
         if isinstance(page, User):
             return "Documents created by this user"
-        
+
         if isinstance(page, Taxon):
             return "Documents associated with this taxon"
-        
+
         if isinstance(page, Task):
             return "Documents associated with this task"
-        
+
         if isinstance(page, Sample):
             return "Documents associated with this sample"
 
@@ -591,13 +679,13 @@ class Document(DocumentInterface, RecordBadge, Section):
         """Return whether the section has records."""
         if isinstance(page, User):
             return page.has_documents()
-        
+
         if isinstance(page, Taxon):
             return page.has_documents()
-        
+
         if isinstance(page, Task):
             return page.has_documents()
-        
+
         if isinstance(page, Sample):
             return page.has_documents()
 
@@ -605,11 +693,13 @@ class Document(DocumentInterface, RecordBadge, Section):
             "Abstract method 'has_records' should be implemented in derived class Document. "
             f"It was not implemented in main page {page.__class__.__name__}."
         )
-    
+
     @staticmethod
-    def get_records(page: Type["RecordPage"], number_of_records: int) -> List[Type[RecordBadge]]:
+    def get_records(
+        page: Type["RecordPage"], number_of_records: int
+    ) -> List[Type[RecordBadge]]:
         """Return section records.
-        
+
         Parameters
         ----------
         number_of_records : int
@@ -617,13 +707,13 @@ class Document(DocumentInterface, RecordBadge, Section):
         """
         if isinstance(page, User):
             return page.get_documents(number_of_records)
-        
+
         if isinstance(page, Taxon):
             return page.get_documents(number_of_records)
-        
+
         if isinstance(page, Task):
             return page.get_documents(number_of_records)
-        
+
         if isinstance(page, Sample):
             return page.get_documents(number_of_records)
 

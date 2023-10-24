@@ -9,6 +9,16 @@
 {% block content %}
     <h2><a href="{{record.get_url()}}">{{ record.get_title() }}</a></h2>
     <p>{{ record.get_description()|safe }}</p>
+    {% if record.has_pins() %}
+    {% set pins = record.get_pins() %}
+    <ul class="pins">
+        {% for pin in pins %}
+        <li class="pin">
+            {{pin.get_pin()|safe}}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     {% for section in record.get_sections() %}
         {{section.get_section_content(page=record, section_type=section)|safe}}
     {% endfor %}

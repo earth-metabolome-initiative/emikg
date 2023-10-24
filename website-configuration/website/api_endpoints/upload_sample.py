@@ -3,6 +3,8 @@ from flask import request, jsonify, session
 from alchemy_wrapper.models import DataPayload
 from ..application import app, db
 from ..models import User
+import zipfile
+import tarfile
 
 
 @app.route("/upload-sample/", methods=["POST"])
@@ -23,6 +25,27 @@ def upload_sample():
         return jsonify({"success": False, "error": "Invalid extension."})
     
     # TODO! CHECK THE INTERNAL STRUCTURE OF THE GZIP.
+
+    # Here we check, without extracting the payload, whether
+    # the compressed directory contains two directories, namely
+    # "msdata" and "metadata".
+
+    if sample_file.mimetype == "application/zip":
+        with zipfile.ZipFile(sample_file) as zip_file:
+            if "msdata/" not in zip_file.namelist():
+                return jsonify({"success": False, "error": "Invalid zip payload, no msdata directory.", "directories": zip_file.namelist()})
+            if "metadata/" not in zip_file.namelist():
+                return jsonify({"success": False, "error": "Invalid zip payload, no metadata directory."})
+            if "msdata/processed/" not in zip_file.namelist():
+                return jsonify({"success": False, "error": "Invalid zip payload, no msdata/processed directory."})
+    elif sample_file.mimetype == "application/gzip":
+        with tarfile.open(sample_file) as tar_file:
+            if "msdata/" not in tar_file.getnames():
+                return jsonify({"success": False, "error": "Invalid gzip payload, no msdata directory."})
+            if "metadata/" not in tar_file.getnames():
+                return jsonify({"success": False, "error": "Invalid gzip payload, no metadata directory."})
+            if "msdata/processed/" not in tar_file.getnames():
+                return jsonify({"success": False, "error": "Invalid gzip payload, no msdata/processed directory."})
 
     # We create a data payload.
     data_payload = DataPayload.new_data_payload(

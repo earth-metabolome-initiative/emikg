@@ -97,4 +97,5 @@ class ORCID(Base):
             session.commit()
         else:
             user = User.from_id(orcid.user_id, session=session)
+            
         return user

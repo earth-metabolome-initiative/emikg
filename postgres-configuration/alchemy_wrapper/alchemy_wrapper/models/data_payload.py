@@ -20,9 +20,9 @@ class DataPayload(Base, TaskInterface):
 
     id = Column(Integer, primary_key=True)
     # The user who uploaded the file.
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"), nullable=False)
     # The task associated with the payload.
-    task_id = Column(Integer, ForeignKey(Task.id), nullable=False)
+    task_id = Column(Integer, ForeignKey(Task.id, ondelete="CASCADE"), nullable=False)
     # The time when the payload was created.
     created_at = Column(DateTime, nullable=False, default=func.now())
     # The extension of the file.

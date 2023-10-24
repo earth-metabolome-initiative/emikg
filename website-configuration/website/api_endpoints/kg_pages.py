@@ -152,4 +152,5 @@ def home_page(lang: str = "en"):
     return render_template(
         "home.html",
         lang=lang,
+        user=User.from_flask_session() if User.is_authenticated() else None,
     )
