@@ -16,10 +16,11 @@ def kg_page(
     session['lang'] = lang
     if identifier is None:
         record = record_class.get_default()
-    try:
-        record = record_class.from_id(identifier)
-    except IdentifierNotFound:
-        return redirect(f"/{lang}/", code=302)
+    else:
+        try:
+            record = record_class.from_id(identifier)
+        except IdentifierNotFound:
+            return redirect(f"/{lang}/", code=302)
 
     if User.is_authenticated():
         user = User.from_flask_session()

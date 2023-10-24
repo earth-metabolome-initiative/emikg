@@ -607,6 +607,21 @@ class Task(Base, TaskInterface):
     def is_pending(self) -> bool:
         """Return whether the task is pending."""
         return self.status == "PENDING"
+    
+    @staticmethod
+    def is_empty(session: Type[Session]) -> bool:
+        """Return whether the table is empty."""
+        return session.query(Task).first() is None
+
+    @staticmethod
+    def get_tasks(session: Type[Session], number_of_records: int) -> List["Task"]:
+        """Return list of tasks."""
+        return (
+            session.query(Task)
+            .order_by(Task.updated_at.desc())
+            .limit(number_of_records)
+            .all()
+        )
 
     def has_parent_task(self, session: Type[Session]) -> bool:
         """Return whether the task has a parent task."""

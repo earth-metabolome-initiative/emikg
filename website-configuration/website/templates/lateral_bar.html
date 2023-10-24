@@ -1,36 +1,14 @@
 <ul id="LateralBar">
     <li>
         <ul>
-            <li><a href="/{{ lang }}/taxons">Taxons</a></li>
-            <li><a href="/{{ lang }}/taxons/new">Create new taxon</a></li>
-            <li><a href="/{{ lang }}/taxons/search">Search taxon</a></li>
-        </ul>
-    </li>
-    <li>
-        <ul>
-            <li><a href="/{{ lang }}/samples">Samples</a></li>
-            <li><a href="/{{ lang }}/samples/new">Create new sample</a></li>
-            <li><a href="/{{ lang }}/samples/search">Search sample</a></li>
-        </ul>
-    </li>
-    <li>
-        <ul>
-            <li><a href="/{{ lang }}/specters">Specter</a></li>
-            <li><a href="/{{ lang }}/specters/new">Add new specter</a></li>
-            <li><a href="/{{ lang }}/specters/search">Search specter</a></li>
-        </ul>
-    </li>
-    <li>
-        <ul>
-            <li><a href="/{{ lang }}/users">Users</a></li>
-            <li><a href="/{{ lang }}/users/search">Search user</a></li>
+            <li><a href="/{{ lang }}/tasks">Tasks</a></li>
+            <li><a href="/{{ lang }}/upload">New pipeline task</a></li>
         </ul>
     </li>
     {% if user %}
     <li>
         <ul>
-            <li><a href="/{{ lang }}/users/{userid}">Myself</a></li>
-            <li><a href="/{{ lang }}/settings">Settings</a></li>
+            <li><a href="{{user.get_url()}}">Myself</a></li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </li>

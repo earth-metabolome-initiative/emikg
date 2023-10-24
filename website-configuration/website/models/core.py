@@ -28,6 +28,45 @@ from .section import (
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
 from ..application import db
 
+class Tasks(Section, RecordPage):
+
+    @staticmethod
+    def get_root() -> str:
+        """Return the root of the page."""
+        return Task.get_root()
+
+    def get_title(self) -> str:
+        """Return the title of the user."""
+        return "Tasks"
+    
+    def get_url(self) -> str:
+        """Return the URL of the user."""
+        lang = session.get("lang", "en")
+        return f"/{lang}/{self.get_root()}"
+    
+    def get_description(self) -> str:
+        """Return the description of the user."""
+        return "In this page you can see the recent tasks. <a href='/upload/'>You can create a new upload task here.</a>"
+    
+    def has_pins(self) -> bool:
+        """Return whether the user has pins."""
+        return False
+    
+    def get_sections(self) -> List[Section]:
+        return [Task]
+    
+    def has_tasks(self) -> bool:
+        """Return whether there are tasks in the DB."""
+        return not TaskTable.is_empty(session=db.session)
+    
+    def get_tasks(self, number_of_records: int = 10) -> List[TaskInterface]:
+        """Return the tasks of the user."""
+        return [
+            Task(task)
+            for task in TaskTable.get_tasks(
+                session=db.session, number_of_records=number_of_records
+            )
+        ]
 
 class User(UserInterface, RecordPage, Section):
     """Concrete implementation of the user interface for Flask."""
@@ -392,12 +431,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
     def get_description(self) -> str:
         """Return the description of the task."""
-        restart_text = (
-            f"You can restart this task by clicking <a href='/tasks/restart/{self.get_id()}'>here</a>."
-            if self.has_failed()
-            else ""
-        )
-        return f"{self._task.get_description(session=db.session)}, " f"{restart_text}"
+        return self._task.get_description(session=db.session)
 
     def get_status(self) -> str:
         """Return the status of the task."""
@@ -422,6 +456,11 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def has_pins(self) -> bool:
         """Return whether the task has pins."""
         return True
+    
+    @staticmethod
+    def get_default() -> Tasks:
+        """Return the default task page."""
+        return Tasks()
 
     def _dispatch_status_pin(self) -> Type[Pin]:
         """Return the status pin."""
@@ -463,7 +502,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     @staticmethod
     def get_section_header(page: Type[RecordPage]) -> str:
         """Return the user section header."""
-        return "Tasks"
+        return "The following are up to the 10 most recent tasks."
 
     def get_sections(self) -> List[Section]:
         """Return sections."""
@@ -515,6 +554,9 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
         if isinstance(page, Task):
             return "Derived tasks"
+        
+        if isinstance(page, Tasks):
+            return "Recent tasks"
 
         raise NotImplementedError(
             "Abstract method 'get_section_title' should be "
@@ -542,6 +584,9 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
         if isinstance(page, Task):
             return page.has_derived_tasks()
+        
+        if isinstance(page, Tasks):
+            return page.has_tasks()
 
         raise NotImplementedError(
             "Abstract method 'has_records' should be implemented in derived class Task. "
@@ -573,6 +618,9 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
         if isinstance(page, Task):
             return page.get_derived_tasks(number_of_records)
+        
+        if isinstance(page, Tasks):
+            return page.get_tasks(number_of_records)
 
         # if isinstance(page, Taxon):
         #     return page.get_tasks(number_of_records)
