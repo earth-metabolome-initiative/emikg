@@ -1,3 +1,8 @@
+div.search-results-wrapper {
+    overflow-y: scroll;
+    max-height: 200px;
+}
+
 ul.search-results{
     list-style-type: none;
     padding: 0;
@@ -7,12 +12,8 @@ ul.search-results{
     width: 100%;
     min-width: 100%;
     background-color: #fff;
-    border: 1px solid #aa9639;
-    max-height: 200px;
-    overflow-y: scroll;
-    border-radius: 0.5em;
     margin-top: 1em;
-    columns: 2;
+    column-count: 2;
 }
 
 ul.autocomplete-search {
@@ -21,8 +22,11 @@ ul.autocomplete-search {
 
 ul.search-results li{
     padding: 0.5em;
+    border-radius: 0.5em;
+    margin-top: 0.1em;
     break-inside: avoid-column;
     cursor: pointer;
+    border: 1px solid #aa9639;
     transition: background-color 0.1s ease-in-out;
 }
 

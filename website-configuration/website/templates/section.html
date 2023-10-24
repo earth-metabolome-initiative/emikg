@@ -2,11 +2,13 @@
     <h3>{{ section.get_section_title(page) }}</h3>
     <p>{{ section.get_section_header(page) }}</p>
     {% if section.has_records(page) %}
-        <ul class="search-results">
-            {% for record in section.get_records(page, 10) %}
-            {{ record.get_record_badge()|safe }}
-            {% endfor %}
-        </ul>
+        <div class="search-results-wrapper">
+            <ul class="search-results">
+                {% for record in section.get_records(page, 10) %}
+                {{ record.get_record_badge()|safe }}
+                {% endfor %}
+            </ul>
+        </div>
     {% else %}
         <p>No records found.</p>
     {% endif %}
