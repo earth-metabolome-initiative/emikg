@@ -67,7 +67,7 @@ def upload_sample():
     # We create a data payload.
     data_payload = DataPayload.new_data_payload(
         user,
-        extension=extension,
+        extension="zip",
         session=db.session
     )
     task = data_payload.get_task(session=db.session)

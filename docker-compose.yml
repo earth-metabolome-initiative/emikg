@@ -10,8 +10,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      FLASK_PORT: ${FLASK_PORT}
     ports:
-      - "4000:5000"
+      - "${FLASK_PORT}:${FLASK_PORT}"
     depends_on:
       - postgres_database
     volumes:
