@@ -1,9 +1,10 @@
 """Endpoint to upload samples."""
+import zipfile
 from flask import request, jsonify, session
+from werkzeug.datastructures import FileStorage
 from alchemy_wrapper.models import DataPayload
 from ..application import app, db
 from ..models import User
-import zipfile
 
 
 @app.route("/upload-sample/", methods=["POST"])
@@ -12,7 +13,7 @@ def upload_sample():
     # Get the user.
     user = User.from_flask_session()
     # Get the sample file.
-    sample_file = request.files.get("file")
+    sample_file: FileStorage = request.files.get("file")
     # We check if the file has a correct mimetype.
     # It can either be gzip or zip.
     if sample_file.mimetype not in ("application/zip", ):
@@ -23,13 +24,12 @@ def upload_sample():
     if extension not in ("zip", ):
         return jsonify({"success": False, "error": "Invalid extension."})
     
-    # TODO! CHECK THE INTERNAL STRUCTURE OF THE GZIP.
-
-    # Here we check, without extracting the payload, whether
-    # the compressed directory contains two directories, namely
-    # "msdata" and "metadata".
-
+    # Run test to see if the zip file is valid.
     with zipfile.ZipFile(sample_file) as zip_file:
+
+        if zip_file.testzip() is not None:
+            return jsonify({"success": False, "error": "Invalid zip payload."})
+
         if "msdata/" not in zip_file.namelist():
             return jsonify({"success": False, "error": "Invalid zip payload, no msdata directory.", "directories": zip_file.namelist()})
         if "metadata/" not in zip_file.namelist():
@@ -74,6 +74,7 @@ def upload_sample():
     url = task.get_url()
 
     # We save the file to the unsafe subdirectory.
+    sample_file.stream.seek(0)
     sample_file.save(data_payload.get_unsafe_path())
 
     lang = session.get("lang", "en")
