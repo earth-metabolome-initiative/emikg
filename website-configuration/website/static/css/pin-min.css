@@ -1,3 +1,11 @@
+ul.pins {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    transition: all 0.1s ease-in-out;
+}
+
 li.pin {
     display: inline-block;
     margin: 0.1em;

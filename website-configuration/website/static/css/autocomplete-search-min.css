@@ -12,7 +12,6 @@ ul.search-results{
     width: 100%;
     min-width: 100%;
     background-color: #fff;
-    margin-top: 1em;
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;
@@ -32,6 +31,16 @@ ul.search-results > li{
     cursor: pointer;
     border: 1px solid #aa9639;
     transition: background-color 0.1s ease-in-out;
+}
+
+ul.search-results > li h4 {
+    margin: 0;
+}
+
+ul.search-results > li p {
+    padding: 0.2em 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 ul.search-results > li h4 a{

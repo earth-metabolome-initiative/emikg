@@ -1,5 +1,17 @@
 .form-container form {
     padding: 1em;
+    box-sizing: border-box;
+}
+
+fieldset {
+    box-sizing: border-box;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+input, label {
+    box-sizing: border-box;
 }
 
 .form-container form::after {
@@ -14,6 +26,13 @@
 
 .form-container form p.flex {
     display: flex;
+}
+
+.form-container img {
+    max-width: 90%;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 1em;
 }
 
 .form-container form label {

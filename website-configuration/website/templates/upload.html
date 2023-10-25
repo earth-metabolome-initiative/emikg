@@ -4,6 +4,31 @@
 <div class="form-container">
     <form action="/upload-sample/" method="POST">
         <h2>Create new complete pipeline task</h2>
+        <p>Upload a zip file containing the following directories:</p>
+        <!-- <ul>
+            <li>metadata</li>
+            <ul>
+                <li>*_lcms_params.txt: </li>
+                <li>*_metadata.tsv: </li>
+                <li>*_mzmine_params.xml: </li>
+            </ul>
+            <li>msdata</li>
+            <ul>
+                <li>raw</li>
+                <ul>
+                    <li>*.mzML</li>
+                </ul>
+                <li>processed</li>
+                <ul>
+                    <li>*.mgf</li>
+                    <li>*_sirius.mgf</li>
+                    <li>*_quant.csv</li>
+                </ul>
+            </ul>
+        </ul> -->
+        
+        <img src="/static/img/emikg_directory.png" alt="">
+
         <fieldset>
             <label for="file" class="hide-before-send dropzone">Select or drop a sample
                 <input class="validate" name="file" type="file" mime-type="application/zip,application/gzip">

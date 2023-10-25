@@ -448,6 +448,10 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def has_started(self) -> bool:
         """Return whether the task is running."""
         return self._task.has_started()
+    
+    def has_completed(self) -> bool:
+        """Return whether the task has completed."""
+        return self.has_failed() or self.has_succeeded()
 
     def is_pending(self) -> bool:
         """Return whether the task is pending."""
