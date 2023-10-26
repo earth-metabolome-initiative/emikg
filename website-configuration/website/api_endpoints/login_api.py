@@ -33,7 +33,7 @@ def orcid_logged_in(orcid_blueprint, token):
     """Internal route to handle the ORCID OAuth callback."""
     app.logger.info("Logging attempt")
     if not token:
-        flash("Failed to log in.", category="error")
+        app.logger.info("Failed to log in.", category="error")
         return False
 
     # get the orcid id information
@@ -44,7 +44,7 @@ def orcid_logged_in(orcid_blueprint, token):
     response = orcid_blueprint.session.get(f"{orcid_user_id}/record")
 
     if not response.ok:
-        flash("Failed to get ORCID User Data", category="error")
+        app.logger.info("Failed to get ORCID User Data", category="error")
         return False
 
     orcid_record = response.json()
