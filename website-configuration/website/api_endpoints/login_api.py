@@ -19,7 +19,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
-    scope=["/authenticate", "/read-limited"],
+    scope="/authenticate",
     authorized_url="/login/orcid/callback",
 )
 
@@ -44,7 +44,7 @@ def orcid_logged_in(orcid_blueprint, token):
     response = orcid_blueprint.session.get(f"{orcid_user_id}/record")
 
     if not response.ok:
-        app.logger.info("Failed to get ORCID User Data")
+        app.logger.info("Failed to get ORCID User Data associated to %s", orcid_user_id)
         return False
 
     orcid_record = response.json()
