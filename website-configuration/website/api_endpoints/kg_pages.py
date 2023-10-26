@@ -150,6 +150,7 @@ def users_page(lang: str = "en", identifier: Optional[int] = None):
 @app.route("/<lang>/")
 def home_page(lang: str = "en"):
     """Load the taxons page."""
+    app.logger.info("Landed on root")
     return render_template(
         "home.html",
         lang=lang,

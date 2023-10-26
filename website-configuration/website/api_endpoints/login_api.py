@@ -31,6 +31,7 @@ app.register_blueprint(
 @oauth_authorized.connect_via(blueprint)
 def orcid_logged_in(orcid_blueprint, token):
     """Internal route to handle the ORCID OAuth callback."""
+    app.logger.info("Logging attempt")
     if not token:
         flash("Failed to log in.", category="error")
         return False
