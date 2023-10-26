@@ -8,6 +8,7 @@ import os
 from flask import redirect, jsonify
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.orcid import make_orcid_blueprint
+
 # from flask_login import logout_user
 from ..application import app
 from ..models import User
@@ -26,12 +27,13 @@ app.register_blueprint(
     blueprint,
 )
 
+
 @oauth_authorized.connect_via(blueprint)
 def orcid_logged_in(orcid_blueprint, token):
     """Internal route to handle the ORCID OAuth callback."""
-    if not orcid_blueprint.authorized:
-        return jsonify({"success": False, "error": "Authorization failed."})
-    
+    # if not orcid_blueprint.authorized:
+    #     return jsonify({"success": False, "error": "Authorization failed."})
+
     return token
 
     # Retrieve the ORCID ID of the authenticated user
@@ -43,15 +45,18 @@ def orcid_logged_in(orcid_blueprint, token):
 
     return redirect("/upload")
 
+
 @oauth_authorized.connect
 def redirect_to_next_url(orcid_blueprint, token):
     """Redirect to the next URL."""
     return redirect("/upload")
 
+
 @oauth_error.connect_via(blueprint)
 def orcid_error(orcid_blueprint, **kwargs):
     """Internal route to handle the ORCID OAuth error."""
     return jsonify({"success": False, "error": "Authorization failed."})
+
 
 # Logout route to clear the session
 @app.route("/logout")
