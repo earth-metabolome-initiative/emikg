@@ -19,7 +19,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
-    scope="/authenticate,/read-limited",
+    scope="/read-limited",
     authorized_url="/login/orcid/callback",
 )
 
