@@ -38,7 +38,7 @@ def orcid_callback():
     # Retrieve the token from ORCID
     response = orcid.get("/authenticate")
 
-    return f"Status: {orcid.authorized} The object is of type: {type(response)}, {str(response)}, {response.__class__.__name__}}"
+    return f"Status: {orcid.authorized} The object is of type: {type(response)}, {str(response)}, {response.__class__.__name__}"
 
     # Retrieve the ORCID ID of the authenticated user
     # resp = orcid.get('orcid', token=token)
