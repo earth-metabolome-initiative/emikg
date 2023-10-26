@@ -53,7 +53,10 @@ def orcid_logged_in(orcid_blueprint, token):
     # to be extracted from the token prior to making any requests
     orcid_user_id = token['orcid']
 
-    response: Response = orcid_blueprint.session.get(f"{orcid_user_id}/person")
+    response: Response = orcid_blueprint.session.get(
+        f"{orcid_user_id}/person",
+        headers={"Authorization": f"Bearer {token['access_token']}"}
+    )
 
     if not response.ok:
         app.logger.info(
