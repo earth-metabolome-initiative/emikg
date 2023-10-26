@@ -7,6 +7,7 @@ The API is implemented using authlib's OAuth 2.0 framework.
 import os
 from flask import redirect, jsonify
 from flask_dance.contrib.orcid import make_orcid_blueprint, orcid
+from flask_login import logout_user
 from ..application import app
 from ..models import User
 
@@ -34,9 +35,7 @@ def orcid_callback():
     if not orcid.authorized:
         return jsonify({"success": False, "error": "Authorization failed."})
     
-    response = orcid.get("/read-public")
-
-    return response.text
+    return orcid.token["access_token"]
 
     # Retrieve the ORCID ID of the authenticated user
     # resp = orcid.get('orcid', token=token)
