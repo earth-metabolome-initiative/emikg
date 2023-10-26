@@ -8,6 +8,7 @@ import os
 from flask import redirect, session, flash
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.orcid import make_orcid_blueprint
+from requests import Response
 
 # from flask_login import logout_user
 from ..application import app
@@ -41,10 +42,12 @@ def orcid_logged_in(orcid_blueprint, token):
     # to be extracted from the token prior to making any requests
     orcid_user_id = token['orcid']
 
-    response = orcid_blueprint.session.get(f"{orcid_user_id}/person")
+    response: Response = orcid_blueprint.session.get(f"{orcid_user_id}/person")
 
     if not response.ok:
-        app.logger.info("Failed to get ORCID User Data associated to %s", orcid_user_id)
+        app.logger.info(
+            "Failed to get ORCID User Data associated to %s, status: %s, url: %s", orcid_user_id, response.status_code, response.url
+        )
         return False
 
     orcid_record = response.json()
