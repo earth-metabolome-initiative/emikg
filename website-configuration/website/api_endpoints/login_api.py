@@ -9,10 +9,20 @@ from flask import redirect, session, flash
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.orcid import make_orcid_blueprint
 from requests import Response
+from flask_dance.consumer.requests import OAuth2Session
 
 # from flask_login import logout_user
 from ..application import app
 from ..models import User
+
+
+class JsonOath2Session(OAuth2Session):
+    def __init__(self, *args, **kwargs):
+        """
+          custom json session to ensure we are getting back json from orchid
+        """
+        super(JsonOath2Session, self).__init__(*args, **kwargs)
+        self.headers["Accept"] = "application/orcid+json"
 
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -22,6 +32,7 @@ blueprint = make_orcid_blueprint(
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
     scope="/authenticate",
     authorized_url="/login/orcid/callback",
+    session_class=JsonOath2Session
 )
 
 app.register_blueprint(
