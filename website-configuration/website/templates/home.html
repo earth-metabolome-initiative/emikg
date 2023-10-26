@@ -6,7 +6,7 @@
         {% if user %}
             <p>You are logged in as <a href="{{user.get_url()}}">{{ user.get_name() }}</a>. You can upload new experiments <a href="/{{lang}}/upload">here</a>.</p>
         {% else %}
-            <p>Login by clicking here: <a href="{{ url_for('orcid_login') }}" class="btn btn-primary">Login</a></p>
+            <p>Login by clicking here: <a href="{{ url_for('orcid.login') }}" class="btn btn-primary">Login</a></p>
         {% endif %}
     </div>
 {% endblock %}

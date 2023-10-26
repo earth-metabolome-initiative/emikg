@@ -40,12 +40,6 @@ def orcid_callback():
 
     return redirect("/upload")
 
-# Login route to initiate ORCID OAuth
-# @app.route('/login/orcid', methods=['GET'])
-# def orcid_login():
-#     """Login route to initiate ORCID OAuth."""
-#     return redirect("/login/orcid/callback")
-
 # Logout route to clear the session
 @app.route('/logout')
 def logout():
