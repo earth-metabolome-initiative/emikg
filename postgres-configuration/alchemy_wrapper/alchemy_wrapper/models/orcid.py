@@ -70,7 +70,13 @@ class ORCID(Base):
         return User.from_id(orcid.user_id, session=session)
     
     @staticmethod
-    def get_or_insert_user_from_orcid(orcid_code: str, session: Type[Session]) -> User:
+    def get_or_insert_user_from_orcid(
+        orcid_code: str,
+        first_name: str,
+        last_name: str,
+        email: str,
+        session: Type[Session]
+    ) -> User:
         """Get user ID associated with the ORCID.
 
         Parameters
@@ -86,9 +92,9 @@ class ORCID(Base):
         orcid = ORCID.from_orcid(orcid_code, session=session)
         if orcid is None:
             user = User(
-                first_name="John",
-                last_name="Wick",
-                email="john@wick.com",
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
             )
             session.add(user)
             session.flush()

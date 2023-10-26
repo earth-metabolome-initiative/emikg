@@ -93,7 +93,12 @@ class User(UserInterface, RecordPage, Section):
             User.logout()
 
     @staticmethod
-    def from_orcid(orcid: str) -> "User":
+    def from_orcid(
+        orcid: str,
+        first_name: str,
+        last_name: str,
+        email: str,
+    ) -> "User":
         """Return a user object from an ORCID.
 
         Parameters
@@ -120,7 +125,13 @@ class User(UserInterface, RecordPage, Section):
             raise APIException("User is already logged in.")
 
         # We check whether the ORCID exists in the orcid table of the database.
-        user = ORCID.get_or_insert_user_from_orcid(orcid, session=db.session)
+        user = ORCID.get_or_insert_user_from_orcid(
+            orcid,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            session=db.session
+        )
 
         # We add the user ID to the Flask session.
         session["user_id"] = user.id
