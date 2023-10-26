@@ -39,7 +39,7 @@
         </div>
         {% else %}
         <!-- Otherwise, we show the login button. -->
-        <a href="/login/orcid" class="signup-button" id="loginBtn">
+        <a href="{{ url_for('orcid.login') }}" class="signup-button" id="loginBtn">
             <i class="fa-brands fa-orcid"></i>
             ORCID Login
         </a>
