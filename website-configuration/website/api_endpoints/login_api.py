@@ -5,7 +5,7 @@ Implementative details
 The API is implemented using authlib's OAuth 2.0 framework.
 """
 import os
-from flask import redirect, jsonify
+from flask import redirect, jsonify, session
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.orcid import make_orcid_blueprint
 
@@ -21,6 +21,7 @@ blueprint = make_orcid_blueprint(
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
     scope="/authenticate",
     authorized_url="/login/orcid/callback",
+    redirect_to="orcid_logged_in"
 )
 
 app.register_blueprint(
@@ -52,10 +53,14 @@ def redirect_to_next_url(orcid_blueprint, token):
     return token
 
 
-@oauth_error.connect_via(blueprint)
-def orcid_error(orcid_blueprint, **kwargs):
-    """Internal route to handle the ORCID OAuth error."""
-    return jsonify({"success": False, "error": "Authorization failed."})
+@oauth_error.connect
+def orcid_error(orcid_blueprint, error, error_description, error_uri):
+    print("in oauth_error")
+    print(error)
+    print(error_description)
+    print(error_uri)
+
+    session['orcid_status'] = error
 
 
 # Logout route to clear the session
