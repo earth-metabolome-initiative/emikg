@@ -6,7 +6,8 @@ The API is implemented using authlib's OAuth 2.0 framework.
 """
 import os
 from flask import redirect, jsonify
-from flask_dance.contrib.orcid import make_orcid_blueprint, orcid
+from flask_dance.consumer import oauth_authorized, oauth_error
+from flask_dance.contrib.orcid import make_orcid_blueprint
 # from flask_login import logout_user
 from ..application import app
 from ..models import User
@@ -17,25 +18,20 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
-    scope="/read-public",
-    redirect_to="orcid_callback",
     authorized_url="/login/orcid/callback",
-    sandbox=False,
 )
 
 app.register_blueprint(
     blueprint,
 )
 
-
-@app.route("/login/orcid/callback")
-@app.route("/login/orcid/callback/", methods=["GET",])
-def orcid_callback():
+@oauth_authorized.connect_via(blueprint)
+def orcid_logged_in(orcid_blueprint, token):
     """Internal route to handle the ORCID OAuth callback."""
-    if not orcid.authorized:
+    if not orcid_blueprint.authorized:
         return jsonify({"success": False, "error": "Authorization failed."})
     
-    return orcid.token["access_token"]
+    return token
 
     # Retrieve the ORCID ID of the authenticated user
     # resp = orcid.get('orcid', token=token)
@@ -46,6 +42,15 @@ def orcid_callback():
 
     return redirect("/upload")
 
+@oauth_authorized.connect
+def redirect_to_next_url(orcid_blueprint, token):
+    """Redirect to the next URL."""
+    return redirect("/upload")
+
+@oauth_error.connect_via(blueprint)
+def orcid_error(orcid_blueprint, **kwargs):
+    """Internal route to handle the ORCID OAuth error."""
+    return jsonify({"success": False, "error": "Authorization failed."})
 
 # Logout route to clear the session
 @app.route("/logout")
