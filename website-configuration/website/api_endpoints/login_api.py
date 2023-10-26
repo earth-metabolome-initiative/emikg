@@ -23,6 +23,7 @@ class JsonOath2Session(OAuth2Session):
         """
         super(JsonOath2Session, self).__init__(*args, **kwargs)
         self.headers["Accept"] = "application/orcid+json"
+        self.headers["Authorization"] = f"Bearer {self.token['access_token']}"
 
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -55,7 +56,6 @@ def orcid_logged_in(orcid_blueprint, token):
 
     response: Response = orcid_blueprint.session.get(
         f"{orcid_user_id}/person",
-        headers={"Authorization": f"Bearer {token['access_token']}"}
     )
 
     if not response.ok:
