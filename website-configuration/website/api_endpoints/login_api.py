@@ -9,9 +9,10 @@ from flask import redirect, jsonify
 from flask_dance.contrib.orcid import make_orcid_blueprint, orcid
 from ..application import app
 from ..models import User
+
 # from ..oauth import orcid  # Import your Authlib OAuth instance
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
@@ -19,23 +20,23 @@ blueprint = make_orcid_blueprint(
     scope="openid",
     redirect_to="orcid_callback",
     authorized_url="/login/orcid/callback",
-    sandbox=False
+    sandbox=False,
 )
 
-app.register_blueprint(blueprint, )
+app.register_blueprint(
+    blueprint,
+)
 
-@app.route('/login/orcid/callback')
-@app.route('/login/orcid/callback/')
+
+@app.route("/login/orcid/callback")
+@app.route("/login/orcid/callback/")
 def orcid_callback():
     """Internal route to handle the ORCID OAuth callback."""
-    return jsonify({
-        "success": True,
-    })
     if not orcid.authorized:
         return jsonify({"success": False, "error": "Authorization failed."})
-    
+
     # Retrieve the token from ORCID
-    response = orcid.get('oauth/token')
+    response = orcid.get("oauth/token")
 
     return jsonify(response.json())
 
@@ -48,8 +49,9 @@ def orcid_callback():
 
     return redirect("/upload")
 
+
 # Logout route to clear the session
-@app.route('/logout')
+@app.route("/logout")
 def logout():
     """Logout route to clear the session."""
     User.logout()
