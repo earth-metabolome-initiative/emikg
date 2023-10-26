@@ -21,7 +21,6 @@ blueprint = make_orcid_blueprint(
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
     scope="/authenticate",
     authorized_url="/login/orcid/callback",
-    redirect_to="orcid_logged_in"
 )
 
 app.register_blueprint(
