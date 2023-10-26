@@ -10,14 +10,13 @@ from flask_dance.contrib.orcid import make_orcid_blueprint, orcid
 from ..application import app
 from ..models import User
 
-# from ..oauth import orcid  # Import your Authlib OAuth instance
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
-    scope="/authenticate",
+    scope="/read-public",
     redirect_to="orcid_callback",
     authorized_url="/login/orcid/callback",
     sandbox=False,
@@ -29,16 +28,15 @@ app.register_blueprint(
 
 
 @app.route("/login/orcid/callback")
-@app.route("/login/orcid/callback/")
+@app.route("/login/orcid/callback/", methods=["GET",])
 def orcid_callback():
     """Internal route to handle the ORCID OAuth callback."""
     if not orcid.authorized:
         return jsonify({"success": False, "error": "Authorization failed."})
+    
+    response = orcid.get("/read-public")
 
-    # Retrieve the token from ORCID
-    response = orcid.get("/authenticate")
-
-    return f"Status: {response.status_code} {response.text}"
+    return jsonify(response.json())
 
     # Retrieve the ORCID ID of the authenticated user
     # resp = orcid.get('orcid', token=token)
