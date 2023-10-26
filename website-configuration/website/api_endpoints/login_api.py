@@ -24,6 +24,7 @@ blueprint = make_orcid_blueprint(
 app.register_blueprint(blueprint, )
 
 @app.route('/login/orcid/callback')
+@app.route('/login/orcid/callback/')
 def orcid_callback():
     """Internal route to handle the ORCID OAuth callback."""
     return jsonify({
