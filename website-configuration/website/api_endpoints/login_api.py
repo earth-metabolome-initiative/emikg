@@ -11,6 +11,8 @@ from ..application import app
 from ..models import User
 # from ..oauth import orcid  # Import your Authlib OAuth instance
 
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
