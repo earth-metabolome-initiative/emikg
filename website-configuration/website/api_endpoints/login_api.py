@@ -22,8 +22,8 @@ class JsonOath2Session(OAuth2Session):
           custom json session to ensure we are getting back json from orchid
         """
         super(JsonOath2Session, self).__init__(*args, **kwargs)
-        self.headers["Accept"] = "application/orcid+json"
-        self.headers["Authorization"] = f"Bearer {self.token['access_token']}"
+        self.headers["Content-Type"] = "application/orcid+json"
+        self.headers["Authorization"] = f"{self.token['access_token']}"
 
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
