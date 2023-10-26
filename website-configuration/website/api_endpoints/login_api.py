@@ -49,7 +49,7 @@ def orcid_logged_in(orcid_blueprint, token):
 @oauth_authorized.connect
 def redirect_to_next_url(orcid_blueprint, token):
     """Redirect to the next URL."""
-    return redirect("/upload")
+    return token
 
 
 @oauth_error.connect_via(blueprint)
