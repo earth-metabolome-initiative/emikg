@@ -7,7 +7,7 @@ The API is implemented using authlib's OAuth 2.0 framework.
 import os
 from flask import redirect, jsonify
 from flask_dance.contrib.orcid import make_orcid_blueprint, orcid
-from flask_login import logout_user
+# from flask_login import logout_user
 from ..application import app
 from ..models import User
 
