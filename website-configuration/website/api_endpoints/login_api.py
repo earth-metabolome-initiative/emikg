@@ -15,10 +15,10 @@ blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
     scope="openid profile",
-    redirect_to="/login/orcid/callback",
+    authorized_url="callback",
 )
 
-app.register_blueprint(blueprint, url_prefix="/login/orcid")
+app.register_blueprint(blueprint, url_prefix="/login/orcid/")
 
 @app.route('/login/orcid/callback')
 def orcid_callback():
