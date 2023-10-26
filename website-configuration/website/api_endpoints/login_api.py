@@ -36,7 +36,7 @@ def orcid_callback():
     
     response = orcid.get("/read-public")
 
-    return jsonify(response.json())
+    return response.text
 
     # Retrieve the ORCID ID of the authenticated user
     # resp = orcid.get('orcid', token=token)
