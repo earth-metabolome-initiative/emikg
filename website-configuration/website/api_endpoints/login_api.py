@@ -23,7 +23,7 @@ class JsonOath2Session(OAuth2Session):
         """
         super(JsonOath2Session, self).__init__(*args, **kwargs)
         self.headers["Content-Type"] = "application/orcid+json"
-        self.headers["Authorization"] = f"{self.token['access_token']}"
+        self.headers["Authorization"] = f"Bearer {self.token['access_token']}"
 
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -60,7 +60,7 @@ def orcid_logged_in(orcid_blueprint, token):
 
     if not response.ok:
         app.logger.info(
-            "Failed to get ORCID User Data associated to %s, status: %s, url: %s, header: %s", orcid_user_id, response.status_code, response.url, response.headers
+            "Failed to get ORCID User Data associated to %s, status: %s, url: %s, header: %s, access token: %s", orcid_user_id, response.status_code, response.url, response.headers, token['access_token']
         )
         return False
 
