@@ -5,8 +5,8 @@ services:
       context: ./
       dockerfile: ./website-configuration/Dockerfile
     environment:
-      YOUR_ORCID_CLIENT_ID: ${YOUR_ORCID_CLIENT_ID}
-      YOUR_ORCID_CLIENT_SECRET: ${YOUR_ORCID_CLIENT_SECRET}
+      ORCID_CLIENT_ID: ${ORCID_CLIENT_ID}
+      ORCID_CLIENT_SECRET: ${ORCID_CLIENT_SECRET}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
