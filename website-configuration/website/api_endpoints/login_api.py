@@ -5,7 +5,7 @@ Implementative details
 The API is implemented using authlib's OAuth 2.0 framework.
 """
 import os
-from flask import redirect, jsonify, session, flash
+from flask import redirect, session, flash
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.orcid import make_orcid_blueprint
 
@@ -53,7 +53,6 @@ def orcid_logged_in(orcid_blueprint, token):
     first_name = orcid_person['name']['given-names']['value']
     last_name = orcid_person['name']['family-name']['value']
 
-    
     _user = User.from_orcid(
         orcid=orcid_user_id,
         first_name=first_name,
@@ -64,10 +63,10 @@ def orcid_logged_in(orcid_blueprint, token):
     return redirect("/upload")
 
 
-@oauth_authorized.connect
-def redirect_to_next_url(orcid_blueprint, token):
-    """Redirect to the next URL."""
-    return token
+# @oauth_authorized.connect
+# def redirect_to_next_url(orcid_blueprint, token):
+#     """Redirect to the next URL."""
+#     return token
 
 
 @oauth_error.connect
