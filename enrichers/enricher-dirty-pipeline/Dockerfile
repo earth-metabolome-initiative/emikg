@@ -45,8 +45,8 @@ COPY postgres-configuration/alchemy_wrapper /app/alchemy_wrapper
 COPY emikg_interfaces /app/emikg_interfaces
 
 # TEMPORARY STEP, TO BE REMOVED AND IMPROVED!!!
-# COPY enrichers/enricher-dirty-pipeline/230106_frozen_metadata.csv.gz /app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_metadata/230106_frozen_metadata.csv.gz
-# COPY enrichers/enricher-dirty-pipeline/isdb_pos_cleaned.pkl /app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_spectra/isdb_pos_cleaned.pkl
+COPY enrichers/enricher-dirty-pipeline/230106_frozen_metadata.csv.gz /app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_metadata/230106_frozen_metadata.csv.gz
+COPY enrichers/enricher-dirty-pipeline/isdb_pos_cleaned.pkl /app/enpkg_full/03_enpkg_mn_isdb_isdb_taxo/db_spectra/isdb_pos_cleaned.pkl
 
 # We make sure that the pip version is up to date
 RUN pip install --upgrade pip

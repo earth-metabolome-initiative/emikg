@@ -22,8 +22,8 @@ BACKUP_REMOTE_PATH='path/to/remote/backup/directory'
 # In order to provide Oauth authentication for the API
 # you need to provide the client id and client secret
 # for the application that you have created in ORCID
-YOUR_ORCID_CLIENT_ID='orcid_client_id'
-YOUR_ORCID_CLIENT_SECRET='orcid_client_secret'
+ORCID_CLIENT_ID='orcid_client_id'
+ORCID_CLIENT_SECRET='orcid_client_secret'
 # We also need to set the login variables for the
 # sirius executable. These are the mail and password,
 # with the email being an academic email address.

@@ -4,21 +4,32 @@ Implementative details
 ----------------------
 The API is implemented using authlib's OAuth 2.0 framework.
 """
-from flask import redirect
+import os
+from flask import redirect, jsonify
+from flask_dance.contrib.orcid import make_orcid_blueprint, orcid
 from ..application import app
 from ..models import User
 # from ..oauth import orcid  # Import your Authlib OAuth instance
 
+blueprint = make_orcid_blueprint(
+    client_id=os.environ.get("ORCID_CLIENT_ID"),
+    client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
+    scope="openid profile",
+    redirect_to="/login/orcid/callback",
+)
+
+app.register_blueprint(blueprint, url_prefix="/login/orcid")
 
 @app.route('/login/orcid/callback')
 def orcid_callback():
     """Internal route to handle the ORCID OAuth callback."""
-    if User.is_authenticated():
-        return redirect("/upload")
-    # Exchange the authorization code for an access token
-    # TODO! ADD SUPPORT FOR PROPER ORCID AUTHENTICATION
-    # WHEN SWITCHING TO ONLINE VERSION.
-    # token = orcid.authorize_access_token()
+    if not orcid.authorized:
+        return redirect("/")
+    
+    # Retrieve the token from ORCID
+    response = orcid.get('oauth/token')
+
+    return jsonify(response.json())
 
     # Retrieve the ORCID ID of the authenticated user
     # resp = orcid.get('orcid', token=token)
@@ -30,10 +41,10 @@ def orcid_callback():
     return redirect("/upload")
 
 # Login route to initiate ORCID OAuth
-@app.route('/login/orcid', methods=['GET'])
-def orcid_login():
-    """Login route to initiate ORCID OAuth."""
-    return redirect("/login/orcid/callback")
+# @app.route('/login/orcid', methods=['GET'])
+# def orcid_login():
+#     """Login route to initiate ORCID OAuth."""
+#     return redirect("/login/orcid/callback")
 
 # Logout route to clear the session
 @app.route('/logout')
