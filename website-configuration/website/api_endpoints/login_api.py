@@ -55,7 +55,7 @@ def orcid_logged_in(orcid_blueprint, token):
     orcid_user_id = token['orcid']
 
     response: Response = orcid_blueprint.session.get(
-        f"{orcid_user_id}/person",
+        f"{orcid_user_id}/record",
     )
 
     if not response.ok:
