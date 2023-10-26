@@ -46,7 +46,7 @@ def orcid_logged_in(orcid_blueprint, token):
 
     if not response.ok:
         app.logger.info(
-            "Failed to get ORCID User Data associated to %s, status: %s, url: %s", orcid_user_id, response.status_code, response.url
+            "Failed to get ORCID User Data associated to %s, status: %s, url: %s, header: %s", orcid_user_id, response.status_code, response.url, response.headers
         )
         return False
 
