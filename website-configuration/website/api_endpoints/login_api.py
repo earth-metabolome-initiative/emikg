@@ -26,7 +26,7 @@ app.register_blueprint(blueprint, url_prefix="/login/orcid/")
 def orcid_callback():
     """Internal route to handle the ORCID OAuth callback."""
     if not orcid.authorized:
-        return redirect("/")
+        return jsonify({"success": False, "error": "Authorization failed."})
     
     # Retrieve the token from ORCID
     response = orcid.get('oauth/token')
