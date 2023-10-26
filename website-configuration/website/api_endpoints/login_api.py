@@ -41,7 +41,7 @@ def orcid_logged_in(orcid_blueprint, token):
     # to be extracted from the token prior to making any requests
     orcid_user_id = token['orcid']
 
-    response = orcid_blueprint.session.get(f"{orcid_user_id}/record")
+    response = orcid_blueprint.session.get(f"email/{orcid_user_id}")
 
     if not response.ok:
         app.logger.info("Failed to get ORCID User Data associated to %s", orcid_user_id)
