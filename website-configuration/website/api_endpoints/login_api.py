@@ -17,6 +17,7 @@ blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
     scope="openid",
+    authorized_url="/login/orcid/callback",
     sandbox=False
 )
 
@@ -25,6 +26,9 @@ app.register_blueprint(blueprint, )
 @app.route('/login/orcid/callback')
 def orcid_callback():
     """Internal route to handle the ORCID OAuth callback."""
+    return jsonify({
+        "success": True,
+    })
     if not orcid.authorized:
         return jsonify({"success": False, "error": "Authorization failed."})
     
