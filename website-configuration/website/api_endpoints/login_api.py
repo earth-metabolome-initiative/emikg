@@ -17,7 +17,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 blueprint = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
-    scope="openid",
+    scope="authenticate",
     redirect_to="orcid_callback",
     authorized_url="/login/orcid/callback",
     sandbox=False,
@@ -36,7 +36,7 @@ def orcid_callback():
         return jsonify({"success": False, "error": "Authorization failed."})
 
     # Retrieve the token from ORCID
-    response = orcid.get("oauth/token")
+    response = orcid.get("authenticate")
 
     return jsonify(response.json())
 
