@@ -440,7 +440,8 @@ $(document).ready(function () {
                 var redirect_url = data['redirect_url'];
                 window.location.replace(redirect_url);
             },
-            error: function (data) {
+            error: function (xhr, textStatus, errorThrown) {
+                alert(xhr.responseText)
                 // We retrieve the error messages from the backend.
                 var errors = data['errors'];
                 // We iterate across the error messages.
