@@ -4,37 +4,115 @@ Implementative details
 ----------------------
 The API is implemented using authlib's OAuth 2.0 framework.
 """
+from typing import Dict
 import os
-from flask import redirect, session, flash
+from flask import redirect, session
 from flask_dance.consumer import oauth_authorized, oauth_error
-from flask_dance.contrib.orcid import make_orcid_blueprint
+from flask_dance.contrib.orcid import make_orcid_blueprint, LocalProxy
 from requests import Response
-from flask_dance.consumer.requests import OAuth2Session
+import requests
 
 # from flask_login import logout_user
 from ..application import app
 from ..models import User
 
 
-class JsonOath2Session(OAuth2Session):
-    def __init__(self, *args, **kwargs):
-        """
-          custom json session to ensure we are getting back json from orchid
-        """
-        super(JsonOath2Session, self).__init__(*args, **kwargs)
-        self.headers["Content-Type"] = "application/orcid+json"
-        self.headers["Authorization"] = f"Bearer {self.token['access_token']}"
+class PublicORCIDAPI:
+    """Define the ORCID API class."""
+
+    def __init__(self) -> None:
+        """Initialize the ORCID API."""
+        reponse: Response = requests.post(
+            "https://orcid.org/oauth/token",
+            data={
+                "client_id": os.environ.get("ORCID_CLIENT_ID"),
+                "client_secret": os.environ.get("ORCID_CLIENT_SECRET"),
+                "grant_type": "client_credentials",
+                "scope": "/read-public",
+            },
+            timeout=10,
+        )
+
+        if not reponse.ok:
+            raise RuntimeError(
+                f"Failed to get ORCID public access token, status: {reponse.status_code}."
+            )
+
+        self._read_public_access_token: Dict[str, str] = reponse.json()
+
+    @property
+    def access_token(self):
+        """Return the access token."""
+        return self._read_public_access_token["access_token"]
+
+    @property
+    def token_type(self):
+        """Return the token type."""
+        return self._read_public_access_token["token_type"]
+
+    @property
+    def refresh_token(self):
+        """Return the refresh token."""
+        return self._read_public_access_token["refresh_token"]
+
+    @property
+    def expires_in(self):
+        """Return the expiration time."""
+        return self._read_public_access_token["expires_in"]
+
+    @property
+    def scope(self):
+        """Return the scope."""
+        return self._read_public_access_token["scope"]
+
+
+class PublicORCIDUserData:
+    """Define the Public ORCID User Data class."""
+
+    def __init__(self, user_orcid_id: str, api: PublicORCIDAPI) -> None:
+        """Initialize the Public ORCID User Data"""
+        response: Response = requests.get(
+            f"https://pub.orcid.org/v2.1/{user_orcid_id}/personal-details",
+            headers={
+                "Content-Type": "application/orcid+json",
+                "Authorization": f"Bearer {api.access_code}",
+            },
+            timeout=10,
+        )
+
+        if not response.ok:
+            raise RuntimeError(
+                f"Failed to get ORCID User Data associated to {user_orcid_id}, status: {response.status_code}"
+            )
+
+        self._orcid_record: Dict[str, str] = response.json()
+
+    @property
+    def given_name(self):
+        """Return the given name."""
+        return self._orcid_record["name"]["given-names"]["value"]
+
+    @property
+    def family_name(self):
+        """Return the family name."""
+        return self._orcid_record["name"]["family-name"]["value"]
+
+    @property
+    def biography(self):
+        """Return the biography."""
+        return self._orcid_record["biography"]["content"]
 
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-blueprint = make_orcid_blueprint(
+blueprint: LocalProxy = make_orcid_blueprint(
     client_id=os.environ.get("ORCID_CLIENT_ID"),
     client_secret=os.environ.get("ORCID_CLIENT_SECRET"),
-    scope="/read-public",
+    scope="/authenticate",
     authorized_url="/login/orcid/callback",
-    session_class=JsonOath2Session
 )
+
+blueprint.public_api = PublicORCIDAPI()
 
 app.register_blueprint(
     blueprint,
@@ -42,7 +120,7 @@ app.register_blueprint(
 
 
 @oauth_authorized.connect_via(blueprint)
-def orcid_logged_in(orcid_blueprint, token):
+def orcid_logged_in(orcid_blueprint: LocalProxy, token):
     """Internal route to handle the ORCID OAuth callback."""
     app.logger.info("Logging attempt")
     if not token:
@@ -52,49 +130,40 @@ def orcid_logged_in(orcid_blueprint, token):
     # get the orcid id information
     # ORCID API calls require that the orcid id be in the request, so that needs
     # to be extracted from the token prior to making any requests
-    orcid_user_id = token['orcid']
+    orcid_user_id = token["orcid"]
 
-    response: Response = orcid_blueprint.session.get(
-        f"{orcid_user_id}/record",
-    )
-
-    if not response.ok:
-        app.logger.info(
-            "Failed to get ORCID User Data associated to %s, status: %s, url: %s, header: %s, access token: %s", orcid_user_id, response.status_code, response.url, response.headers, token['access_token']
-        )
+    try:
+        user_data = PublicORCIDUserData(orcid_user_id, orcid_blueprint.public_api)
+    except RuntimeError:
         return False
-
-    orcid_record = response.json()
-
-    orcid_person = orcid_record['person']
-    email = orcid_person["emails"]["email"][0]["email"]
-    first_name = orcid_person['name']['given-names']['value']
-    last_name = orcid_person['name']['family-name']['value']
 
     _user = User.from_orcid(
         orcid=orcid_user_id,
-        first_name=first_name,
-        last_name=last_name,
-        email=email,
+        first_name=user_data.given_name,
+        last_name=user_data.family_name,
+        description=user_data.biography,
     )
 
     return redirect("/upload")
 
 
 # @oauth_authorized.connect
-# def redirect_to_next_url(orcid_blueprint, token):
+# def redirect_to_next_url(orcid_blueprint: LocalProxy, token):
 #     """Redirect to the next URL."""
 #     return token
 
 
 @oauth_error.connect
-def orcid_error(orcid_blueprint, error, error_description, error_uri):
+def orcid_error(
+    orcid_blueprint: LocalProxy, error: str, error_description: str, error_uri: str
+):
+    """Internal route to handle the ORCID OAuth callback."""
     print("in oauth_error")
     print(error)
     print(error_description)
     print(error_uri)
 
-    session['orcid_status'] = error
+    session["orcid_status"] = error
 
 
 # Logout route to clear the session

@@ -1,6 +1,6 @@
 """Concretely implements the proxy user and taxon interface using SQLAlchemy."""
 from flask import session
-from typing import List, Type
+from typing import List, Type, Optional
 from flask import render_template
 from emikg_interfaces import User as UserInterface
 from emikg_interfaces import Task as TaskInterface
@@ -97,14 +97,20 @@ class User(UserInterface, RecordPage, Section):
         orcid: str,
         first_name: str,
         last_name: str,
-        email: str,
+        description: Optional[str],
     ) -> "User":
         """Return a user object from an ORCID.
 
         Parameters
         ----------
         orcid : str
-            ORCID.
+            ORCID Identifier of the shape "0000-0000-0000-0000".
+        first_name : str
+            First name.
+        last_name : str
+            Last name.
+        description : str
+            Description.
 
         Implementation details
         ----------------------
@@ -129,7 +135,7 @@ class User(UserInterface, RecordPage, Section):
             orcid,
             first_name=first_name,
             last_name=last_name,
-            email=email,
+            description=description,
             session=db.session
         )
 

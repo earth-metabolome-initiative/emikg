@@ -74,7 +74,7 @@ class ORCID(Base):
         orcid_code: str,
         first_name: str,
         last_name: str,
-        email: str,
+        description: str,
         session: Type[Session]
     ) -> User:
         """Get user ID associated with the ORCID.
@@ -83,7 +83,13 @@ class ORCID(Base):
         ----------
         orcid_code : str
             ORCID.
-
+        first_name : str
+            First name.
+        last_name : str
+            Last name.
+        description : str
+            Description.
+            
         Returns
         -------
         int
@@ -94,7 +100,7 @@ class ORCID(Base):
             user = User(
                 first_name=first_name,
                 last_name=last_name,
-                email=email,
+                description=description,
             )
             session.add(user)
             session.flush()
