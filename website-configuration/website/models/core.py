@@ -547,7 +547,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
                 )
                 if self.can_delete()
                 else ()
-            )
+            ),
             * ((CreatedByBotPin(),) if self.was_created_by_bot() else ()),
         ]
 
