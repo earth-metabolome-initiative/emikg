@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from flask import jsonify, Response
 
 def get_form_error_output_from_input_name(
@@ -8,12 +8,12 @@ def get_form_error_output_from_input_name(
 ) -> (Response, int):
     """Returns a Flask response with the error output."""
     return get_form_error_output(
-        errors={input_name: error_message},
+        errors=[{input_name: error_message}],
         status_code=status_code
     )
 
 def get_form_error_output(
-    errors: Dict[str, str],
+    errors: List[Dict[str, str]],
     status_code: int = 400
 ) -> (Response, int):
     """Returns a Flask response with the error output."""
