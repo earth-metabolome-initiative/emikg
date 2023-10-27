@@ -381,6 +381,12 @@ $(document).ready(function () {
                 form.find('.hide-before-send').hide(300);
             },
             complete: function () {
+                // We remove the "valid" class from
+                // all labels with class "validate" within
+                // the form.
+                form.find('input').removeClass('valid');
+                form.find('textarea').removeClass('valid');
+                form.find('label.valid').removeClass('valid');
                 // We wait for 3 seconds before hiding the elememts, so
                 // to allow the user to understand that the task was
                 // successfull.
@@ -415,13 +421,6 @@ $(document).ready(function () {
                 form.find('input').val('');
                 form.find('textarea').val('');
 
-                // We remove the "valid" class from
-                // all labels with class "validate" within
-                // the form.
-                form.find('input').removeClass('valid');
-                form.find('textarea').removeClass('valid');
-                form.find('label.valid').removeClass('valid');
-
                 // We remove the "dropped" class from
                 // all labels with class "dropzone" within
                 // the form.
@@ -448,6 +447,12 @@ $(document).ready(function () {
                 errors.forEach(function (error) {
                     // We retrieve the input field.
                     var input = form.find('input[name="' + error.field + '"]');
+                    // We add the "error" class to the input field.
+                    input.addClass('error');
+                    // We retrieve the label associated to the input field.
+                    var label = form.find('label[for="' + error.field + '"]');
+                    // We add the "error" class to the label.
+                    label.addClass('error');
                     // We display the error message.
                     show_error_message(input, error.message);
                 });
