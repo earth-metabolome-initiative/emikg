@@ -24,12 +24,14 @@ from .section import (
     RunningPin,
     PendingPin,
     DeletePin,
+    CreatedByBotPin,
+    TimeRecordPin,
 )
 from ..exceptions import APIException, NotLoggedIn, Unauthorized
 from ..application import db
 
-class Tasks(Section, RecordPage):
 
+class Tasks(Section, RecordPage):
     @staticmethod
     def get_root() -> str:
         """Return the root of the page."""
@@ -38,27 +40,27 @@ class Tasks(Section, RecordPage):
     def get_title(self) -> str:
         """Return the title of the user."""
         return "Tasks"
-    
+
     def get_url(self) -> str:
         """Return the URL of the user."""
         lang = session.get("lang", "en")
         return f"/{lang}/{self.get_root()}"
-    
+
     def get_description(self) -> str:
         """Return the description of the user."""
         return "In this page you can see the recent tasks. <a href='/upload/'>You can create a new upload task here.</a>"
-    
+
     def has_pins(self) -> bool:
         """Return whether the user has pins."""
         return False
-    
+
     def get_sections(self) -> List[Section]:
         return [Task]
-    
+
     def has_tasks(self) -> bool:
         """Return whether there are tasks in the DB."""
         return not TaskTable.is_empty(session=db.session)
-    
+
     def get_tasks(self, number_of_records: int = 10) -> List[TaskInterface]:
         """Return the tasks of the user."""
         return [
@@ -67,6 +69,7 @@ class Tasks(Section, RecordPage):
                 session=db.session, number_of_records=number_of_records
             )
         ]
+
 
 class User(UserInterface, RecordPage, Section):
     """Concrete implementation of the user interface for Flask."""
@@ -136,7 +139,7 @@ class User(UserInterface, RecordPage, Section):
             first_name=first_name,
             last_name=last_name,
             description=description,
-            session=db.session
+            session=db.session,
         )
 
         # We add the user ID to the Flask session.
@@ -194,14 +197,25 @@ class User(UserInterface, RecordPage, Section):
         return self._user.get_description()
 
     def get_name(self) -> str:
+        """Return the user name."""
         return self._user.get_name()
 
     def is_administrator(self) -> bool:
+        """Return whether the user is an administrator."""
         return self._user.is_administrator(session=db.session)
 
     def is_moderator(self) -> bool:
+        """Return whether the user is a moderator."""
         return self._user.is_moderator(session=db.session)
-    
+
+    def is_bot(self) -> bool:
+        """Return whether the user is a bot."""
+        return self._user.is_bot(session=db.session)
+
+    def is_new(self) -> bool:
+        """Return whether the user is new."""
+        return self._user.is_new(session=db.session)
+
     def has_pins(self) -> bool:
         """Return whether the user has pins."""
         return False
@@ -465,19 +479,31 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def has_started(self) -> bool:
         """Return whether the task is running."""
         return self._task.has_started()
-    
+
     def has_completed(self) -> bool:
         """Return whether the task has completed."""
         return self.has_failed() or self.has_succeeded()
+
+    def was_created_by_bot(self) -> bool:
+        """Return whether the task was created by a bot."""
+        return self._task.was_created_by_bot(session=db.session)
 
     def is_pending(self) -> bool:
         """Return whether the task is pending."""
         return self._task.is_pending()
 
+    def get_average_task_type_duration(self) -> float:
+        """Return the average task type duration."""
+        return self._task.get_average_task_type_duration(session=db.session)
+
+    def get_task_duration(self) -> float:
+        """Return the task duration."""
+        return self._task.get_task_duration(session=db.session)
+
     def has_pins(self) -> bool:
         """Return whether the task has pins."""
         return True
-    
+
     @staticmethod
     def get_default() -> Tasks:
         """Return the default task page."""
@@ -501,10 +527,28 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
     def get_pins(self) -> List[Type[Pin]]:
         return [
             self._dispatch_status_pin(),
-            *((DeletePin(
-                root=self.get_root(),
-                identifier=self.get_id(),
-            ),) if self.can_delete() else ())
+            *(
+                (
+                    TimeRecordPin(
+                        time_required_in_seconds=self.get_task_duration(),
+                        average_time_required_in_seconds=self.get_average_task_type_duration(),
+                        completed=self.has_completed(),
+                    ),
+                )
+                if self.has_started()
+                else ()
+            ),
+            *(
+                (
+                    DeletePin(
+                        root=self.get_root(),
+                        identifier=self.get_id(),
+                    ),
+                )
+                if self.can_delete()
+                else ()
+            )
+            * ((CreatedByBotPin(),) if self.was_created_by_bot() else ()),
         ]
 
     def has_documents(self) -> bool:
@@ -556,7 +600,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
             return False
         user = User.from_flask_session()
         return user.is_administrator() or self.is_author(user)
-    
+
     def delete(self):
         """Delete the task."""
         if not self.can_delete():
@@ -575,7 +619,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
         if isinstance(page, Task):
             return "Derived tasks"
-        
+
         if isinstance(page, Tasks):
             return "Recent tasks"
 
@@ -605,7 +649,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
         if isinstance(page, Task):
             return page.has_derived_tasks()
-        
+
         if isinstance(page, Tasks):
             return page.has_tasks()
 
@@ -639,7 +683,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
         if isinstance(page, Task):
             return page.get_derived_tasks(number_of_records)
-        
+
         if isinstance(page, Tasks):
             return page.get_tasks(number_of_records)
 

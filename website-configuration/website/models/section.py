@@ -2,6 +2,7 @@
 
 from typing import List, Optional, Type, Union
 from emikg_interfaces import Authored, Record
+from humanize import naturaldelta
 from flask import render_template
 
 
@@ -79,7 +80,6 @@ class SuccessPin(FontAwesomePin):
             classes=["fa-solid", "fa-square-check"], color="green", name="Success"
         )
 
-
 class RunningPin(FontAwesomePin):
     """Abstract interface describing a running pin."""
 
@@ -88,13 +88,11 @@ class RunningPin(FontAwesomePin):
             classes=["fa-solid", "fa-person-running"], color="orange", name="Running"
         )
 
-
 class PendingPin(FontAwesomePin):
     """Class describing a pending pin."""
 
     def __init__(self) -> None:
         super().__init__(classes=["fa-solid", "fa-moon"], color="blue", name="Pending")
-
 
 class DeletePin(FontAwesomePin):
     """Class describing a delete pin."""
@@ -107,6 +105,13 @@ class DeletePin(FontAwesomePin):
             action=f"/{root}/delete/{identifier}",
         )
 
+class CreatedByBotPin(FontAwesomePin):
+    """Class describing a created by bot pin."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            classes=["fa-solid", "fa-robot"], color="blue", name="Created by bot"
+        )
 
 class OnlinePin(FontAwesomePin):
     """Class describing an online pin."""
@@ -116,6 +121,34 @@ class OnlinePin(FontAwesomePin):
             classes=["fa-solid", "fa-wifi", "fa-1x"], color="green", name="Online"
         )
 
+class NewUserPin(FontAwesomePin):
+    """Class describing a new user pin."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            classes=["fa-solid", "fa-user-graduate"], color="green", name="This user just joined the community!"
+        )
+
+class TimeRecordPin(FontAwesomePin):
+    """Class describing a time record pin."""
+
+    def __init__(self, time_required_in_seconds: int, average_time_required_in_seconds: int, completed: bool) -> None:
+        # We compose the pin name, which depending on whether the record is completed or not, will be different.
+        # In both instances, the time required in seconds are converted to a human readable format using the
+        # humanize function naturaldelta. In the description we show both the time required for the record and
+        # the average time required for the record, so that the user can compare the two.
+
+        humanized_time_required = naturaldelta(time_required_in_seconds)
+        humanized_average_time_required = naturaldelta(average_time_required_in_seconds)
+
+        if completed:
+            name = f"Completed in {humanized_time_required} (average: {humanized_average_time_required})"
+        else:
+            name = f"Time required so far: {humanized_time_required} (average completion: {humanized_average_time_required})"
+
+        super().__init__(
+            classes=["fa-solid", "fa-clock"], color="blue", name=name
+        )
 
 class RecordBadge:
     """Abstract interface describing a record badge."""

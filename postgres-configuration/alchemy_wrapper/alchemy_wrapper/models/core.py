@@ -2,6 +2,7 @@
 
 from typing import List, Optional, Type, Union
 from alchemy_wrapper.database import Session
+import datetime
 from sqlalchemy.sql import func
 from sqlalchemy import (
     Column,
@@ -101,7 +102,7 @@ class User(Base, UserInterface):
             session.query(Administrator).filter_by(user_id=self.id).first() is not None
         )
 
-    def is_bot(self, session: Type[Session]):
+    def is_bot(self, session: Type[Session]) -> bool:
         """Check if user is a bot.
 
         Implementation details
@@ -111,6 +112,10 @@ class User(Base, UserInterface):
         """
         # We query the bots table to check if the user is a bot
         return session.query(Bot).filter_by(user_id=self.id).first() is not None
+
+    def is_new(self) -> bool:
+        """Returns whether the user is new, i.e. more recent than a day."""
+        return self.created_at > datetime.datetime.now() - datetime.timedelta(days=1)
 
     def delete(self):
         """Delete the user."""
@@ -510,6 +515,7 @@ class Task(Base, TaskInterface):
         nullable=False,
     )
     created_at = Column(DateTime, nullable=False, default=func.now())
+    started_at = Column(DateTime, nullable=True)
     updated_at = Column(
         DateTime, nullable=False, default=func.now(), onupdate=func.now()
     )
@@ -517,7 +523,7 @@ class Task(Base, TaskInterface):
     def __repr__(self):
         """Represent instance as a unique string."""
         return f"<Task({self.id!r})>"
-    
+
     def restart(self, session: Type[Session]):
         """Restart the task."""
         self.status = "PENDING"
@@ -526,6 +532,7 @@ class Task(Base, TaskInterface):
     def start(self, session: Type[Session]):
         """Start the task."""
         self.status = "STARTED"
+        self.started_at = datetime.datetime.now()
         session.commit()
 
     def success(self, session: Type[Session]):
@@ -539,7 +546,9 @@ class Task(Base, TaskInterface):
         session.delete(self)
         session.commit()
 
-    def failure(self, session: Type[Session], reason: Optional[Union[str, Exception]] = None):
+    def failure(
+        self, session: Type[Session], reason: Optional[Union[str, Exception]] = None
+    ):
         """Finish the task with a failure."""
         if self.status == "FAILURE":
             return
@@ -587,6 +596,9 @@ class Task(Base, TaskInterface):
 
         session.commit()
 
+    def get_task_duration(self) -> float:
+        """Return task duration."""
+        return (self.updated_at - self.started_at).total_seconds()
 
     def get_status(self) -> str:
         """Return task status."""
@@ -603,11 +615,11 @@ class Task(Base, TaskInterface):
     def has_started(self) -> bool:
         """Return whether the task has started."""
         return self.status == "STARTED"
-    
+
     def is_pending(self) -> bool:
         """Return whether the task is pending."""
         return self.status == "PENDING"
-    
+
     @staticmethod
     def is_empty(session: Type[Session]) -> bool:
         """Return whether the table is empty."""
@@ -615,12 +627,17 @@ class Task(Base, TaskInterface):
 
     @staticmethod
     def get_tasks(session: Type[Session], number_of_records: int) -> List["Task"]:
-        """Return list of tasks."""
+        """Return list of tasks, omitting those created by the bots."""
         return (
             session.query(Task)
+            .join(User, User.id == Task.user_id)
+            .filter(
+                User.id.notin_(
+                    session.query(Bot.user_id).filter(Bot.user_id == User.id)
+                )
+            )
             .order_by(Task.updated_at.desc())
             .limit(number_of_records)
-            .all()
         )
 
     def has_parent_task(self, session: Type[Session]) -> bool:
@@ -628,6 +645,21 @@ class Task(Base, TaskInterface):
         return (
             session.query(DerivedTask).filter_by(derived_task_id=self.id).first()
             is not None
+        )
+    
+    def was_created_by_bot(self, session: Type[Session]) -> bool:
+        """Return whether the task was created by a bot."""
+        return (
+            session.query(Bot).filter_by(user_id=self.user_id).first()
+            is not None
+        )
+    
+    def get_average_task_type_duration(self, session: Type[Session]) -> float:
+        """Return average task type duration."""
+        return (
+            session.query(func.avg(Task.updated_at - Task.started_at))
+            .filter_by(task_type_id=self.task_type_id)
+            .scalar()
         )
 
     def get_parent_task(self, session: Type[Session]) -> Optional["Task"]:
@@ -638,14 +670,14 @@ class Task(Base, TaskInterface):
             .filter_by(derived_task_id=self.id)
             .first()
         )
-    
+
     def has_derived_tasks(self, session: Type[Session]) -> bool:
         """Return whether the task has derived tasks."""
         return (
             session.query(DerivedTask).filter_by(parent_task_id=self.id).first()
             is not None
         )
-
+    
     def get_derived_tasks(
         self, session: Type[Session], number_of_records: int
     ) -> List["Task"]:
@@ -735,7 +767,7 @@ class Document(Base, DocumentInterface):
     def get_description(self) -> str:
         """Return recorded object description."""
         return self.description
-    
+
     def get_author(self, session: Type[Session]) -> User:
         """Return the author of the document."""
         return User.from_id(self.user_id, session=session)
@@ -748,7 +780,7 @@ class Document(Base, DocumentInterface):
         if document is None:
             raise IdentifierNotFound(f"Document with id {identifier} not found")
         return document
-    
+
     def delete(self, session: Type[Session]):
         """Delete the document."""
         # We delete the document from the database
