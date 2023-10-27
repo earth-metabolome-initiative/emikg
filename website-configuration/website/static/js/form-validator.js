@@ -440,21 +440,18 @@ $(document).ready(function () {
                 var redirect_url = data['redirect_url'];
                 window.location.replace(redirect_url);
             },
-            error: function (xhr, textStatus, errorThrown) {
+            error: function (xhr, _textStatus, _errorThrown) {
                 var data = xhr.responseJSON;
-                console.log(data);
-                console.log(textStatus);
-                console.log(errorThrown);
                 // We retrieve the error messages from the backend.
-                var errors = data['errors'];
+                var errors = data.errors;
                 // We iterate across the error messages.
                 for (var i = 0; i < errors; i++) {
                     // We retrieve the error message.
                     var error = errors[i];
                     // We retrieve the input field.
-                    var input = form.find('input[name="' + error['field'] + '"]');
+                    var input = form.find('input[name="' + error.field + '"]');
                     // We display the error message.
-                    show_error_message(input, error['message']);
+                    show_error_message(input, error.message);
                 }
             }
         });
