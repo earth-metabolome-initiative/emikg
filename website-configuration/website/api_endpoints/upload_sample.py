@@ -5,7 +5,7 @@ from werkzeug.datastructures import FileStorage
 from alchemy_wrapper.models import DataPayload
 from ..application import app, db
 from ..models import User
-
+from .form_error_output import get_form_error_output_from_input_name
 
 @app.route("/upload-sample/", methods=["POST"])
 def upload_sample():
@@ -17,25 +17,49 @@ def upload_sample():
     # We check if the file has a correct mimetype.
     # It can either be gzip or zip.
     if sample_file.mimetype not in ("application/zip", ):
-        return jsonify({"success": False, "error": "Invalid mimetype."})
+        return get_form_error_output_from_input_name(
+            input_name="file",
+            error_message="Invalid mimetype, expected application/zip.",
+            status_code=415
+        )
     # We get the extension of the document.
     extension = sample_file.filename.split(".")[-1]
     # We check if the extension is valid.
     if extension not in ("zip", ):
-        return jsonify({"success": False, "error": "Invalid extension."})
+        return get_form_error_output_from_input_name(
+            input_name="file",
+            error_message="Invalid extension, expected zip.",
+            status_code=415
+        )
     
     # Run test to see if the zip file is valid.
     with zipfile.ZipFile(sample_file) as zip_file:
 
         if zip_file.testzip() is not None:
-            return jsonify({"success": False, "error": "Invalid zip payload."})
+            return get_form_error_output_from_input_name(
+                input_name="file",
+                error_message="Invalid zip payload, zip file is corrupted.",
+                status_code=415
+            )
 
         if "msdata/" not in zip_file.namelist():
-            return jsonify({"success": False, "error": "Invalid zip payload, no msdata directory.", "directories": zip_file.namelist()})
+            return get_form_error_output_from_input_name(
+                input_name="file",
+                error_message="Invalid zip payload, no msdata directory.",
+                status_code=415
+            )
         if "metadata/" not in zip_file.namelist():
-            return jsonify({"success": False, "error": "Invalid zip payload, no metadata directory."})
+            return get_form_error_output_from_input_name(
+                input_name="file",
+                error_message="Invalid zip payload, no metadata directory.",
+                status_code=415
+            )
         if "msdata/processed/" not in zip_file.namelist():
-            return jsonify({"success": False, "error": "Invalid zip payload, no msdata/processed directory."})
+            return get_form_error_output_from_input_name(
+                input_name="file",
+                error_message="Invalid zip payload, no processed directory.",
+                status_code=415
+            )
         
         metadata_file_ends = [
             "metadata.tsv",
@@ -51,7 +75,11 @@ def upload_sample():
                 if f.startswith("metadata/") and f.endswith(metadata_file_end) and f.count("/") == 1
             ]
             if len(metadata_files) != 1:
-                return jsonify({"success": False, "error": f"Invalid zip payload, no file ending with {metadata_file_end}"})
+                return get_form_error_output_from_input_name(
+                    input_name="file",
+                    error_message=f"Invalid zip payload, no file with pattern metadata/{metadata_file_end}.",
+                    status_code=415
+                )
 
         # Under the processed directory, we check that there is are
         # *.mgf, *_sirius.mgf, and *_quant.csv.
@@ -62,7 +90,11 @@ def upload_sample():
             ]
 
             if len(processed_files) == 0:
-                return jsonify({"success": False, "error": f"Invalid zip payload, no files with extension {extension} under msdata/processed."})
+                return get_form_error_output_from_input_name(
+                    input_name="file",
+                    error_message=f"Invalid zip payload, no file with pattern msdata/processed/*{extension}.",
+                    status_code=415
+                )
 
     # We create a data payload.
     data_payload = DataPayload.new_data_payload(
