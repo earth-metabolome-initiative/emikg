@@ -7,3 +7,4 @@ Flask-SocketIO
 dict_hash
 requests
 flask_dance
+humanize
