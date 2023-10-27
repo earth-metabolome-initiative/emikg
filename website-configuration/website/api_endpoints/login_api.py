@@ -75,7 +75,7 @@ class PublicORCIDUserData:
             f"https://pub.orcid.org/v2.1/{user_orcid_id}/personal-details",
             headers={
                 "Content-Type": "application/orcid+json",
-                "Authorization": f"Bearer {api.access_code}",
+                "Authorization": f"Bearer {api.access_token}",
             },
             timeout=10,
         )
