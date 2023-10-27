@@ -535,7 +535,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
                         completed=self.has_completed(),
                     ),
                 )
-                if self.has_started()
+                if self.has_started() or self.has_completed()
                 else ()
             ),
             *(
