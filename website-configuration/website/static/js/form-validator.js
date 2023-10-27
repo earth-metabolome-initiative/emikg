@@ -441,7 +441,7 @@ $(document).ready(function () {
                 window.location.replace(redirect_url);
             },
             error: function (xhr, textStatus, errorThrown) {
-                alert(xhr.responseText)
+                var data = xhr.responseJSON;
                 // We retrieve the error messages from the backend.
                 var errors = data['errors'];
                 // We iterate across the error messages.
