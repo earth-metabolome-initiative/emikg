@@ -498,7 +498,7 @@ class Task(TaskInterface, Section, RecordPage, RecordBadge):
 
     def get_task_duration(self) -> float:
         """Return the task duration."""
-        return self._task.get_task_duration(session=db.session)
+        return self._task.get_task_duration()
 
     def has_pins(self) -> bool:
         """Return whether the task has pins."""
