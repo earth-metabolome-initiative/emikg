@@ -442,7 +442,7 @@ $(document).ready(function () {
             },
             error: function (xhr, textStatus, errorThrown) {
                 var data = xhr.responseJSON;
-                allert(data);
+                alert(data);
                 // We retrieve the error messages from the backend.
                 var errors = data['errors'];
                 // We iterate across the error messages.
