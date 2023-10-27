@@ -8,7 +8,10 @@ def get_form_error_output_from_input_name(
 ) -> (Response, int):
     """Returns a Flask response with the error output."""
     return get_form_error_output(
-        errors=[{input_name: error_message}],
+        errors=[{
+            "field": input_name,
+            "message": error_message
+        }],
         status_code=status_code
     )
 
