@@ -445,14 +445,12 @@ $(document).ready(function () {
                 // We retrieve the error messages from the backend.
                 var errors = data.errors;
                 // We iterate across the error messages.
-                for (var i = 0; i < errors; i++) {
-                    // We retrieve the error message.
-                    var error = errors[i];
+                errors.forEach(function (error) {
                     // We retrieve the input field.
                     var input = form.find('input[name="' + error.field + '"]');
                     // We display the error message.
                     show_error_message(input, error.message);
-                }
+                });
             }
         });
     });
