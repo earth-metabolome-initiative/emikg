@@ -4,7 +4,7 @@ Implementative details
 ----------------------
 The API is implemented using authlib's OAuth 2.0 framework.
 """
-from typing import Dict
+from typing import Dict, Optional
 import os
 from flask import redirect, session
 from flask_dance.consumer import oauth_authorized, oauth_error
@@ -88,19 +88,29 @@ class PublicORCIDUserData:
         self._orcid_record: Dict[str, str] = response.json()
 
     @property
-    def given_name(self):
+    def given_name(self) -> Optional[str]:
         """Return the given name."""
-        return self._orcid_record["name"]["given-names"]["value"]
+        if "name" not in self._orcid_record:
+            return None
+        if "given-names" in self._orcid_record["name"]:
+            return self._orcid_record["name"]["given-names"].get("value", None)
+        return None
 
     @property
-    def family_name(self):
+    def family_name(self) -> Optional[str]:
         """Return the family name."""
-        return self._orcid_record["name"]["family-name"]["value"]
+        if "name" not in self._orcid_record:
+            return None
+        if "family-name" in self._orcid_record["name"]:
+            return self._orcid_record["name"]["family-name"].get("value", None)
+        return None
 
     @property
-    def biography(self):
+    def biography(self) -> Optional[str]:
         """Return the biography."""
-        return self._orcid_record["biography"]["content"]
+        if "biography" in self._orcid_record:
+            return self._orcid_record["biography"].get("value", None)
+        return None
 
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
