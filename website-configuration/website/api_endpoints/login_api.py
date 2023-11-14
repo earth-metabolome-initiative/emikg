@@ -92,7 +92,7 @@ class PublicORCIDUserData:
         """Return the given name."""
         if "name" not in self._orcid_record:
             return None
-        if "given-names" in self._orcid_record["name"]:
+        if "given-names" in self._orcid_record["name"] and self._orcid_record["name"] is not None:
             return self._orcid_record["name"]["given-names"].get("value", None)
         return None
 
@@ -101,14 +101,14 @@ class PublicORCIDUserData:
         """Return the family name."""
         if "name" not in self._orcid_record:
             return None
-        if "family-name" in self._orcid_record["name"]:
+        if "family-name" in self._orcid_record["name"] and self._orcid_record["name"] is not None:
             return self._orcid_record["name"]["family-name"].get("value", None)
         return None
 
     @property
     def biography(self) -> Optional[str]:
         """Return the biography."""
-        if "biography" in self._orcid_record:
+        if "biography" in self._orcid_record and self._orcid_record["biography"] is not None:
             return self._orcid_record["biography"].get("value", None)
         return None
 
