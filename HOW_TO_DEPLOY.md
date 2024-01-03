@@ -72,6 +72,12 @@ To run the docker compose, you need to run the following command in the root dir
 docker-compose up -d --build -V
 ```
 
+Note that, in some systems, the `docker-compose` command might not be available and it may be integrated into the `docker` command. In this case, you need to run the following command:
+
+```bash
+docker compose up -d --build -V
+```
+
 Additionally, if you want to run the version with also the backup service enabled, you can run the following command:
 
 ```bash
