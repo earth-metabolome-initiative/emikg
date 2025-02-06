@@ -26,7 +26,7 @@ RUN echo "source activate enpkg_full" > ~/.bashrc
 RUN apt-get update && apt-get install -y jq unzip curl
 
 # We install Sirius using the bash script provided by the dirty-pipeline repository
-RUN bash enpkg_full/src/install_sirius.sh
+RUN bash enpkg_full/src/install_sirius.sh v5.8.6
 
 # Set the permission to allow the execution of the files under
 # the /app/sirius/bin directory
